@@ -6,8 +6,10 @@ package chat;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -40,16 +42,23 @@ public class Server extends JFrame implements Runnable{
             ServerSocket port = new ServerSocket(37127);
             String nick, ip, move, msg;
             Package p;
-            
+            txt.setText("polla");
             while(true){
                 try (Socket socket = port.accept()) {
+                    
                     ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
                     p = (Package) entrada.readObject();
-                    
-                    nick = p.getNick();
-                    ip = p.getIp();
-                    move = p.getMove();
-                    txt.setText(p.getMsg());
+                    txt.setText(p.getStatus());
+                    if(p.getStatus().equals("online")){
+                        InetAddress locateip = socket.getInetAddress();
+                        String getip = locateip.getHostAddress();  
+                        txt.setText(getip);
+                    } else if (p.getStatus().equals("messaging")){
+                        nick = p.getNick();
+                        ip = p.getIp();
+                        move = p.getMove();
+                        txt.setText(p.getMsg());
+                    }
                 }
             }
         } catch (IOException ex) {

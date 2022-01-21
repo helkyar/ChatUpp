@@ -49,7 +49,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
 
     public Chat() {
         super("Chatty");
-        
+        serverConnect();
         try {
             txtArea.setEditable(false);
             text.add(txtArea); 
@@ -83,14 +83,30 @@ class Chat extends JFrame implements ActionListener, KeyListener{
 		
     }
     
+    public void serverConnect(){
+        try {
+            Socket mySocket = new Socket("192.168.1.78",37127);
+            Package p = new Package();
+            p.setStatus("online");
+            p.setIp("192.168.1.78");
+            
+            ObjectOutputStream objp = new ObjectOutputStream(mySocket.getOutputStream());
+            objp.writeObject(p);
+            mySocket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void sendMsg() {
             
             try {
-                try (Socket socket = new Socket("192.168.249.1",37127)) {
+                try (Socket socket = new Socket("192.168.1.78",37127)) {
                     Package p = new Package();
                     p.setNick("");
                     p.setIp("");
                     p.setMove("");
+                    p.setStatus("messaging");
                     p.setMsg(field.getText());
                     
                     ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
@@ -142,14 +158,16 @@ class Chat extends JFrame implements ActionListener, KeyListener{
 
 class Package implements Serializable{
     
-    private String nick, ip, move, msg;
+    private String nick, ip, move, msg, status;
     
     public void setNick(String nick){this.nick = nick;}
     public void setIp(String ip){this.ip = ip;}
     public void setMove(String move){this.move = move;}
     public void setMsg(String msg){this.msg = msg;}
+    public void setStatus(String st){this.status = st;}
     public String getNick(){return nick;}
     public String getIp(){return ip;}
     public String getMove(){return move;}
     public String getMsg(){return msg;}
+    public String getStatus(){return status;}
 }
