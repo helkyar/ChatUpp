@@ -6,9 +6,11 @@ package chat;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,25 +41,44 @@ public class Server extends JFrame implements Runnable{
     @Override
     public void run() {
         try {
-            ServerSocket port = new ServerSocket(37127);
+            ServerSocket port = new ServerSocket(9999);
             String nick, ip, move, msg;
+            ArrayList<String> ips = new ArrayList<String>();
             Package p;
-            txt.setText("polla");
+            
             while(true){
-                try (Socket socket = port.accept()) {
+                try (Socket mysocket = port.accept()) {
                     
-                    ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+                    ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
                     p = (Package) entrada.readObject();
-                    txt.setText(p.getStatus());
+                    
                     if(p.getStatus().equals("online")){
-                        InetAddress locateip = socket.getInetAddress();
-                        String getip = locateip.getHostAddress();  
-                        txt.setText(getip);
+                        InetAddress locateip = mysocket.getInetAddress();
+                        String getip = locateip.getHostAddress();
+                        
+                        if(!ips.contains(getip)){
+                            ips.add(getip);
+                        }
+                        
+                        p.setIps(ips);
+                    
+                        for(String userip:ips){
+                            Socket sendmsg = new Socket(userip, 9090);
+                            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+                            msgpackage.writeObject(p);
+
+                            msgpackage.close(); sendmsg.close(); mysocket.close();
+                        }
+                        
                     } else if (p.getStatus().equals("messaging")){
-                        nick = p.getNick();
+//                        nick = p.getNick();
                         ip = p.getIp();
-                        move = p.getMove();
-                        txt.setText(p.getMsg());
+                        
+                        Socket sendmsg = new Socket(ip, 9090);
+                        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+                        msgpackage.writeObject(p);
+                        
+                        msgpackage.close(); sendmsg.close(); mysocket.close();
                     }
                 }
             }
