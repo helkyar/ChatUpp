@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-
 package chat;
 
 /**
@@ -89,7 +84,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setVisible(true);
             setLocationRelativeTo(null);	
-    }
+    }  
     
     public void serverConnect(){
         try {
