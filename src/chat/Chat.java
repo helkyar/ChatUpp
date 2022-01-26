@@ -13,10 +13,13 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,10 +50,16 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     JScrollPane userPane = new JScrollPane();
     JPanel allusers = new JPanel();
 
+    String serverIP;
+    JList userOnline;
+    DefaultListModel model = new DefaultListModel();;
+     
     public Chat() {
         super("Chatty");
+        serverIP = (String) JOptionPane.showInputDialog(this, "Introduce ip del servidor");
+        serverConnect();
+        new RecieveMsg();
         
-        try {
             txtArea.setEditable(false);
             text.add(txtArea); 
             
@@ -59,10 +68,13 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             input.add(erasebtn);
             input.add(field);
                     
-            allusers.setLayout(new BorderLayout());
-            userPane = new JScrollPane(allusers);
-            users.add(userPane);
-       
+            allusers.setLayout(new BorderLayout(10,10));
+            
+            userOnline = new JList<String>();
+            userOnline.setModel(model);
+            userPane = new JScrollPane(userOnline);
+            users.add(userPane);            
+
             content.add("Center", text);
             content.add("South", input);
             content.add("East", users);
@@ -74,23 +86,34 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             field.addKeyListener(this);
             
             setSize(screenSize.width, screenSize.height-60);
-            setDefaultCloseOperation(EXIT_ON_CLOSE); 
-            frame.pack();
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
             setVisible(true);
-            setLocationRelativeTo(null);
+            setLocationRelativeTo(null);	
+    }
+    
+    public void serverConnect(){
+        try {
+            Socket mySocket = new Socket(serverIP,9999);
+            Package p = new Package();
+            p.setStatus("online");
             
-        } catch (Exception e) {System.out.println(e);}
-		
+            ObjectOutputStream objp = new ObjectOutputStream(mySocket.getOutputStream());
+            objp.writeObject(p);
+            mySocket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void sendMsg() {
             
             try {
-                try (Socket socket = new Socket("192.168.249.1",37127)) {
+                try (Socket socket = new Socket(serverIP,9999)) {
                     Package p = new Package();
                     p.setNick("");
-                    p.setIp("");
+                    p.setIp(userOnline.getSelectedValue().toString()); //***
                     p.setMove("");
+                    p.setStatus("messaging");
                     p.setMsg(field.getText());
                     
                     ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
@@ -102,6 +125,39 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                 Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
+    class RecieveMsg implements Runnable{
+       
+        RecieveMsg(){
+            Thread lintening = new Thread(this);
+            lintening.start();
+        }
+        
+        @Override
+        public void run() {
+            try {
+                ServerSocket port = new ServerSocket(9090);
+                String nick, ip, move, msg;
+                ArrayList<String> ips = new ArrayList<String>();
+                Package p;
+
+                while(true){
+                    try (Socket mysocket = port.accept()) {
+                        ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
+                        p = (Package) entrada.readObject();
+
+                        txtArea.append(p.getMsg());
+                        ArrayList<String> users = p.getIps();                        
+                        for(String user : users){
+                            model.addElement(user);
+                        }
+                        
+                    } catch(Exception e){}                    
+                }
+            } catch (Exception e){}
+        }
+        
+    }
         
     /**
     * @param args the command line arguments
@@ -138,18 +194,4 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     
     public void keyTyped (KeyEvent typing){}
     public void keyReleased(KeyEvent released){}
-}
-
-class Package implements Serializable{
-    
-    private String nick, ip, move, msg;
-    
-    public void setNick(String nick){this.nick = nick;}
-    public void setIp(String ip){this.ip = ip;}
-    public void setMove(String move){this.move = move;}
-    public void setMsg(String msg){this.msg = msg;}
-    public String getNick(){return nick;}
-    public String getIp(){return ip;}
-    public String getMove(){return move;}
-    public String getMsg(){return msg;}
 }
