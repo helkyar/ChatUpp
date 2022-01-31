@@ -1,8 +1,10 @@
+package packager;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chat;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.ArrayList;
  *
  * @author javip
  */
-class Package implements Serializable{
+public class Package implements Serializable{
     
     private String nick, ip, move, msg, status;
     private ArrayList<String> ips;

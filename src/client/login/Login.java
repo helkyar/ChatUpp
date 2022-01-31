@@ -1,5 +1,5 @@
 
-package test1sql;
+package client.login;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -91,7 +91,7 @@ public class Login extends javax.swing.JFrame {
         jLabel_minimizar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_minimizar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_minimizar.setText("-");
-        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_minimizar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 jLabel_minimizarMouseEntered(evt);
@@ -104,7 +104,7 @@ public class Login extends javax.swing.JFrame {
         jLabel_cerrar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_cerrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_cerrar.setText("x");
-        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_cerrar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel_cerrarMouseClicked(evt);
@@ -370,13 +370,12 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUserFocusLost
 
     private void jLabel_cerrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseClicked
-       
         System.exit(0);
     }//GEN-LAST:event_jLabel_cerrarMouseClicked
 
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
-  if(evt.getKeyCode()== KeyEvent.VK_ENTER){
-    verifyLogin();  
+        if(evt.getKeyCode()== KeyEvent.VK_ENTER){
+        verifyLogin();  
   }// TODO add your handling code here:
     }//GEN-LAST:event_txtPasswordKeyPressed
 
@@ -395,7 +394,7 @@ if(evt.getKeyCode()== KeyEvent.VK_ENTER){
     }//GEN-LAST:event_jPanel_tituloMouseClicked
 
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
-verifyLogin();        // TODO add your handling code here:
+        verifyLogin();        // TODO add your handling code here:
     }//GEN-LAST:event_loginActionPerformed
 
     private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
@@ -450,31 +449,33 @@ verifyLogin();        // TODO add your handling code here:
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Login().setVisible(true);
+                try{new Login().setVisible(true);}catch(Exception e){e.printStackTrace();}
+                
             }
         });
     }
-public void verifyLogin(){
-        loginuser = txtUser.getText().toLowerCase();
-        password = String.valueOf(txtPassword.getPassword());
-        try {
-            Class.forName(driver);
-            try {
-                conn = DriverManager.getConnection(url, user, pass);
-                st = conn.createStatement();
-                rs = st.executeQuery("SELECT * FROM usuario WHERE nombre_usuario='" + loginuser + "'"
-                        + "and contrasenya='" + password + "'");
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Acceso autorizado");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Por favor comprueba las credenciales");
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "No vaAAAAAAAAA2");
-            }
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "No va");
-        }
+    
+    public void verifyLogin(){
+//        loginuser = txtUser.getText().toLowerCase();
+//        password = String.valueOf(txtPassword.getPassword());
+//        try {
+//            Class.forName(driver);
+//            try {
+//                conn = DriverManager.getConnection(url, user, pass);
+//                st = conn.createStatement();
+//                rs = st.executeQuery("SELECT * FROM usuario WHERE nombre_usuario='" + loginuser + "'"
+//                        + "and contrasenya='" + password + "'");
+//                if (rs.next()) {
+//                    JOptionPane.showMessageDialog(null, "Acceso autorizado");
+//                } else {
+//                    JOptionPane.showMessageDialog(null, "Por favor comprueba las credenciales");
+//                }
+//            } catch (SQLException ex) {
+//                JOptionPane.showMessageDialog(null, "No vaAAAAAAAAA2");
+//            }
+//        } catch (ClassNotFoundException e) {
+//            JOptionPane.showMessageDialog(null, "No va");
+//        }
 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
