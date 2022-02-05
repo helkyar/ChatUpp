@@ -112,7 +112,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                 try (Socket socket = new Socket(serverIP,9999)) {
                     Package p = new Package();
                     p.setNick("");
-                    p.setIp(userOnline.getSelectedValue().toString()); //***
+                    try{p.setIp(userOnline.getSelectedValue().toString());}catch(Exception e){} //***
                     p.setMove("");
                     p.setStatus("messaging");
                     p.setMsg(field.getText());
@@ -123,7 +123,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                 }
                 
             } catch (IOException ex) {
-                Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
 
@@ -139,7 +139,6 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             try {
                 ServerSocket port = new ServerSocket(9090);
                 String nick, ip, move, msg;
-                ArrayList<String> ips = new ArrayList<String>();
                 Package p;
 
                 while(true){
@@ -147,10 +146,20 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                         ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
                         p = (Package) entrada.readObject();
 
-                        txtArea.append(p.getMsg());
-                        ArrayList<String> users = p.getIps();                        
-                        for(String user : users){
-                            model.addElement(user);
+                        txtArea.append(p.getMsg()+"\n");
+                        
+                        for(String user : p.getIps()){
+//                            boolean inside = false;
+//                            String userIP = GetIP.getLocalIp()+","+GetIP.getPublicIP();
+//                            System.out.println(userIP);
+//                            
+//                            for(int i = 0; i< model.getSize(); i++){
+//                                System.out.println(model.getSize());
+//                                if(model.get(i).equals(user)||userIP.contains(user)){inside = true;}
+//                            }
+                            boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
+                            if(!model.contains(user) && !own){model.addElement(user);}
+//                            if(!inside){model.addElement(user);}
                         }
                         
                     } catch(Exception e){}                    
@@ -173,24 +182,27 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     public void actionPerformed(ActionEvent event) {
         try {                
             if(event.getSource() == sendbtn){
-                txtArea.append(field.getText() + "\n");
                 sendMsg();
+                
+                txtArea.append(field.getText() + "\n");
                 field.setText("");
             } else if (event.getSource() == erasebtn){
                 txtArea.setText("");
             }else if (event.getSource() == exitbtn){
                 System.exit(0);
             }
-        } catch (Exception e){System.out.println(e);}
+        } catch (Exception e){e.printStackTrace();}
     }
     
     public void keyPressed(KeyEvent pressed) {
          try {
             if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
+                sendMsg();
+                
                 txtArea.append(field.getText() + "\n");
                 field.setText("");
             }  
-        } catch (Exception e){System.out.println(e);}
+        } catch (Exception e){e.printStackTrace();}
     }
     
     public void keyTyped (KeyEvent typing){}
