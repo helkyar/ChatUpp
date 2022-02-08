@@ -108,9 +108,19 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     
     class Information extends JFrame{
         Information(){
+            setLayout(new BorderLayout());
+            JButton btn = new JButton("Retry");
+            btn.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                   userInfo.setText("");
+                   getServerIP();
+                }
+                
+            });
             userInfo.setBackground(Color.black);
             userInfo.setForeground(Color.green);
-            add(userInfo);
+            add("Center",userInfo);
+            add("South",btn);
 //            setUndecorated(true);
             setLocationRelativeTo(null);
             pack();
