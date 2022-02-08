@@ -50,7 +50,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     JButton erasebtn = new JButton("Clean", erase);
         
     JTextField field = new JTextField(38);
-    JTextArea txtArea = new JTextArea(40,115);
+    JTextArea txtArea = new JTextArea(20,50);
     
 //=======================================================================
     JScrollPane userPane = new JScrollPane();
