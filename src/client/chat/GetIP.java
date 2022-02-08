@@ -6,7 +6,6 @@ package client.chat;
  * and open the template in the editor.
  */
 
-
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.InputStreamReader;
@@ -52,7 +51,7 @@ public class GetIP {
         try {
             for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 // Due to the amount of the interfaces, we will only print the ones online
-                if (iface.isUp()) {localIP.add(iface.getDisplayName());}                
+                if (iface.isUp()) {localIP.add(iface.getInetAddresses().nextElement().getHostAddress());}                
             }           
         } catch (SocketException ex) {
             Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);

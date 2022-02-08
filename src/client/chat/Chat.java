@@ -22,6 +22,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,8 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     Container content = getContentPane();
     Container sideBar = getContentPane();
         
+    ImageIcon chatico = new ImageIcon("send.png");
+    
     JPanel users = new JPanel();
     JPanel win = new JPanel();
     JPanel input = new JPanel();
@@ -49,17 +52,22 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     JTextField field = new JTextField(38);
     JTextArea txtArea = new JTextArea(40,115);
     
+//=======================================================================
     JScrollPane userPane = new JScrollPane();
     JPanel allusers = new JPanel();
 
     String serverIP;
     JList userOnline;
-    DefaultListModel model = new DefaultListModel();;
+    DefaultListModel model = new DefaultListModel();
+    
+    JTextArea userInfo = new JTextArea(7,20);
      
     public Chat() {
-        super("Chatty");               
+        super("Chatty");     
         
     // SHITTY SWING COMPONENTS WITH NO STYLE WHATSOEVER ========================
+            userInfo.setEditable(false);
+            
             txtArea.setEditable(false);
             text.add(txtArea); 
             
@@ -87,22 +95,38 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             field.addKeyListener(this);
             
             //FRAME _________________________________________________________
-            setSize(screenSize.width, screenSize.height-60);
+            pack();
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setVisible(true);
             setLocationRelativeTo(null);
         //=====================================================================
-            
+            new Information();
             getServerIP();
 //        serverIP = (String) JOptionPane.showInputDialog(this, "Introduce ip del servidor");
             new RecieveMsg();
     }  
     
+    class Information extends JFrame{
+        Information(){
+            userInfo.setBackground(Color.black);
+            userInfo.setForeground(Color.green);
+            add(userInfo);
+//            setUndecorated(true);
+            setLocationRelativeTo(null);
+            pack();
+            setVisible(true);
+        }
+        
+    }
+    
     private void getServerIP() {
-        txtArea.append("Starting connection...");
+        userInfo.append("\n   Starting connection...\n");
+        String ip = (String) GetIP.getLocalIp().get(1);
+        String[] ipArray = Arrays.copyOf(ip.split("."), ip.split(".").length);
+        String localip = String.join(".", ipArray);
         for(int i = 0; i<=255; i++){
             try {
-                try (Socket socket = new Socket("192.168.1."+i,9999)) {
+                try (Socket socket = new Socket(localip+i,9999)) {
                     Package p = new Package();
                     p.setStatus("online");
                     
@@ -113,23 +137,9 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                 
             } catch (IOException ex) {System.out.println("Server tested: 192.168.1."+i);}
         }
-        txtArea.append("Waiting response....");
+        userInfo.append("   Waiting response....\n");
     }
-        
-//    public void serverConnect(){
-//        try {
-//            Socket mySocket = new Socket(serverIP,9999);
-//            Package p = new Package();
-//            p.setStatus("online");
-//            
-//            ObjectOutputStream objp = new ObjectOutputStream(mySocket.getOutputStream());
-//            objp.writeObject(p);
-//            mySocket.close();
-//        } catch (IOException ex) {
-//            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-    
+
     public void sendMsg() {
             
             try {
@@ -170,7 +180,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                         ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
                         p = (Package) entrada.readObject();
                         
-                        txtArea.append("Server response: "+ p.getStatus());
+                        userInfo.append("   Server response: "+ p.getStatus()+"\n");
                         
                         if(p.getStatus().equals("imserver")){setServerIP(mysocket, p);}
                         if(p.getStatus().equals("messaging")){sendMessage(p);} 
@@ -181,7 +191,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
         }      
         
         private void setServerIP(Socket mysocket, Package p) {
-            txtArea.append("server response: "+p.getStatus());
+            userInfo.append("   Setting connection \n");
             
             InetAddress locateip = mysocket.getInetAddress();
             serverIP = locateip.getHostAddress();            
@@ -190,12 +200,27 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                 boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
                 if(!model.contains(user) && !own){model.addElement(user);}
             }
+            
+            userInfo.append("   Use responsibly, don't be a jerk  ;)");
+            closeOptionPanel();
         }
-
+        
         private void sendMessage(Package p){
             txtArea.append(p.getMsg()+"\n");
 
-        }      
+        }     
+        
+        private void closeOptionPanel(){
+//            Window[] windows = Window.getWindows();
+//            for (Window window : windows) {
+//                if (window instanceof JFrame) {
+//                    JFrame dialog = (JFrame) window;
+//                    if (dialog.hasFocus()){
+//                        dialog.dispose();
+//                    }
+//                }
+//            }
+        }
     }
     
 
