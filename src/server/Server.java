@@ -4,10 +4,12 @@
  */
 package server;
 
+import java.io.EOFException;
 import packager.Package;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -57,11 +59,12 @@ public class Server extends JFrame implements Runnable{
                         InetAddress locateip = mysocket.getInetAddress();
                         String getip = locateip.getHostAddress();
                         
-                        if(!ips.contains(getip)){
-                            ips.add(getip);
-                        }
+                        txt.append("New connection: "+getip);
+                        
+                        if(!ips.contains(getip)){ips.add(getip);}
                         
                         p.setIps(ips);
+                        p.setStatus("imserver");
                     
                         for(String userip:ips){
                             Socket sendmsg = new Socket(userip, 9090);
@@ -72,7 +75,6 @@ public class Server extends JFrame implements Runnable{
                         }
                         
                     } else if (p.getStatus().equals("messaging")){
-//                        nick = p.getNick();
                         ip = p.getIp();
                         
                         Socket sendmsg = new Socket(ip, 9090);
@@ -81,11 +83,13 @@ public class Server extends JFrame implements Runnable{
                         
                         msgpackage.close(); sendmsg.close(); mysocket.close();
                     }
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                } catch(EOFException ex){
+                    System.out.println("Wrong chat connection protocol");
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
