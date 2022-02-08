@@ -61,6 +61,8 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     DefaultListModel model = new DefaultListModel();
     
     JTextArea userInfo = new JTextArea(7,20);
+    
+    JFrame infoFrame;
      
     public Chat() {
         super("Chatty");     
@@ -100,28 +102,23 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             setVisible(true);
             setLocationRelativeTo(null);
         //=====================================================================
-            new Information();
+            infoFrame = new Information();
             getServerIP();
-//        serverIP = (String) JOptionPane.showInputDialog(this, "Introduce ip del servidor");
             new RecieveMsg();
     }  
     
     class Information extends JFrame{
         Information(){
             setLayout(new BorderLayout());
-            JButton btn = new JButton("Retry");
-            btn.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent e) {
-                   userInfo.setText("");
-                   getServerIP();
-                }
-                
-            });
+            
+            JButton btn = new JButton("Retry");            
             userInfo.setBackground(Color.black);
             userInfo.setForeground(Color.green);
+            btn.addActionListener((ActionEvent e) -> {getServerIP();});
+            
             add("Center",userInfo);
             add("South",btn);
-//            setUndecorated(true);
+            setUndecorated(true);
             setLocationRelativeTo(null);
             pack();
             setVisible(true);
@@ -130,7 +127,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     }
     
     private void getServerIP() {
-        userInfo.append("\n   Starting connection...\n");
+        userInfo.setText("\n   Starting connection...\n");
         String ip = (String) GetIP.getLocalIp().get(1);
         String[] ipArray = Arrays.copyOf(ip.split("."), ip.split(".").length);
         String localip = String.join(".", ipArray);
@@ -212,7 +209,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             }
             
             userInfo.append("   Use responsibly, don't be a jerk  ;)");
-            closeOptionPanel();
+            closeInfoPanel();
         }
         
         private void sendMessage(Package p){
@@ -220,16 +217,9 @@ class Chat extends JFrame implements ActionListener, KeyListener{
 
         }     
         
-        private void closeOptionPanel(){
-//            Window[] windows = Window.getWindows();
-//            for (Window window : windows) {
-//                if (window instanceof JFrame) {
-//                    JFrame dialog = (JFrame) window;
-//                    if (dialog.hasFocus()){
-//                        dialog.dispose();
-//                    }
-//                }
-//            }
+        private void closeInfoPanel(){
+            try { Thread.sleep(5000);} catch (InterruptedException ex) {}
+            infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
         }
     }
     
