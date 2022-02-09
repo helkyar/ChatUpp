@@ -23,8 +23,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.util.Timer;
 
 class Chat extends JFrame implements ActionListener, KeyListener{
         
@@ -103,8 +106,8 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             setLocationRelativeTo(null);
         //=====================================================================
             infoFrame = new Information();
-            getServerIP();
             new RecieveMsg();
+            getServerIP();
     }  
     
     class Information extends JFrame{
@@ -126,24 +129,63 @@ class Chat extends JFrame implements ActionListener, KeyListener{
         
     }
     
+    class SearchServer implements Runnable {
+        int i;
+        String ip;
+        
+        SearchServer(int i, String ip){
+            this.ip = ip;
+            this.i = i;
+        }
+        
+        @Override
+        public void run() {
+            while (!Thread.interrupted()) {
+                try {
+                    try (Socket socket = new Socket(ip+i,9999)) {
+                        Package p = new Package();
+                        p.setStatus("online");
+
+                        ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
+                        objp.writeObject(p);
+                        socket.close();
+                    } 
+
+                } catch (IOException ex) {System.out.println("Server tested: "+ip+i);}
+            }
+        }
+    }
+    
+    class KillSearchThread extends TimerTask {
+        private Thread t;
+        private Timer timer;
+
+        KillSearchThread(Thread t, Timer timer){
+            this.t = t;
+            this.timer = timer;
+        }
+
+        public void run() {
+            if (t != null && t.isAlive()) {
+                t.interrupt();
+                timer.cancel();
+            }
+        }
+    }
+    
     private void getServerIP() {
         userInfo.setText("\n   Starting connection...\n");
         String ip = (String) GetIP.getLocalIp().get(1);
-        String[] ipArray = Arrays.copyOf(ip.split("."), ip.split(".").length);
-        String localip = String.join(".", ipArray);
+        ip = ip.substring(0, ip.lastIndexOf(".")+1);
+        
         for(int i = 0; i<=255; i++){
-            try {
-                try (Socket socket = new Socket(localip+i,9999)) {
-                    Package p = new Package();
-                    p.setStatus("online");
-                    
-                    ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
-                    objp.writeObject(p);
-                    socket.close();
-                }
-                
-            } catch (IOException ex) {System.out.println("Server tested: 192.168.1."+i);}
+            Thread t = new Thread(new SearchServer(i, ip));
+            
+            Timer timer = new Timer();
+            timer.schedule(new KillSearchThread(t, timer), 100);
+            t.start();
         }
+        
         userInfo.append("   Waiting response....\n");
     }
 
