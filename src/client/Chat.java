@@ -3,12 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 
-package client.chat;
+package client;
 
 /**
  *
  * @author Javier Palacios Botejara
  */
+import client.login.Login;
+import client.login.Register;
 import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
@@ -29,12 +31,10 @@ import java.util.logging.Logger;
 
 import java.util.Timer;
 
-class Chat extends JFrame implements ActionListener, KeyListener{
+public class Chat extends JFrame implements ActionListener, KeyListener{
         
     Container content = getContentPane();
     Container sideBar = getContentPane();
-        
-    ImageIcon chatico = new ImageIcon("send.png");
     
     JPanel users = new JPanel();
     JPanel win = new JPanel();
@@ -44,9 +44,9 @@ class Chat extends JFrame implements ActionListener, KeyListener{
          
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    ImageIcon send = new ImageIcon("send.png");
-    ImageIcon erase = new ImageIcon("erase.png");
-    ImageIcon exit = new ImageIcon("exit.png");        
+    ImageIcon send = new ImageIcon("img/send.png");
+    ImageIcon erase = new ImageIcon("img/erase.png");
+    ImageIcon exit = new ImageIcon("img/exit.png");        
         
     JButton sendbtn = new JButton("Send", send);
     JButton exitbtn = new JButton("Exit", exit);
@@ -56,6 +56,9 @@ class Chat extends JFrame implements ActionListener, KeyListener{
     JTextArea txtArea = new JTextArea(20,50);
     
 //=======================================================================
+    public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
+    public static final Image LOGO = CHATLOGO.getImage();
+    
     JScrollPane userPane = new JScrollPane();
     JPanel allusers = new JPanel();
 
@@ -69,7 +72,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
      
     public Chat() {
         super("Chatty");     
-        
+        setIconImage(LOGO);
     // SHITTY SWING COMPONENTS WITH NO STYLE WHATSOEVER ========================
             userInfo.setEditable(false);
             
@@ -105,10 +108,23 @@ class Chat extends JFrame implements ActionListener, KeyListener{
             setVisible(true);
             setLocationRelativeTo(null);
         //=====================================================================
+        
+        //USER LOGIN ==========================================================            
+           JOptionPane.showOptionDialog(this, new SessionStart(), "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
+           processSessionStart(SessionStart.getSelection());
+        //=====================================================================
+        //SERVER CONNECTION ===================================================
             infoFrame = new Information();
             new RecieveMsg();
             getServerIP();
+        //=====================================================================
     }  
+    
+    private void  processSessionStart(String slc){
+        System.out.println(slc);
+        if(slc.equals("Login")){new Login().setVisible(true);}
+        else if(slc.equals("Register")){new Register().setVisible(true);}
+    }
     
     class Information extends JFrame{
         Information(){
@@ -151,7 +167,7 @@ class Chat extends JFrame implements ActionListener, KeyListener{
                         socket.close();
                     } 
 
-                } catch (IOException ex) {System.out.println("Server tested: "+ip+i);}
+                } catch (IOException ex) {/*System.out.println("Server tested: "+ip+i);*/}
             }
         }
     }

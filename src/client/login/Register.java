@@ -1,5 +1,6 @@
-package test1sql;
+package client.login;
 
+import client.Chat;
 import java.awt.Color;
 import java.awt.*;
 import java.io.File;
@@ -27,7 +28,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Academia
  */
-public class Registro extends javax.swing.JFrame {
+public class Register extends javax.swing.JFrame {
 
     DefaultTableModel model = null;
     String driver = "com.mysql.jdbc.Driver";
@@ -51,7 +52,10 @@ public class Registro extends javax.swing.JFrame {
     //creamos una variable para fijar la ipagen al path
     String image_path = null;
 
-    public Registro() {
+    public Register() {
+        super("Chatty");
+        setIconImage(Chat.LOGO);
+        
         Login log = new Login(); //llamar a Login.java para poder referenciarlo
         initComponents();
         //        centramos el form
@@ -131,7 +135,7 @@ public class Registro extends javax.swing.JFrame {
 
         jLabel_minimizar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_minimizar.setText("-");
-        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_minimizar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel_minimizarMouseClicked(evt);
@@ -147,7 +151,7 @@ public class Registro extends javax.swing.JFrame {
         jLabel_cerrar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_cerrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_cerrar.setText("x");
-        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_cerrar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel_cerrarMouseClicked(evt);
@@ -187,7 +191,7 @@ public class Registro extends javax.swing.JFrame {
         jButton_Registro.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jButton_Registro.setForeground(new java.awt.Color(255, 255, 255));
         jButton_Registro.setText("Registro");
-        jButton_Registro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton_Registro.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton_Registro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 jButton_RegistroMouseEntered(evt);
@@ -545,11 +549,11 @@ public class Registro extends javax.swing.JFrame {
 //                         }
 //                         
 //                     } catch (FileNotFoundException ex) {
-//                         Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+//                         Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
 //                     }
 //                     
 //                 } catch (SQLException ex) {
-//                     Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+//                     Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
 //                 }
 //                 
 //             }
@@ -704,7 +708,7 @@ public class Registro extends javax.swing.JFrame {
 //            }
 //            
 //        } catch (SQLException ex) {
-//            Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //        
 //        return username_exist;
@@ -727,21 +731,23 @@ public class Registro extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Registro().setVisible(true);
+                new Register().setVisible(true);
             }
         });
     }

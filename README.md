@@ -26,3 +26,11 @@ Chat based in java
 ## Design
 
 ## Next Steps
+User/Group info 
+Show Only saved friends/groups  
+Block user  
+User/Group photo  
+Clean own chat  
+Search user/group/text  
+Edit message
+

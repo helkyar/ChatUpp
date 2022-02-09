@@ -1,5 +1,5 @@
 
-package test1sql;
+package client.login;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -7,14 +7,20 @@ import java.awt.Toolkit;
 import javax.swing.border.Border; 
 import javax.swing.BorderFactory;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import client.Chat;
 
 /**
  *
@@ -38,6 +44,9 @@ public class Login extends javax.swing.JFrame {
      * Creates new form Login
      */
     public Login() {
+        super("Chatty");
+        setIconImage(Chat.LOGO);
+        
         initComponents();
 //        centramos el form
         this.setLocationRelativeTo(null);
@@ -94,7 +103,7 @@ public class Login extends javax.swing.JFrame {
         jLabel_minimizar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_minimizar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_minimizar.setText("-");
-        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_minimizar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 jLabel_minimizarMouseEntered(evt);
@@ -107,7 +116,7 @@ public class Login extends javax.swing.JFrame {
         jLabel_cerrar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel_cerrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel_cerrar.setText("x");
-        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_cerrar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel_cerrarMouseClicked(evt);
@@ -153,9 +162,9 @@ public class Login extends javax.swing.JFrame {
                 .addGap(28, 28, 28))
         );
 
-        jLabel_user.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/password.png"))); // NOI18N
+        jLabel_user.setIcon(new ImageIcon("img/password.png"));
 
-        jLabel_password.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/user.png"))); // NOI18N
+        jLabel_password.setIcon(new ImageIcon("img/user.png"));
 
         txtUser.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         txtUser.setForeground(new java.awt.Color(153, 153, 153));
@@ -241,10 +250,10 @@ public class Login extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel_user, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtUser))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel_password, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPassword))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel_password, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(login)
@@ -434,10 +443,10 @@ verifyLogin();        // TODO add your handling code here:
     }//GEN-LAST:event_txtPasswordFocusLost
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-       Registro register1 = new Registro();
-       register1.setVisible(true);
-        setVisible(false);
+       Register openRegister = new Register();
+//       openRegister.setLocationRelativeTo(null);
+       openRegister.setVisible(true);
+       setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
