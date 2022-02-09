@@ -9,6 +9,9 @@ package client;
  *
  * @author Javier Palacios Botejara
  */
+import client.helpers.GetIP;
+import client.helpers.KillSearchThread;
+import client.helpers.SearchServer;
 import client.login.Login;
 import client.login.Register;
 import packager.Package;
@@ -66,8 +69,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     JList userOnline;
     DefaultListModel model = new DefaultListModel();
     
-    JTextArea userInfo = new JTextArea(7,20);
-    
+    JTextArea userInfo = new JTextArea(7,20);    
     JFrame infoFrame;
      
     public Chat() {
@@ -109,86 +111,14 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             setLocationRelativeTo(null);
         //=====================================================================
         
-        //USER LOGIN ==========================================================            
-           JOptionPane.showOptionDialog(this, new SessionStart(), "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
-           processSessionStart(SessionStart.getSelection());
         //=====================================================================
-        //SERVER CONNECTION ===================================================
+        //                      SERVER CONNECTION         
+        //=====================================================================
             infoFrame = new Information();
             new RecieveMsg();
             getServerIP();
-        //=====================================================================
     }  
-    
-    private void  processSessionStart(String slc){
-        System.out.println(slc);
-        if(slc.equals("Login")){new Login().setVisible(true);}
-        else if(slc.equals("Register")){new Register().setVisible(true);}
-    }
-    
-    class Information extends JFrame{
-        Information(){
-            setLayout(new BorderLayout());
-            
-            JButton btn = new JButton("Retry");            
-            userInfo.setBackground(Color.black);
-            userInfo.setForeground(Color.green);
-            btn.addActionListener((ActionEvent e) -> {getServerIP();});
-            
-            add("Center",userInfo);
-            add("South",btn);
-            setUndecorated(true);
-            setLocationRelativeTo(null);
-            pack();
-            setVisible(true);
-        }
-        
-    }
-    
-    class SearchServer implements Runnable {
-        int i;
-        String ip;
-        
-        SearchServer(int i, String ip){
-            this.ip = ip;
-            this.i = i;
-        }
-        
-        @Override
-        public void run() {
-            while (!Thread.interrupted()) {
-                try {
-                    try (Socket socket = new Socket(ip+i,9999)) {
-                        Package p = new Package();
-                        p.setStatus("online");
-
-                        ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
-                        objp.writeObject(p);
-                        socket.close();
-                    } 
-
-                } catch (IOException ex) {/*System.out.println("Server tested: "+ip+i);*/}
-            }
-        }
-    }
-    
-    class KillSearchThread extends TimerTask {
-        private Thread t;
-        private Timer timer;
-
-        KillSearchThread(Thread t, Timer timer){
-            this.t = t;
-            this.timer = timer;
-        }
-
-        public void run() {
-            if (t != null && t.isAlive()) {
-                t.interrupt();
-                timer.cancel();
-            }
-        }
-    }
-    
+           
     private void getServerIP() {
         userInfo.setText("\n   Starting connection...\n");
         String ip = (String) GetIP.getLocalIp().get(1);
@@ -200,11 +130,29 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             Timer timer = new Timer();
             timer.schedule(new KillSearchThread(t, timer), 100);
             t.start();
-        }
-        
+        }        
         userInfo.append("   Waiting response....\n");
+        
+        new javax.swing.Timer(10000, (ActionEvent e) -> {
+                userInfo.append("   Maybe your Internet is down?\n");
+                userInfo.append("   Or our server is fucked...\n");            
+        }).start();
+    }
+//=====================================================================
+//                     USER LOGIN 
+//=====================================================================
+    private void  processSessionStart(){     
+        StartOptions options = new StartOptions();
+        JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
+        String slc = options.getSelection();
+        System.out.println(slc);
+        if(slc.equals("Login")){new Login().setVisible(true);}
+        else if(slc.equals("Register")){new Register().setVisible(true);}
     }
 
+//=====================================================================
+//                     SEND MESSAGE
+//=====================================================================
     public void sendMsg() {
             
             try {
@@ -226,6 +174,9 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             }
         }
     
+//=====================================================================
+//                     RECIEVE MESSAGE 
+//=====================================================================   
     class RecieveMsg implements Runnable{
        
         RecieveMsg(){
@@ -267,20 +218,75 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             }
             
             userInfo.append("   Use responsibly, don't be a jerk  ;)");
-            closeInfoPanel();
+            try { Thread.sleep(3000);} catch (InterruptedException ex) {}
+            infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
+            processSessionStart();
         }
         
         private void sendMessage(Package p){
             txtArea.append(p.getMsg()+"\n");
-
         }     
-        
-        private void closeInfoPanel(){
-            try { Thread.sleep(5000);} catch (InterruptedException ex) {}
-            infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
-        }
     }
     
+    //=======================================================================
+    // POP-UPS
+    //=======================================================================
+    private class Information extends JFrame{
+        Information(){
+            setLayout(new BorderLayout());
+            
+            JButton btn = new JButton("Retry");            
+            userInfo.setBackground(Color.black);
+            userInfo.setForeground(Color.green);
+            btn.addActionListener((ActionEvent e) -> {getServerIP();});
+            
+            add("Center",userInfo);
+            add("South",btn);
+            setUndecorated(true);
+            setLocationRelativeTo(null);
+            pack();
+            setVisible(true);
+        }
+        
+    }
+    
+    private class StartOptions extends JPanel implements ActionListener{   
+    private String selection = "";
+    
+    public StartOptions (){
+        JButton log = new JButton("Login");        
+        JButton reg = new JButton("Register");        
+        JButton guest = new JButton("Guesst");
+        log.addActionListener(this);
+        reg.addActionListener(this);
+        guest.addActionListener(this);
+        add(log);
+        add(reg);
+        add(guest);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        selection = e.getActionCommand();
+        System.out.println(selection);
+        Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof JDialog) {
+                        JDialog dialog = (JDialog) window;
+                        if (dialog.getContentPane().getComponentCount() == 1
+                            && dialog.getContentPane().getComponent(0) instanceof JOptionPane){
+                            dialog.dispose();
+                        }
+                    }
+                }
+    }
+    
+    public String getSelection(){
+        return selection;
+    }
+    
+}
+
 
         
 // ======================================================================
