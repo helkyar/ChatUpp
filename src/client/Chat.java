@@ -34,6 +34,10 @@ import java.util.logging.Logger;
 
 import java.util.Timer;
 
+/**
+ * 
+ * @author Javier Palacios
+ */
 public class Chat extends JFrame implements ActionListener, KeyListener{
         
     Container content = getContentPane();
@@ -69,14 +73,14 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     JList userOnline;
     DefaultListModel model = new DefaultListModel();
     
-    JTextArea userInfo = new JTextArea(7,20);    
+    JTextArea serverConnectionInfo = new JTextArea(7,20);    
     JFrame infoFrame;
      
     public Chat() {
         super("Chatty");     
         setIconImage(LOGO);
     // SHITTY SWING COMPONENTS WITH NO STYLE WHATSOEVER ========================
-            userInfo.setEditable(false);
+            serverConnectionInfo.setEditable(false);
             
             txtArea.setEditable(false);
             text.add(txtArea); 
@@ -120,7 +124,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     }  
            
     private void getServerIP() {
-        userInfo.setText("\n   Starting connection...\n");
+        serverConnectionInfo.setText("\n   Starting connection...\n");
         String ip = (String) GetIP.getLocalIp().get(1);
         ip = ip.substring(0, ip.lastIndexOf(".")+1);
         
@@ -131,11 +135,11 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             timer.schedule(new KillSearchThread(t, timer), 100);
             t.start();
         }        
-        userInfo.append("   Waiting response....\n");
+        serverConnectionInfo.append("   Waiting response....\n");
         
         new javax.swing.Timer(10000, (ActionEvent e) -> {
-                userInfo.append("   Maybe your Internet is down?\n");
-                userInfo.append("   Or our server is fucked...\n");            
+            serverConnectionInfo.append("   Maybe your Internet is down?\n");
+            serverConnectionInfo.append("   Or our server is fucked...\n");            
         }).start();
     }
 //=====================================================================
@@ -150,33 +154,9 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         else if(slc.equals("Register")){new Register().setVisible(true);}
     }
 
-//=====================================================================
-//                     SEND MESSAGE
-//=====================================================================
-    public void sendMsg() {
-            
-            try {
-                try (Socket socket = new Socket(serverIP,9999)) {
-                    Package p = new Package();
-                    p.setNick("");
-                    try{p.setIp(userOnline.getSelectedValue().toString());}catch(Exception e){} //***
-                    p.setMove("");
-                    p.setStatus("messaging");
-                    p.setMsg(field.getText());
-                    
-                    ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
-                    objp.writeObject(p);
-                    socket.close();
-                }
-                
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    
-//=====================================================================
+//===========================================================================================
 //                     RECIEVE MESSAGE 
-//=====================================================================   
+//===========================================================================================
     class RecieveMsg implements Runnable{
        
         RecieveMsg(){
@@ -196,37 +176,51 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
                         ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
                         p = (Package) entrada.readObject();
                         
-                        userInfo.append("   Server response: "+ p.getStatus()+"\n");
+                        serverConnectionInfo.append("   Server response: "+ p.getStatus()+"\n");
                         
+                //=====================================================================================
+                //                 SERVER RESPONSE MANAGING
+                //=====================================================================================                        
                         if(p.getStatus().equals("imserver")){setServerIP(mysocket, p);}
-                        if(p.getStatus().equals("messaging")){sendMessage(p);} 
-                        
+                        if(p.getStatus().equals("messaging")){sendMessage(p);}                 
+                //=====================================================================================                        
                     } catch(Exception e){}                    
                 }
             } catch (Exception e){}
-        }      
-        
-        private void setServerIP(Socket mysocket, Package p) {
-            userInfo.append("   Setting connection \n");
+        }                     
+    }
+    
+    /**
+     * Sets the server ip after server response. To avoid scanning every
+     * time a message has to be send. At the same time gets all ips 
+     * connected to the server.
+     * @param socket socket in witch the chat is listenning
+     * @param package Object send by server (Serializable class Package)
+     */
+    private void setServerIP(Socket mysocket, Package p) {
+        serverConnectionInfo.append("   Setting connection \n");
             
-            InetAddress locateip = mysocket.getInetAddress();
-            serverIP = locateip.getHostAddress();            
+        InetAddress locateip = mysocket.getInetAddress();
+        serverIP = locateip.getHostAddress();            
             
-            for(String user : p.getIps()){
-                boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
-                if(!model.contains(user) && !own){model.addElement(user);}
-            }
+        for(String user : p.getIps()){
+            boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
+            if(!model.contains(user) && !own){model.addElement(user);}
+        }
             
-            userInfo.append("   Use responsibly, don't be a jerk  ;)");
+            
+            serverConnectionInfo.append("   Use responsibly, don't be a jerk  ;)");
             try { Thread.sleep(3000);} catch (InterruptedException ex) {}
+            //Close Server Connection Info POP-UP
             infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
+            new Send(serverIP);
             processSessionStart();
         }
-        
-        private void sendMessage(Package p){
-            txtArea.append(p.getMsg()+"\n");
-        }     
-    }
+    
+    private void sendMessage(Package p){
+        txtArea.append(p.getMsg()+"\n");
+    }     
+    
     
     //=======================================================================
     // POP-UPS
@@ -236,18 +230,17 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             setLayout(new BorderLayout());
             
             JButton btn = new JButton("Retry");            
-            userInfo.setBackground(Color.black);
-            userInfo.setForeground(Color.green);
+            serverConnectionInfo.setBackground(Color.black);
+            serverConnectionInfo.setForeground(Color.green);
             btn.addActionListener((ActionEvent e) -> {getServerIP();});
             
-            add("Center",userInfo);
+            add("Center",serverConnectionInfo);
             add("South",btn);
             setUndecorated(true);
             setLocationRelativeTo(null);
             pack();
             setVisible(true);
-        }
-        
+        }        
     }
     
     private class StartOptions extends JPanel implements ActionListener{   
@@ -286,9 +279,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     }
     
 }
-
-
-        
+    
 // ======================================================================
 // MAIN
 // ======================================================================
@@ -305,7 +296,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     public void actionPerformed(ActionEvent event) {
         try {                
             if(event.getSource() == sendbtn){
-                sendMsg();
+                Send.message(field.getText(), userOnline.getSelectedValue().toString(), "", "");
                 
                 txtArea.append(field.getText() + "\n");
                 field.setText("");
@@ -320,7 +311,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     public void keyPressed(KeyEvent pressed) {
          try {
             if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
-                sendMsg();
+                Send.message(field.getText(), userOnline.getSelectedValue().toString(), "", "");
                 
                 txtArea.append(field.getText() + "\n");
                 field.setText("");

@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import client.Chat;
+import client.Send;
+import client.helpers.GetIP;
 
 /**
  *
@@ -28,14 +30,7 @@ import client.Chat;
  */
 public class Login extends javax.swing.JFrame {
     DefaultTableModel model = null;
-    String driver = "com.mysql.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/ccw?autoReconnect=true&useSSL=false";
-    String user = "root";
-    String pass = "";
-    Connection conn = null;
-    PreparedStatement ps = null;
-    Statement st = null;
-    ResultSet rs = null;
+
     int islogin;
     String loginuser;
     String password;
@@ -50,11 +45,10 @@ public class Login extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 //        centramos el form
-        this.setLocationRelativeTo(null);
-        this.setTitle("Login");
+        setLocationRelativeTo(null);
 //        setLogin(registerlogin);
 //        Image img = Toolkit.getDefaultToolkit().getImage(getClass().getResource("img/login.png"));
-//setIcon(new ImageIcon(img.getScaledInstance(getWidth(),getHeight(),Image.SCALE_SMOOTH)));
+//        setIcon(new ImageIcon(img.getScaledInstance(getWidth(),getHeight(),Image.SCALE_SMOOTH)));
 //        setIconImage(img);
 
 //        creamos un borde amarillo para el titulo del panel
@@ -370,25 +364,23 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
-        if(txtUser.getText().trim().toLowerCase().equals("username"))
-        {
+        if(txtUser.getText().trim().toLowerCase().equals("username")){
             txtUser.setText("");
             txtUser.setForeground(Color.black);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-       jLabel_user.setBorder(jlabel_icon);
+            jLabel_user.setBorder(jlabel_icon);
         }
         
     }//GEN-LAST:event_txtUserFocusGained
 
     private void txtUserFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusLost
-    if(txtUser.getText().equals(""))
-        {
-            txtUser.setText("Username");
+        if(txtUser.getText().equals("")){
+            txtUser.setText("\tUsername");
             txtUser.setForeground(Color.gray);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-       jLabel_user.setBorder(jlabel_icon);
+            jLabel_user.setBorder(jlabel_icon);
         }
     }//GEN-LAST:event_txtUserFocusLost
 
@@ -397,19 +389,15 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel_cerrarMouseClicked
 
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
-  if(evt.getKeyCode()== KeyEvent.VK_ENTER){
-    verifyLogin();  
-  }// TODO add your handling code here:
+        if(evt.getKeyCode()== KeyEvent.VK_ENTER){verifyLogin();}
     }//GEN-LAST:event_txtPasswordKeyPressed
 
     private void txtUserKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyPressed
-if(evt.getKeyCode()== KeyEvent.VK_ENTER){
-    verifyLogin(); 
-}
+        if(evt.getKeyCode()== KeyEvent.VK_ENTER){verifyLogin();}
     }//GEN-LAST:event_txtUserKeyPressed
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
-    verifyLogin();     
+        verifyLogin();     
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jPanel_tituloMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel_tituloMouseClicked
@@ -417,34 +405,32 @@ if(evt.getKeyCode()== KeyEvent.VK_ENTER){
     }//GEN-LAST:event_jPanel_tituloMouseClicked
 
     private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
-verifyLogin();        // TODO add your handling code here:
+        verifyLogin();
     }//GEN-LAST:event_loginActionPerformed
 
     private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
-                if(txtPassword.getText().equals("Username"))
-        {
+        if(txtPassword.getPassword().equals("Username")){
             txtPassword.setText("");
             txtPassword.setForeground(Color.black);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-       jLabel_user.setBorder(jlabel_icon);
+            jLabel_user.setBorder(jlabel_icon);
         }
     }//GEN-LAST:event_txtPasswordFocusGained
 
     private void txtPasswordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusLost
-        if(txtPassword.getText().equals(""))
+        if(txtPassword.getPassword().equals(""))
         {
             txtPassword.setText("Username");
             txtPassword.setForeground(Color.gray);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-       jLabel_user.setBorder(jlabel_icon);
+            jLabel_user.setBorder(jlabel_icon);
         }
     }//GEN-LAST:event_txtPasswordFocusLost
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        Register openRegister = new Register();
-//       openRegister.setLocationRelativeTo(null);
        openRegister.setVisible(true);
        setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -483,33 +469,21 @@ verifyLogin();        // TODO add your handling code here:
             }
         });
     }
-public void verifyLogin(){
+    //=========================================================================
+    //Pasar al servidor
+    //=========================================================================
+    public void verifyLogin(){
         loginuser = txtUser.getText().toLowerCase();
         password = String.valueOf(txtPassword.getPassword());
-        try {
-            Class.forName(driver);
-            try {
-                conn = DriverManager.getConnection(url, user, pass);
-                st = conn.createStatement();
-                rs = st.executeQuery("SELECT * FROM usuario WHERE nombre_usuario='" + loginuser + "'"
-                        + "and contrasenya='" + password + "'");
-                if (rs.next()) {
-                    JOptionPane.showMessageDialog(null, "Acceso autorizado");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Por favor comprueba las credenciales");
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "No vaAAAAAAAAA2");
-            }
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "No va");
-        }
-
+        
+    //Login message sets ip adress as its own to recive the server response
+        Send.message((String) GetIP.getLocalIp().get(1), password, loginuser, "login");
     }
+    
     public void setLogin(String registerlogin){
-        if(!registerlogin.isEmpty()){
-        txtUser.setText(registerlogin);
-    }}
+        if(!registerlogin.isEmpty()){txtUser.setText(registerlogin);}
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JDesktopPane jDesktopPane1;
