@@ -60,24 +60,23 @@ public class DBConnection {
         try{     
             Class.forName(driver);
             try{
-                conn = DriverManager.getConnection(url, user, pass);
+                    conn = DriverManager.getConnection(url, user, pass);
+                    Connection connection = new DBConnection().conn;
+                    Statement stmt = connection.createStatement();
                 st = conn.createStatement();
                 rs = st.executeQuery("SELECT user_id FROM users WHERE username='" + data[0] + "'");
                 if (rs.next()) {error += "\n\tNick taken"; }
                 
-                if(error.length()<1){
-                    ps = conn.prepareStatement("INSERT INTO `users`( `username`, `email`, `name`, `surname`, `last_ip`, `password`, `genre, `image`) VALUES (?,?,?,?,'',?,?,'null')");
-                    ps.setString(1, data[0]);
-                    ps.setString(2, data[4]);
-                    ps.setString(3, data[2]);
-                    ps.setString(4, data[3]);
-                    ps.setString(5, data[1]);
-                    ps.setString(6, data[5]);
-                    ps.executeUpdate();
+                if(error.equals("")){
+                    String query = "INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `name`, `surname`, `last_ip`, `genre`, `image`)"
+                                    + " VALUES (NULL,"+"'"+data[0]+"'"+", "+"'"+data[4]+"'"+", "+"'"+data[2]+"'"+", "+"'"+data[3]+"'"+", "+"'"+data[1]+"'"+", '', "+"'"+data[5]+"'"+", 'null')";
+                    
+                    stmt.executeUpdate(query);
+                    System.out.println("ddd");
                 }
                 String[] msg = {error, ""};
                 return msg;
-            } catch (SQLException ex) {return serverError;}             
+            } catch (SQLException ex) {ex.printStackTrace();return serverError;}             
         } catch (ClassNotFoundException e) {return serverError;}        
         finally { try {conn.close();} catch (SQLException ex) {return serverError;}}
     }

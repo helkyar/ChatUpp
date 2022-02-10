@@ -238,7 +238,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     
     private void setRegisterMessage(Package p) {
         infoFrame = new Information();
-        if(p.getMsg().equals("")){
+        if(p.getNick().equals("")){
             userInfo.setText("\n\tRegister successfull!!");
         
         } else{userInfo.setText(p.getMsg()+p.getNick());}         

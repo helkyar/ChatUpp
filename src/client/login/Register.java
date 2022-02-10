@@ -489,73 +489,7 @@ public class Register extends javax.swing.JFrame {
         //fijar el fondo del jbuton
         jButton_Registro.setBackground(new Color(235, 47, 6));
     }//GEN-LAST:event_jButton_RegistroMouseExited
-
-    // obtener los datos de las casillas
-//        String usuario = userUser.getText();
-//        String nombreReal = userName.getText();
-//        String apellidos = userSurname.getText();
-//        String nickname= userNick.getText();
-//        String pass1 = String.valueOf(userPassword.getPassword());
-//        String pass2 = String.valueOf(userPassword2.getPassword());
-//        String genero = "Masculino";
-//         if(jRadioButton_Femenino.isSelected()){
-//             genero = "Femenino";       
-//         }
-//        if(jRadioButton_Otros.isSelected()){
-//             genero = "Otros";      
-//    
-//        }
-//        // check if the data are empty
-//         if(verifyFields())
-//         {
-//// check if the username already exists
-//             if(!checkUsername(username));
-//             {
-//                 PreparedStatement ps;
-//                 ResultSet rs;
-//                 String registerUserQuery = "INSERT INTO `users`(`username`, `password`, `nombre_real`, `apellidos`, `nickname`, `genero`, `imagen`) VALUES (?,?,?,?,?,?,?,?)";
-//                 
-//                 try {
-//                     
-//                     ps = My_CNX.getConnection().prepareStatement(registerUserQuery);
-//                     ps.setString(1, usuario);
-//                     ps.setString(2, nombreReal);
-//                     ps.setString(3, apellidos);
-//                     ps.setString(4, nickname);
-//                     ps.setString(5, genero);
-//                     
-//                     try {
-//                         
-//                         // save the image as blob in the database
-//                         if(image_path != null){
-//                         
-//                             InputStream image = new FileInputStream(new File(image_path));
-//                             ps.setBlob(6, image);
-//                             
-//                         }else{
-//                             ps.setNull(6, java.sql.Types.NULL);
-//                         }
-//                         
-//                         if(ps.executeUpdate() != 0){
-//                             JOptionPane.showMessageDialog(null, "Your Account Has Been Created");
-//                         }else{
-//                             JOptionPane.showMessageDialog(null, "Error: Check Your Information");
-//                         }
-//                         
-//                     } catch (FileNotFoundException ex) {
-//                         Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
-//                     }
-//                     
-//                 } catch (SQLException ex) {
-//                     Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
-//                 }
-//                 
-//             }
-//         
-//             
-//             
-//            
-//    }                                                                                                
+                                                                                      
     private void jButton_SeleccionImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SeleccionImagenActionPerformed
         //Seleccionar una imagen y fijarla en la jlabel del image path
         String path = null;
