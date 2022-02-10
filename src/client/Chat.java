@@ -29,89 +29,98 @@ import javax.swing.Timer;
  * @author Javier Palacios
  */
 public class Chat extends JFrame implements ActionListener, KeyListener{
-        
-    Container content = getContentPane();
-    Container sideBar = getContentPane();
     
-    JPanel users = new JPanel();
-    JPanel win = new JPanel();
-    JPanel input = new JPanel();
-    JPanel text = new JPanel();
     JFrame frame = new JFrame();
+    
+    private JPanel chat = new JPanel();
+    private JPanel input = new JPanel(); //facilitate adding componnents
+    private JPanel connect = new JPanel();
+    private JPanel users = new JPanel();
+    private JPanel groups = new JPanel();
+    private JScrollPane scrollUsers;
+    private JScrollPane scrollGroups;
          
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
     ImageIcon send = new ImageIcon("img/send.png");
-    ImageIcon erase = new ImageIcon("img/erase.png");
-    ImageIcon exit = new ImageIcon("img/exit.png");        
+//    ImageIcon erase = new ImageIcon("img/erase.png");
+//    ImageIcon exit = new ImageIcon("img/exit.png");        
         
     JButton sendbtn = new JButton("Send", send);
-    JButton exitbtn = new JButton("Exit", exit);
-    JButton erasebtn = new JButton("Clean", erase);
-        
-    JTextField field = new JTextField(38);
-    JTextArea txtArea = new JTextArea(20,50);
+//    JButton exitbtn = new JButton("Exit", exit);
+//    JButton erasebtn = new JButton("Clean", erase);
+//=====================================================================
+    JTextField userinput = new JTextField(38);
+    JTextArea chatxt = new JTextArea(20,50);
     
 //=======================================================================
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
     
-    JScrollPane userPane = new JScrollPane();
-    JPanel allusers = new JPanel();
+//    JScrollPane userPane = new JScrollPane();
+//    JPanel allusers = new JPanel();
 
     String serverIP = "";
-    JList userOnline;
-    DefaultListModel model = new DefaultListModel();
+//    JList userOnline;
+//    DefaultListModel model = new DefaultListModel();
     
-    private static JTextArea userInfo = new JTextArea(7,20); 
-    JFrame infoFrame;
+    private JTextArea userInfo;
+    private JFrame infoPopup;
+    
+    //setting it as static to prevent lossing reference on session change doesn't work
     public static JFrame sessionFrame;
      
     public Chat() {
-        super("Chatty");     
-        setIconImage(LOGO);
-    // SHITTY SWING COMPONENTS WITH NO STYLE WHATSOEVER ========================
-            userInfo.setEditable(false);
-            
-            txtArea.setEditable(false);
-            text.add(txtArea); 
-            
-            input.add(sendbtn);
-            input.add(exitbtn);
-            input.add(erasebtn);
-            input.add(field);
-                    
-            allusers.setLayout(new BorderLayout(10,10));
-            
-            userOnline = new JList<String>();
-            userOnline.setModel(model);
-            userPane = new JScrollPane(userOnline);
-            users.add(userPane);            
-
-            content.add("Center", text);
-            content.add("South", input);
-            content.add("East", users);
-                    
-            //LISTENERS ____________________________________________________
-            sendbtn.addActionListener(this);
-            exitbtn.addActionListener(this);
-            erasebtn.addActionListener(this);
-                    
-            field.addKeyListener(this);
-            
-            //FRAME _________________________________________________________
-            pack();
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
-            setVisible(true);
-            setLocationRelativeTo(null);
-        //=====================================================================
         
-        //=====================================================================
-        //                      SERVER CONNECTION         
-        //=====================================================================
-            infoFrame = new Information();
-            new RecieveMsg();
-            getServerIP();
+    //POP-UP textarea___________________________________________________ 
+        userInfo = new JTextArea(7,20); 
+        userInfo.setEditable(false);
+        
+    //Set Panels_________________________________________________________
+        setLayout(new BorderLayout());
+        connect.setLayout(new GridLayout(2,1));
+        scrollUsers = new JScrollPane(users);
+        scrollGroups = new JScrollPane(groups);
+        
+    //Dimension and Layout_______________________________________________    
+        users.setLayout(new BoxLayout(users, BoxLayout.Y_AXIS));
+        groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));
+        scrollUsers.setPreferredSize(new Dimension(100,200));
+        scrollGroups.setPreferredSize(new Dimension(100,200));
+        
+        chat.setLayout(new BorderLayout());
+        input.setLayout(new FlowLayout());
+        chatxt.setEditable(false);
+    
+    //Add them___________________________________________________________
+        connect.add(scrollUsers);
+        connect.add(scrollGroups);
+               
+        input.add(sendbtn);
+        input.add(userinput);
+        chat.add("Center",chatxt);
+        chat.add("South",input);
+        
+        add("Center", chat);
+        add("West", connect);
+                    
+    //LISTENERS ____________________________________________________
+        sendbtn.addActionListener(this);                    
+        userinput.addKeyListener(this);
+            
+    //FRAME _________________________________________________________            
+        setTitle("Chatty");     
+        setIconImage(LOGO);
+        pack();
+           
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+        
+    //=====================================================================
+    //                      SERVER CONNECTION         
+    //=====================================================================
+        infoPopup = new Information();
+        new RecieveMsg();
+        getServerIP();
     }  
            
     private void getServerIP() {
@@ -125,6 +134,9 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             java.util.Timer timer = new java.util.Timer();
             timer.schedule(new KillSearchThread(t, timer), 100);
             t.start();
+            
+            users.add(new JButton("User"));
+            groups.add(new JButton("Group"));
         }        
         userInfo.append("   Waiting response....\n");
         
@@ -201,13 +213,13 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         userInfo.append("   Use responsibly, don't be a jerk  ;)");
         try { Thread.sleep(3000);} catch (InterruptedException ex) {}
         //Close Server Connection Info POP-UP
-        infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         new Send(serverIP);
         processSessionStart();
     }
     
     private void setLoginMessage(Package p) {
-        infoFrame = new Information();
+        infoPopup = new Information();
         if(p.getMsg().equals("OK")){
             userInfo.setText("\n\tLogin successfull!!");
         }
@@ -216,7 +228,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         
         try { Thread.sleep(1000);} catch (InterruptedException ex) {}
         //Close Login Info POP-UP
-        infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
         if(p.getMsg().equals("OK"))
         sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));
@@ -226,7 +238,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     }
     
     private void setRegisterMessage(Package p) {
-        infoFrame = new Information();
+        infoPopup = new Information();
         if(p.getInfo().equals("")){
             userInfo.setText("\n\tRegister successfull!!");
         
@@ -234,7 +246,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         
         try { Thread.sleep(5000);} catch (InterruptedException ex) {}
         //Close Login Info POP-UP
-        infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
         if(p.getMsg().equals(""))
         sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));
@@ -254,14 +266,16 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
                 GetIP.getPublicIP().contains(p.getIps().get(user)) || 
                 GetIP.getLocalIp().contains(p.getIps().get(user))
             );
-            
-            if(!model.contains(user)){model.addElement(user);}
+                       
+            users.add(new JButton(user));
+            groups.add(new JButton("Group"));
+//            if(!model.contains(user)){model.addElement(user);}
         }            
             
     }
     
     private void sendMessage(Package p){
-        txtArea.append(p.getMsg()+"\n");
+        chatxt.append(p.getMsg()+"\n");
     }     
     
     
@@ -337,29 +351,29 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
 // EVENTS
 // ======================================================================
     public void actionPerformed(ActionEvent event) {
-        try {                
-            if(event.getSource() == sendbtn){
-                Send.message( userOnline.getSelectedValue().toString(),field.getText(), "", "messaging");
-                
-                txtArea.append(field.getText() + "\n");
-                field.setText("");
-            } else if (event.getSource() == erasebtn){
-                txtArea.setText("");
-            }else if (event.getSource() == exitbtn){
-                System.exit(0);
-            }
-        } catch (Exception e){e.printStackTrace();}
+//        try {                
+//            if(event.getSource() == sendbtn){
+//                Send.message( userOnline.getSelectedValue().toString(),userinput.getText(), "", "messaging");
+//                
+//                chatxt.append(userinput.getText() + "\n");
+//                userinput.setText("");
+//            } else if (event.getSource() == erasebtn){
+//                chatxt.setText("");
+//            }else if (event.getSource() == exitbtn){
+//                System.exit(0);
+//            }
+//        } catch (Exception e){e.printStackTrace();}
     }
     
     public void keyPressed(KeyEvent pressed) {
-         try {
-            if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
-                Send.message( userOnline.getSelectedValue().toString(), field.getText(), "", "messaging");
-                
-                txtArea.append(field.getText() + "\n");
-                field.setText("");
-            }  
-        } catch (Exception e){e.printStackTrace();}
+//         try {
+//            if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
+//                Send.message( userOnline.getSelectedValue().toString(), userinput.getText(), "", "messaging");
+//                
+//                chatxt.append(userinput.getText() + "\n");
+//                userinput.setText("");
+//            }  
+//        } catch (Exception e){e.printStackTrace();}
     }
     
     public void keyTyped (KeyEvent typing){}
