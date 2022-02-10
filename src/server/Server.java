@@ -9,12 +9,10 @@ import packager.Package;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -38,60 +36,68 @@ public class Server extends JFrame implements Runnable{
     
     public static void main(String[] args) {
         new Server();
-    }
-    
+    }    
 
     @Override
     public void run() {
         try {
             ServerSocket port = new ServerSocket(9999);
-            String nick, ip, move, msg;
+            String nick, move, msg, ip="";
             ArrayList<String> ips = new ArrayList<String>();
             Package p;
             
             while(true){
-                try (Socket mysocket = port.accept()) {
+                try (Socket socket = port.accept()) {
                     
-                    ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
+                    ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
                     p = (Package) entrada.readObject();
                     
-                    if(p.getStatus().equals("online")){
-                        InetAddress locateip = mysocket.getInetAddress();
-                        String getip = locateip.getHostAddress();
-                        
-                        txt.append("New connection: "+getip);
-                        
-                        if(!ips.contains(getip)){ips.add(getip);}
-                        
-                        p.setIps(ips);
-                        p.setStatus("imserver");
+                    if(p.getStatus().equals("online")){getOnlineUseres(socket, p, ips);}
+                    else if (p.getStatus().equals("login")){checkLogin();}
+                    else if (p.getStatus().equals("register")){registerUser();}
+                    else if (p.getStatus().equals("messaging")){sendMessage(socket, p, ip);}
                     
-                        for(String userip:ips){
-                            Socket sendmsg = new Socket(userip, 9090);
-                            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-                            msgpackage.writeObject(p);
-
-                            msgpackage.close(); sendmsg.close(); mysocket.close();
-                        }
-                        
-                    } else if (p.getStatus().equals("messaging")){
-                        ip = p.getIp();
-                        
-                        Socket sendmsg = new Socket(ip, 9090);
-                        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-                        msgpackage.writeObject(p);
-                        
-                        msgpackage.close(); sendmsg.close(); mysocket.close();
-                    }
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                } catch(EOFException ex){
-                    System.out.println("Wrong chat connection protocol");
-                }
+                } catch (ClassNotFoundException ex) {System.out.println("Class not found");}
+                 catch(EOFException ex){System.out.println("Wrong chat connection protocol");}
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {ex.printStackTrace();}
+    }
+    
+    private void getOnlineUseres(Socket socket, Package p, ArrayList<String> ips) throws IOException{
+        InetAddress locateip = socket.getInetAddress();
+        String getip = locateip.getHostAddress();
+                        
+        txt.append("New connection: "+getip);
+                        
+        if(!ips.contains(getip)){ips.add(getip);}
+                        
+        p.setIps(ips);
+        p.setStatus("imserver");
+                    
+        for(String userip:ips){
+            Socket sendmsg = new Socket(userip, 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close(); socket.close();
         }
     }
     
+    private void sendMessage(Socket socket, Package p, String ip) throws IOException{
+        ip = p.getIp();
+                        
+        Socket sendmsg = new Socket(ip, 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); socket.close();
+    }
+
+    private void checkLogin() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void registerUser() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
