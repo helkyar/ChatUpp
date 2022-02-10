@@ -71,6 +71,11 @@ public class Server extends JFrame implements Runnable{
                         
         txt.append("New connection: "+getip);
         p.setStatus("imserver");   
+        Socket sendmsg = new Socket(getip, 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); socket.close();
     }
     
     private void checkLogin(Socket socket, Package p) throws IOException{
