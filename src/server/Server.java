@@ -71,7 +71,7 @@ public class Server extends JFrame implements Runnable{
                         
         txt.append("New connection: "+getip);
         p.setStatus("imserver");   
-        Socket sendmsg = new Socket(getip, 9090);
+        Socket sendmsg = new Socket(getip, 9191);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
                         

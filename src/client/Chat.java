@@ -28,9 +28,10 @@ import javax.swing.Timer;
  * 
  * @author Javier Palacios
  */
-public class Chat extends JFrame implements ActionListener, KeyListener{
+public class Chat extends JFrame implements ActionListener{
     
-    JFrame frame = new JFrame();
+    public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
+    public static final Image LOGO = CHATLOGO.getImage();
     
     private JPanel chat = new JPanel();
     private JPanel input = new JPanel(); //facilitate adding componnents
@@ -40,27 +41,13 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     private JScrollPane scrollUsers;
     private JScrollPane scrollGroups;
          
-    ImageIcon send = new ImageIcon("img/send.png");
-//    ImageIcon erase = new ImageIcon("img/erase.png");
-//    ImageIcon exit = new ImageIcon("img/exit.png");        
-        
-    JButton sendbtn = new JButton("Send", send);
-//    JButton exitbtn = new JButton("Exit", exit);
-//    JButton erasebtn = new JButton("Clean", erase);
-//=====================================================================
-    JTextField userinput = new JTextField(38);
-    JTextArea chatxt = new JTextArea(20,50);
+    private ImageIcon send = new ImageIcon("img/send.png");  
+    private JButton sendbtn = new JButton("Send", send);
     
-//=======================================================================
-    public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
-    public static final Image LOGO = CHATLOGO.getImage();
+    private JTextField userinput = new JTextField(38);
+    private JTextArea chatxt = new JTextArea(20,50);
     
-//    JScrollPane userPane = new JScrollPane();
-//    JPanel allusers = new JPanel();
-
-    String serverIP = "";
-//    JList userOnline;
-//    DefaultListModel model = new DefaultListModel();
+    private String serverIP = "";
     
     private JTextArea userInfo;
     private JFrame infoPopup;
@@ -104,7 +91,9 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
                     
     //LISTENERS ____________________________________________________
         sendbtn.addActionListener(this);                    
-        userinput.addKeyListener(this);
+        userinput.addKeyListener(new KeyAdapter(){
+            public void keyPressed(KeyEvent pressed){sendToChat(pressed);}            
+        });
             
     //FRAME _________________________________________________________            
         setTitle("Chatty");     
@@ -124,10 +113,11 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     }  
            
     private void getServerIP() {
+        //Get user local ip
         userInfo.setText("\n   Starting connection...\n");
         String ip = (String) GetIP.getLocalIp().get(1);
         ip = ip.substring(0, ip.lastIndexOf(".")+1);
-        
+        //Test last 255 local ips searching for server
         for(int i = 0; i<=255; i++){
             Thread t = new Thread(new SearchServer(i, ip));
             
@@ -140,7 +130,8 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         }        
         userInfo.append("   Waiting response....\n");
         
-        new Timer(10000, (ActionEvent e) -> {
+        //Set message in case it takes too much
+        new Timer(15000, (ActionEvent e) -> {
             userInfo.append("   Maybe your Internet is down?\n");
             userInfo.append("   Or our server is fucked...\n"); 
             if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
@@ -153,7 +144,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         StartOptions options = new StartOptions();
         JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
         String slc = options.getSelection();
-        System.out.println(slc);
+        
         if(slc.equals("Login")){sessionFrame = new Login();}
         else if(slc.equals("Register")){sessionFrame = new Register();}
     }
@@ -171,7 +162,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         @Override
         public void run() {
             try {
-                ServerSocket port = new ServerSocket(9090);
+                ServerSocket port = new ServerSocket(9191);
                 String nick, ip, move, msg;
                 Package p;
 
@@ -357,15 +348,11 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
 //                
 //                chatxt.append(userinput.getText() + "\n");
 //                userinput.setText("");
-//            } else if (event.getSource() == erasebtn){
-//                chatxt.setText("");
-//            }else if (event.getSource() == exitbtn){
-//                System.exit(0);
-//            }
+   
 //        } catch (Exception e){e.printStackTrace();}
     }
     
-    public void keyPressed(KeyEvent pressed) {
+    public void sendToChat(KeyEvent pressed) {
 //         try {
 //            if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
 //                Send.message( userOnline.getSelectedValue().toString(), userinput.getText(), "", "messaging");
@@ -375,7 +362,4 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
 //            }  
 //        } catch (Exception e){e.printStackTrace();}
     }
-    
-    public void keyTyped (KeyEvent typing){}
-    public void keyReleased(KeyEvent released){}
 }
