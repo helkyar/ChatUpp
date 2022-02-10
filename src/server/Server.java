@@ -53,8 +53,8 @@ public class Server extends JFrame implements Runnable{
                     p = (Package) entrada.readObject();
                     
                     if(p.getStatus().equals("online")){getOnlineUseres(socket, p, ips);}
-                    else if (p.getStatus().equals("login")){checkLogin();}
-                    else if (p.getStatus().equals("register")){registerUser();}
+                    else if (p.getStatus().equals("login")){checkLogin(socket, p, ip);}
+                    else if (p.getStatus().equals("register")){registerUser(socket, p, ip);}
                     else if (p.getStatus().equals("messaging")){sendMessage(socket, p, ip);}
                     
                 } catch (ClassNotFoundException ex) {System.out.println("Class not found");}
@@ -69,10 +69,9 @@ public class Server extends JFrame implements Runnable{
                         
         txt.append("New connection: "+getip);
                         
-        if(!ips.contains(getip)){ips.add(getip);}
-                        
-        p.setIps(ips);
+        if(!ips.contains(getip)){ips.add(getip);}                        
         p.setStatus("imserver");
+        p.setIps(ips);
                     
         for(String userip:ips){
             Socket sendmsg = new Socket(userip, 9090);
@@ -83,6 +82,32 @@ public class Server extends JFrame implements Runnable{
         }
     }
     
+    private void checkLogin(Socket socket, Package p, String ip) throws IOException{
+        
+        p.setMsg(DBConnection.checkLogin(p.getMsg(), p.getNick()));
+        
+        ip = p.getIp();  
+        Socket sendmsg = new Socket(ip, 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); socket.close();
+    }
+
+    private void registerUser(Socket socket, Package p, String ip) throws IOException{
+        String[] data = DBConnection.registerUser(p.getMsg(), p.getNick());
+        p.setMsg(data[0]);
+        p.setNick(data[1]);
+         
+        ip = p.getIp();  
+        Socket sendmsg = new Socket(ip, 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); socket.close();
+        
+    }
+    
     private void sendMessage(Socket socket, Package p, String ip) throws IOException{
         ip = p.getIp();
                         
@@ -91,13 +116,5 @@ public class Server extends JFrame implements Runnable{
         msgpackage.writeObject(p);
                         
         msgpackage.close(); sendmsg.close(); socket.close();
-    }
-
-    private void checkLogin() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void registerUser() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

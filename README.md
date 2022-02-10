@@ -22,7 +22,9 @@ Chat based in java
 ### Run
 
 ## Known issues
-
+Sometimes connection to server doesn't stop looping (reestart server to solve this issue).  
+Register panel returns a Frame with previous information (instead of new one).  
+Lost connection message repeats itself.  
 ## Design
 
 ## Next Steps

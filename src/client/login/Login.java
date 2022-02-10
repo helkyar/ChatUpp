@@ -46,12 +46,7 @@ public class Login extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 //        centramos el form
         setLocationRelativeTo(null);
-//        setLogin(registerlogin);
-//        Image img = Toolkit.getDefaultToolkit().getImage(getClass().getResource("img/login.png"));
-//        setIcon(new ImageIcon(img.getScaledInstance(getWidth(),getHeight(),Image.SCALE_SMOOTH)));
-//        setIconImage(img);
-
-//        creamos un borde amarillo para el titulo del panel
+        
 //         con el 0, en la parte superior del titulo del panel no ponemos borde
         Border jpanel_titulo_borde = BorderFactory.createMatteBorder(0, 1, 1, 1, Color.YELLOW);
 //        fijamos el borde al jpanel del título
@@ -62,6 +57,8 @@ public class Login extends javax.swing.JFrame {
         jLabel_cerrar.setBorder(jlabel_borde);
         txtPassword.setTransferHandler(null);
         
+        //Make it visible
+        setVisible(true);
     }
 
     /**
@@ -430,50 +427,12 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordFocusLost
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       Register openRegister = new Register();
-       openRegister.setVisible(true);
+       Chat.sessionFrame = new Register();
        setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Login().setVisible(true);
-            }
-        });
-    }
-    //=========================================================================
-    //Pasar al servidor
-    //=========================================================================
     public void verifyLogin(){
-        loginuser = txtUser.getText().toLowerCase();
+        loginuser = txtUser.getText();
         password = String.valueOf(txtPassword.getPassword());
         
     //Login message sets ip adress as its own to recive the server response

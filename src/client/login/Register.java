@@ -1,6 +1,8 @@
 package client.login;
 
 import client.Chat;
+import client.Send;
+import client.helpers.GetIP;
 import java.awt.Color;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -42,22 +44,12 @@ public class Register extends javax.swing.JFrame {
     ResultSet rs = null;
     int islogin;
 
-    String txtUser;
-    String txtPassword;
-    String txtPassword2;
-    String txtName;
-    String txtSurname;
-    String txtNickname;
-    String txtGenero;
-    String registerlogin;
     //creamos una variable para fijar la ipagen al path
     String image_path = null;
 
     public Register() {
         super("Chatty");
         setIconImage(Chat.LOGO);
-        
-        Login log = new Login(); //llamar a Login.java para poder referenciarlo
         
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -88,6 +80,9 @@ public class Register extends javax.swing.JFrame {
         bg.add(jRadioButton_Masculino);
         bg.add(jRadioButton_Femenino);
         bg.add(jRadioButton_Otros);
+        
+        //Make it visible
+        setVisible(true);
     }
 
     /**
@@ -480,20 +475,17 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel_cerrarMouseEntered
 
     private void jLabel_cerrarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseExited
-        // TODO add your handling code here:
         Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black);
         jLabel_cerrar.setBorder(jlabel_borde);
         jLabel_cerrar.setForeground(Color.black);
     }//GEN-LAST:event_jLabel_cerrarMouseExited
 
     private void jButton_RegistroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton_RegistroMouseEntered
-        // TODO add your handling code here:
         //fijar el fondo del jbuton
         jButton_Registro.setBackground(new Color(225, 20, 2));
     }//GEN-LAST:event_jButton_RegistroMouseEntered
 
     private void jButton_RegistroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton_RegistroMouseExited
-        // TODO add your handling code here:
         //fijar el fondo del jbuton
         jButton_Registro.setBackground(new Color(235, 47, 6));
     }//GEN-LAST:event_jButton_RegistroMouseExited
@@ -587,77 +579,39 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_SeleccionImagenActionPerformed
 
     private void frameLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_frameLoginActionPerformed
-        Login login1 = new Login();
-        login1.setVisible(true);
+        Chat.sessionFrame = new Login();
         setVisible(false);
     }//GEN-LAST:event_frameLoginActionPerformed
 
     private void jButton_RegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RegistroActionPerformed
-        // TODO add your handling code here:
-        // TODO add your handling code here:
-        txtUser = userUser.getText().toLowerCase();
-        try {
-            Class.forName(driver);
-            try {
-                conn = DriverManager.getConnection(url, user, pass);
-                st = conn.createStatement();
-                rs = st.executeQuery("SELECT * FROM usuario WHERE nombre_usuario='" + txtUser + "'");
-                if (!rs.next()) {
-                    txtPassword = String.valueOf(userPassword.getPassword());
-                    System.out.println(txtPassword);
-                    txtPassword2 = String.valueOf(userPassword2.getPassword());
-                    System.out.println(txtPassword2);
-                    if (txtPassword.equals(txtPassword2)) {
+        String nick = userUser.getText();
 
-                        txtName = userName.getText();
-                        txtSurname = userSurname.getText();
-                        txtNickname = userNick.getText();
-                        if (jRadioButton_Femenino.isSelected()) {
-                            txtGenero = "Femenino";
-                        }
-                        if (jRadioButton_Otros.isSelected()) {
-                            txtGenero = "Otros";
-                        }
-                        if (jRadioButton_Masculino.isSelected()) {
-                            txtGenero = "Masculino";
-                        }
-                        ps = conn.prepareStatement("INSERT INTO `usuario`( `nombre_usuario`, `nombre_visible`, `nombre_legal`, `apellido_legal`, `ultima_ip`, `contrasenya`, `genero`, `imagen`) VALUES (?,?,?,?,'',?,?,'null')");
-                        ps.setString(1, txtUser);
-                        ps.setString(2, txtNickname);
-                        ps.setString(3, txtName);
-                        ps.setString(4, txtSurname);
-                        ps.setString(5, txtPassword);
-                        ps.setString(6, txtGenero);
-                        ps.executeUpdate();
-//conn = DriverManager.getConnection(url, user, pass);
-//                st = conn.createStatement();
-//                            conn.prepareStatement("INSERT INTO usuario(nombre_usuario) VALUES (?)");
-//                            ps.setString(1, txtUser);
-//                            ps.executeUpdate();
-
-                        JOptionPane.showMessageDialog(null, "Has sido Registrado correctamente");
-                        registerlogin=txtName;
-                        Login login1 = new Login();
-                                login1.setVisible(true);
-        setVisible(false);
-                        
-
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Este Usuario ya existe");
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "No se pudo conectar con el servidor");
-            }
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "");
-        }
-
-
+        String pwd = String.valueOf(userPassword.getPassword());
+        String pwd2 = String.valueOf(userPassword2.getPassword());
+                   
+        String name = userName.getText();
+        String surname = userSurname.getText();
+        String email = userNick.getText();
+        
+        String genre;
+        if (jRadioButton_Masculino.isSelected()){genre = "Masculino";}
+        else if (jRadioButton_Femenino.isSelected()){genre = "Femenino";}
+        else {genre = "Otros";}       
+        
+        String data = nick+"~"+pwd+"~"+name+"~"+surname+"~"+email+"~"+genre;
+        String registerFail = "";
+        
+        //Forbid "~" symbol
+         //Check empty inputs
+        if(nick.trim().equals("") || name.trim().equals("") || surname.trim().equals("") ||
+                email.trim().equals("") || pwd.trim().equals("") || pwd2.trim().equals("")){
+            registerFail += "\n\tLos campos no pueden estar vacíos";
+        }                 
+        if (!pwd.equals(pwd2)) {registerFail += "\n\tLas contraseñas no coinciden";}
+      
+        Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register");
     }//GEN-LAST:event_jButton_RegistroActionPerformed
-
+    
     //crear una funcion para verificar las casillas vacias
 //    public boolean verifyFields()
 //    {
@@ -716,43 +670,6 @@ public class Register extends javax.swing.JFrame {
 //        return username_exist;
 //    }
 //    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Register.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Register().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton frameLogin;
