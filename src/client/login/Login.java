@@ -2,27 +2,16 @@
 package client.login;
 
 import java.awt.Color;
-import java.awt.Image;
-import java.awt.Toolkit;
 import javax.swing.border.Border; 
 import javax.swing.BorderFactory;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import client.Chat;
 import client.Send;
 import client.helpers.GetIP;
+import javax.swing.ImageIcon;
 
 /**
  *

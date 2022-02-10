@@ -13,6 +13,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -42,8 +44,7 @@ public class Server extends JFrame implements Runnable{
     public void run() {
         try {
             ServerSocket port = new ServerSocket(9999);
-            String nick, move, msg, ip="";
-            ArrayList<String> ips = new ArrayList<String>();
+            String nick, move, msg;
             Package p;
             
             while(true){
@@ -52,10 +53,11 @@ public class Server extends JFrame implements Runnable{
                     ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
                     p = (Package) entrada.readObject();
                     
-                    if(p.getStatus().equals("online")){getOnlineUseres(socket, p, ips);}
-                    else if (p.getStatus().equals("login")){checkLogin(socket, p, ip);}
-                    else if (p.getStatus().equals("register")){registerUser(socket, p, ip);}
-                    else if (p.getStatus().equals("messaging")){sendMessage(socket, p, ip);}
+                    if(p.getStatus().equals("online")){sayHelloToChat(socket, p);}
+                    else if (p.getStatus().equals("login")){checkLogin(socket, p);}
+                    else if (p.getStatus().equals("register")){registerUser(socket, p);}
+                    else if (p.getStatus().equals("getusers")){sendUsersOnline(socket, p);}
+                    else if (p.getStatus().equals("messaging")){sendMessage(socket, p);}
                     
                 } catch (ClassNotFoundException ex) {System.out.println("Class not found");}
                  catch(EOFException ex){System.out.println("Wrong chat connection protocol");}
@@ -63,17 +65,47 @@ public class Server extends JFrame implements Runnable{
         } catch (IOException ex) {ex.printStackTrace();}
     }
     
-    private void getOnlineUseres(Socket socket, Package p, ArrayList<String> ips) throws IOException{
+    private void sayHelloToChat(Socket socket, Package p) throws IOException{
         InetAddress locateip = socket.getInetAddress();
         String getip = locateip.getHostAddress();
                         
         txt.append("New connection: "+getip);
+        p.setStatus("imserver");   
+    }
+    
+    private void checkLogin(Socket socket, Package p) throws IOException{
+        
+        p.setMsg(DBConnection.checkLogin(p.getMsg(), p.getNick()));
+        
+        Socket sendmsg = new Socket(p.getIp(), 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
                         
-        if(!ips.contains(getip)){ips.add(getip);}                        
-        p.setStatus("imserver");
+        msgpackage.close(); sendmsg.close(); socket.close();
+    }
+
+    private void registerUser(Socket socket, Package p) throws IOException{
+        String[] data = DBConnection.registerUser(p.getMsg(), p.getNick());
+        p.setMsg(data[0]);
+        p.setInfo(data[1]);
+        p.setNick(data[2]);
+         
+        Socket sendmsg = new Socket(p.getIp(), 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); socket.close();        
+    }
+    
+    private void sendUsersOnline(Socket socket, Package p) throws IOException{
+        Map<String, String> ips = new HashMap<>();        
+        InetAddress locateip = socket.getInetAddress();
+        String getip = locateip.getHostAddress();
+        
+        if(!ips.containsValue(getip)){ips.put(p.getNick(), getip);}        
         p.setIps(ips);
-                    
-        for(String userip:ips){
+                            
+        for(String userip:ips.values()){
             Socket sendmsg = new Socket(userip, 9090);
             ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
             msgpackage.writeObject(p);
@@ -82,36 +114,9 @@ public class Server extends JFrame implements Runnable{
         }
     }
     
-    private void checkLogin(Socket socket, Package p, String ip) throws IOException{
-        
-        p.setMsg(DBConnection.checkLogin(p.getMsg(), p.getNick()));
-        
-        ip = p.getIp();  
-        Socket sendmsg = new Socket(ip, 9090);
-        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-        msgpackage.writeObject(p);
-                        
-        msgpackage.close(); sendmsg.close(); socket.close();
-    }
+    private void sendMessage(Socket socket, Package p) throws IOException{
 
-    private void registerUser(Socket socket, Package p, String ip) throws IOException{
-        String[] data = DBConnection.registerUser(p.getMsg(), p.getNick());
-        p.setMsg(data[0]);
-        p.setNick(data[1]);
-         
-        ip = p.getIp();  
-        Socket sendmsg = new Socket(ip, 9090);
-        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-        msgpackage.writeObject(p);
-                        
-        msgpackage.close(); sendmsg.close(); socket.close();
-        
-    }
-    
-    private void sendMessage(Socket socket, Package p, String ip) throws IOException{
-        ip = p.getIp();
-                        
-        Socket sendmsg = new Socket(ip, 9090);
+        Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
                         

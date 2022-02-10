@@ -24,7 +24,8 @@ Chat based in java
 ## Known issues
 Sometimes connection to server doesn't stop looping (reestart server to solve this issue).  
 Register panel returns a Frame with previous information (instead of new one).  
-Lost connection message repeats itself.  
+Lost connection message repeats itself.
+Session frames don't close if changed between them (login to register || resgister to login)
 ## Design
 
 ## Next Steps

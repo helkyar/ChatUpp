@@ -18,20 +18,10 @@ import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.Timer;
 
 /**
@@ -184,8 +174,9 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
                 //                 SERVER RESPONSE MANAGING
                 //=====================================================================================                        
                         if(p.getStatus().equals("imserver")){setServerIP(mysocket, p);}
-                        else if(p.getStatus().equals("login")){setLoginMessage(p.getMsg());}
-                        else if(p.getStatus().equals("register")){setRegisterMessage(p);}
+                        else if(p.getStatus().equals("login")){setLoginMessage(p);}
+                        else if(p.getStatus().equals("register")){setRegisterMessage(p);}                        
+                        else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
                         else if(p.getStatus().equals("messaging")){sendMessage(p);} 
                 //=====================================================================================                        
                     } catch(Exception e){}                    
@@ -206,12 +197,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
             
         InetAddress locateip = mysocket.getInetAddress();
         serverIP = locateip.getHostAddress();            
-            
-        for(String user : p.getIps()){
-            boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
-            if(!model.contains(user) && !own){model.addElement(user);}
-        }            
-            
+
         userInfo.append("   Use responsibly, don't be a jerk  ;)");
         try { Thread.sleep(3000);} catch (InterruptedException ex) {}
         //Close Server Connection Info POP-UP
@@ -220,25 +206,28 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         processSessionStart();
     }
     
-    private void setLoginMessage(String msg) {
+    private void setLoginMessage(Package p) {
         infoFrame = new Information();
-        if(msg.equals("OK")){
+        if(p.getMsg().equals("OK")){
             userInfo.setText("\n\tLogin successfull!!");
         }
-        else if(msg.equals("X")){userInfo.setText("\n\tWrong credentials");}        
+        else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
         else {userInfo.setText("\n\tServer error, please restart");}  
         
         try { Thread.sleep(1000);} catch (InterruptedException ex) {}
         //Close Login Info POP-UP
         infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
-        if(msg.equals("OK"))
+        if(p.getMsg().equals("OK"))
         sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));
+        
+        //Ask server to get users and send current user
+        askForUsersOnline(p.getNick());
     }
     
     private void setRegisterMessage(Package p) {
         infoFrame = new Information();
-        if(p.getNick().equals("")){
+        if(p.getInfo().equals("")){
             userInfo.setText("\n\tRegister successfull!!");
         
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
@@ -249,6 +238,26 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
         //Close Login/Register window
         if(p.getMsg().equals(""))
         sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));
+        
+        //Ask server to get users and send current user
+        askForUsersOnline(p.getNick());
+    }
+    
+    private void askForUsersOnline(String nick){
+        Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers");
+    }
+    
+    private void setUsersOnline(Package p){
+                    
+        for(String user : p.getIps().keySet()){
+            boolean own = (
+                GetIP.getPublicIP().contains(p.getIps().get(user)) || 
+                GetIP.getLocalIp().contains(p.getIps().get(user))
+            );
+            
+            if(!model.contains(user)){model.addElement(user);}
+        }            
+            
     }
     
     private void sendMessage(Package p){
@@ -330,7 +339,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     public void actionPerformed(ActionEvent event) {
         try {                
             if(event.getSource() == sendbtn){
-                Send.message(field.getText(), userOnline.getSelectedValue().toString(), "", "");
+                Send.message( userOnline.getSelectedValue().toString(),field.getText(), "", "messaging");
                 
                 txtArea.append(field.getText() + "\n");
                 field.setText("");
@@ -345,7 +354,7 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
     public void keyPressed(KeyEvent pressed) {
          try {
             if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
-                Send.message(field.getText(), userOnline.getSelectedValue().toString(), "", "");
+                Send.message( userOnline.getSelectedValue().toString(), field.getText(), "", "messaging");
                 
                 txtArea.append(field.getText() + "\n");
                 field.setText("");

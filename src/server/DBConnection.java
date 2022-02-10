@@ -56,7 +56,7 @@ public class DBConnection {
     public static String[] registerUser(String error, String nick){
         //parse response
         String[] data = nick.split("~");
-        String[] serverError = {error, "\n\tServer Error"};
+        String[] serverError = {error, "\n\tServer Error", ""};
         try{     
             Class.forName(driver);
             try{
@@ -75,7 +75,7 @@ public class DBConnection {
                     ps.setString(6, data[5]);
                     ps.executeUpdate();
                 }
-                String[] msg = {error, ""};
+                String[] msg = {error, "", data[0]};
                 return msg;
             } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
         } catch (ClassNotFoundException e) {return serverError;}        
