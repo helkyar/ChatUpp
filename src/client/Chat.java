@@ -64,14 +64,15 @@ public class Chat extends JFrame implements ActionListener{
     //Set Panels_________________________________________________________
         setLayout(new BorderLayout());
         connect.setLayout(new GridLayout(2,1));
-        scrollUsers = new JScrollPane(users);
-        scrollGroups = new JScrollPane(groups);
+        System.out.println(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS+","+JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollUsers = new JScrollPane(users, 22,31); //vertical always [20 for needed], horizontal never
+        scrollGroups = new JScrollPane(groups, 22,31); //vertical always [20 for needed], horizontal never
         
     //Dimension and Layout_______________________________________________    
         users.setLayout(new BoxLayout(users, BoxLayout.Y_AXIS));
         groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));
-        scrollUsers.setPreferredSize(new Dimension(100,200));
-        scrollGroups.setPreferredSize(new Dimension(100,200));
+        scrollUsers.setPreferredSize(new Dimension(115,210));
+        scrollGroups.setPreferredSize(new Dimension(115,210));
         
         chat.setLayout(new BorderLayout());
         input.setLayout(new FlowLayout());
@@ -125,8 +126,8 @@ public class Chat extends JFrame implements ActionListener{
             timer.schedule(new KillSearchThread(t, timer), 100);
             t.start();
             
-            users.add(new JButton("User"));
-            groups.add(new JButton("Group"));
+            users.add(new JButton("Usermm", send));
+            groups.add(new JButton("Group", send));
         }        
         userInfo.append("   Waiting response....\n");
         
@@ -258,8 +259,8 @@ public class Chat extends JFrame implements ActionListener{
                 GetIP.getLocalIp().contains(p.getIps().get(user))
             );
                        
-            users.add(new JButton(user));
-            groups.add(new JButton("Group"));
+            users.add(new JButton("Usermm", send));
+            groups.add(new JButton("Group", send));
 //            if(!model.contains(user)){model.addElement(user);}
         }            
             
