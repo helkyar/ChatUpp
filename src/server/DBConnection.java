@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author Mateo
  */
 public class DBConnection {
-    private static final String driver = "com.mysql.jdbc.Driver";
+    private static final String driver = "com.mysql.cj.jdbc.Driver";
     private static final String url = "jdbc:mysql://localhost:3306/chat";
     private static final String user = "root";
     private static final String pass = "";
@@ -48,9 +48,9 @@ public class DBConnection {
                 if (rs.next()) {return "OK";}
                 else {return "X";}                
                          
-            } catch (SQLException ex) {return "SP";}             
+            } catch (SQLException ex) {ex.printStackTrace(); return "SP";}             
         } catch (ClassNotFoundException e) {return "SP";}         
-        finally { try {conn.close();} catch (SQLException ex) {return "SPS";}}
+        finally { try {conn.close();} catch (SQLException ex) {return "SPS";} catch (Exception ex) {return "SPS";}}
     }
     
     public static String[] registerUser(String error, String nick){
@@ -79,6 +79,6 @@ public class DBConnection {
                 return msg;
             } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
         } catch (ClassNotFoundException e) {return serverError;}        
-        finally { try {conn.close();} catch (SQLException ex) {return serverError;}}
+        finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
     }
 }
