@@ -75,7 +75,7 @@ CREATE TABLE `users` (
   `surname` varchar(50) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `last_ip` varchar(15) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `genre` varchar(15) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
-  `image` varchar(50) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL
+  `image` blob NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
