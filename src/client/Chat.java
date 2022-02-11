@@ -9,223 +9,169 @@ package client;
  *
  * @author Javier Palacios Botejara
  */
+import client.helpers.GetIP;
+import client.helpers.KillSearchThread;
+import client.helpers.SearchServer;
 import client.login.Login;
 import client.login.Register;
 import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.Timer;
 
-import java.util.Timer;
-
-public class Chat extends JFrame implements ActionListener, KeyListener{
-        
-    Container content = getContentPane();
-    Container sideBar = getContentPane();
+/**
+ * 
+ * @author Javier Palacios
+ */
+public class Chat extends JFrame implements ActionListener{
     
-    JPanel users = new JPanel();
-    JPanel win = new JPanel();
-    JPanel input = new JPanel();
-    JPanel text = new JPanel();
-    JFrame frame = new JFrame();
-         
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-    ImageIcon send = new ImageIcon("img/send.png");
-    ImageIcon erase = new ImageIcon("img/erase.png");
-    ImageIcon exit = new ImageIcon("img/exit.png");        
-        
-    JButton sendbtn = new JButton("Send", send);
-    JButton exitbtn = new JButton("Exit", exit);
-    JButton erasebtn = new JButton("Clean", erase);
-        
-    JTextField field = new JTextField(38);
-    JTextArea txtArea = new JTextArea(20,50);
-    
-//=======================================================================
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
     
-    JScrollPane userPane = new JScrollPane();
-    JPanel allusers = new JPanel();
-
-    String serverIP;
-    JList userOnline;
-    DefaultListModel model = new DefaultListModel();
+    private JPanel chat = new JPanel();
+    private JPanel options = new JPanel();
+    private JPanel input = new JPanel(); //facilitate adding componnents
+    private JPanel connect = new JPanel();
+    private JPanel users = new JPanel();
+    private JPanel groups = new JPanel();
+    private JScrollPane scrollUsers;
+    private JScrollPane scrollGroups; 
+        
+    private JButton sendbtn = new JButton(new ImageIcon("img/send.png"));
+    private JButton exitbtn = new JButton("X");
+    private JButton erasebtn = new JButton("#");
+    private JButton login = new JButton("Login");
+    private JButton register = new JButton("Register");
     
-    JTextArea userInfo = new JTextArea(7,20);
+    private JTextField userinput = new JTextField(38);
+    private JTextArea chatxt = new JTextArea(20,50);
+        
+    private JTextArea userInfo;
+    private JFrame infoPopup;    
+    //setting it as static to prevent lossing reference on session change doesn't work
+    public static JFrame sessionFrame;
     
-    JFrame infoFrame;
+    private String serverIP = "";
+    private boolean onlyonce = true;
+    private String adress = "";
+    private String nick = "~guest~";
+    private JLabel nickLabel = new JLabel("username: "+nick);
      
     public Chat() {
-        super("Chatty");     
+        
+    //POP-UP textarea___________________________________________________ 
+        userInfo = new JTextArea(7,20); 
+        userInfo.setEditable(false);
+        
+    //Set Panels_________________________________________________________
+        setLayout(new BorderLayout(5,5));
+        connect.setLayout(new GridLayout(2,1));
+        scrollUsers = new JScrollPane(users, 22,31); //vertical always [20 for needed], horizontal never
+        scrollGroups = new JScrollPane(groups, 22,31); //vertical always [20 for needed], horizontal never
+        
+    //Dimension and Layout_______________________________________________    
+        users.setLayout(new BoxLayout(users, BoxLayout.Y_AXIS));
+        groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));
+        scrollUsers.setPreferredSize(new Dimension(115,210));
+        scrollGroups.setPreferredSize(new Dimension(115,210));
+        
+        chat.setLayout(new BorderLayout(10,10));
+        input.setLayout(new FlowLayout());
+        chatxt.setEditable(false);
+    
+    //Add them___________________________________________________________
+        connect.add(scrollUsers);
+        connect.add(scrollGroups);
+               
+        input.add(sendbtn);
+        input.add(userinput);
+        input.add(nickLabel);
+        chat.add("Center",chatxt);
+        chat.add("South",input);
+        options.add(login);
+        options.add(register);
+        options.add(erasebtn);
+        options.add(exitbtn);
+        
+        add("North", options);
+        add("Center", chat);
+        add("West", connect);
+        add("East", new JPanel()); //Just for style
+                    
+    //LISTENERS ____________________________________________________
+        sendbtn.addActionListener(this);  
+        erasebtn.addActionListener(this);    
+        exitbtn.addActionListener(this);    
+        login.addActionListener(this);    
+        register.addActionListener(this);    
+        userinput.addKeyListener(new KeyAdapter(){
+            public void keyPressed(KeyEvent pressed){sendToChat(pressed);}            
+        });
+            
+    //FRAME _________________________________________________________            
+        setTitle("Chatty");     
         setIconImage(LOGO);
-    // SHITTY SWING COMPONENTS WITH NO STYLE WHATSOEVER ========================
-            userInfo.setEditable(false);
-            
-            txtArea.setEditable(false);
-            text.add(txtArea); 
-            
-            input.add(sendbtn);
-            input.add(exitbtn);
-            input.add(erasebtn);
-            input.add(field);
-                    
-            allusers.setLayout(new BorderLayout(10,10));
-            
-            userOnline = new JList<String>();
-            userOnline.setModel(model);
-            userPane = new JScrollPane(userOnline);
-            users.add(userPane);            
-
-            content.add("Center", text);
-            content.add("South", input);
-            content.add("East", users);
-                    
-            //LISTENERS ____________________________________________________
-            sendbtn.addActionListener(this);
-            exitbtn.addActionListener(this);
-            erasebtn.addActionListener(this);
-                    
-            field.addKeyListener(this);
-            
-            //FRAME _________________________________________________________
-            pack();
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
-            setVisible(true);
-            setLocationRelativeTo(null);
-        //=====================================================================
+        setSize(800,600);
+           
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
         
-        //USER LOGIN ==========================================================            
-           JOptionPane.showOptionDialog(this, new SessionStart(), "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
-           processSessionStart(SessionStart.getSelection());
-        //=====================================================================
-        //SERVER CONNECTION ===================================================
-            infoFrame = new Information();
-            new RecieveMsg();
-            getServerIP();
-        //=====================================================================
+    //=====================================================================
+    //                      SERVER CONNECTION         
+    //=====================================================================
+        infoPopup = new Information();
+        new RecieveMsg();
+        getServerIP();
     }  
-    
-    private void  processSessionStart(String slc){
-        System.out.println(slc);
-        if(slc.equals("Login")){new Login().setVisible(true);}
-        else if(slc.equals("Register")){new Register().setVisible(true);}
-    }
-    
-    class Information extends JFrame{
-        Information(){
-            setLayout(new BorderLayout());
-            
-            JButton btn = new JButton("Retry");            
-            userInfo.setBackground(Color.black);
-            userInfo.setForeground(Color.green);
-            btn.addActionListener((ActionEvent e) -> {getServerIP();});
-            
-            add("Center",userInfo);
-            add("South",btn);
-            setUndecorated(true);
-            setLocationRelativeTo(null);
-            pack();
-            setVisible(true);
-        }
-        
-    }
-    
-    class SearchServer implements Runnable {
-        int i;
-        String ip;
-        
-        SearchServer(int i, String ip){
-            this.ip = ip;
-            this.i = i;
-        }
-        
-        @Override
-        public void run() {
-            while (!Thread.interrupted()) {
-                try {
-                    try (Socket socket = new Socket(ip+i,9999)) {
-                        Package p = new Package();
-                        p.setStatus("online");
-
-                        ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
-                        objp.writeObject(p);
-                        socket.close();
-                    } 
-
-                } catch (IOException ex) {/*System.out.println("Server tested: "+ip+i);*/}
-            }
-        }
-    }
-    
-    class KillSearchThread extends TimerTask {
-        private Thread t;
-        private Timer timer;
-
-        KillSearchThread(Thread t, Timer timer){
-            this.t = t;
-            this.timer = timer;
-        }
-
-        public void run() {
-            if (t != null && t.isAlive()) {
-                t.interrupt();
-                timer.cancel();
-            }
-        }
-    }
-    
+           
     private void getServerIP() {
-        userInfo.setText("\n   Starting connection...\n");
-        String ip = (String) GetIP.getLocalIp().get(1);
-        ip = ip.substring(0, ip.lastIndexOf(".")+1);
-        
-        for(int i = 0; i<=255; i++){
-            Thread t = new Thread(new SearchServer(i, ip));
-            
-            Timer timer = new Timer();
-            timer.schedule(new KillSearchThread(t, timer), 100);
-            t.start();
+        //Get user local ip
+        if(serverIP.equals("")){
+            userInfo.setText("\n   Starting connection...\n");
+            String ip = (String) GetIP.getLocalIp().get(1);
+            ip = ip.substring(0, ip.lastIndexOf(".")+1);
+            //Test last 255 local ips searching for server
+            for(int i = 0; i<=255; i++){
+                Thread t = new Thread(new SearchServer(i, ip));
+
+                java.util.Timer timer = new java.util.Timer();
+                timer.schedule(new KillSearchThread(t, timer), 100);
+                t.start();
+            }           
+            userInfo.append("   Waiting response....\n");
         }
         
-        userInfo.append("   Waiting response....\n");
+        //Set message in case it takes too much
+        new Timer(15000, (ActionEvent e) -> {
+            userInfo.append("   Maybe your Internet is down?\n");
+            userInfo.append("   Or our server is fucked...\n"); 
+            if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
+        }).start();
+    }
+//=====================================================================
+//                     USER SESSION
+//=====================================================================
+    private void  processSessionStart(){ 
+        if(onlyonce){
+            StartOptions options = new StartOptions();
+            JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
+            String slc = options.getSelection();
+
+            if(slc.equals("Login")){sessionFrame = new Login();}
+            else if(slc.equals("Register")){sessionFrame = new Register();}
+            onlyonce = false;
+        }
     }
 
-    public void sendMsg() {
-            
-            try {
-                try (Socket socket = new Socket(serverIP,9999)) {
-                    Package p = new Package();
-                    p.setNick("");
-                    try{p.setIp(userOnline.getSelectedValue().toString());}catch(Exception e){} //***
-                    p.setMove("");
-                    p.setStatus("messaging");
-                    p.setMsg(field.getText());
-                    
-                    ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
-                    objp.writeObject(p);
-                    socket.close();
-                }
-                
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    
+//===========================================================================================
+//                     RECIEVE MESSAGE 
+//===========================================================================================
     class RecieveMsg implements Runnable{
        
         RecieveMsg(){
@@ -247,42 +193,167 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
                         
                         userInfo.append("   Server response: "+ p.getStatus()+"\n");
                         
+                //=====================================================================================
+                //                 SERVER RESPONSE MANAGING
+                //=====================================================================================                        
                         if(p.getStatus().equals("imserver")){setServerIP(mysocket, p);}
-                        if(p.getStatus().equals("messaging")){sendMessage(p);} 
-                        
+                        else if(p.getStatus().equals("login")){setLoginMessage(p);}
+                        else if(p.getStatus().equals("register")){setRegisterMessage(p);}                        
+                        else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
+                        else if(p.getStatus().equals("messaging")){sendMessage(p);} 
+                //=====================================================================================                        
                     } catch(Exception e){}                    
                 }
             } catch (Exception e){}
-        }      
-        
-        private void setServerIP(Socket mysocket, Package p) {
-            userInfo.append("   Setting connection \n");
-            
-            InetAddress locateip = mysocket.getInetAddress();
-            serverIP = locateip.getHostAddress();            
-            
-            for(String user : p.getIps()){
-                boolean own = GetIP.getPublicIP().contains(user) || GetIP.getLocalIp().contains(user);
-                if(!model.contains(user) && !own){model.addElement(user);}
-            }
-            
-            userInfo.append("   Use responsibly, don't be a jerk  ;)");
-            closeInfoPanel();
-        }
-        
-        private void sendMessage(Package p){
-            txtArea.append(p.getMsg()+"\n");
-
-        }     
-        
-        private void closeInfoPanel(){
-            try { Thread.sleep(5000);} catch (InterruptedException ex) {}
-            infoFrame.dispatchEvent(new WindowEvent(infoFrame, WindowEvent.WINDOW_CLOSING));
-        }
+        }                     
     }
     
+    /**
+     * Sets the server ip after server response. To avoid scanning every
+     * time a message has to be send. At the same time gets all ips 
+     * connected to the server.
+     * @param socket socket in witch the chat is listenning
+     * @param package Object send by server (Serializable class Package)
+     */
+    private void setServerIP(Socket mysocket, Package p) {
+        userInfo.append("   Setting connection \n");
+            
+        InetAddress locateip = mysocket.getInetAddress();
+        serverIP = locateip.getHostAddress();            
 
+        userInfo.append("   Use responsibly, don't be a jerk  ;)");
+        try { Thread.sleep(3000);} catch (InterruptedException ex) {}
+        //Close Server Connection Info POP-UP
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
+        new Send(serverIP);
+        processSessionStart();
+    }
+    
+    private void setLoginMessage(Package p) {
+        infoPopup = new Information();
+        if(p.getMsg().equals("OK")){
+            userInfo.setText("\n\tLogin successfull!!");
+            //Ask server to get users and send current user
+            askForUsersOnline(p.getNick());
         
+        }
+        else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
+        else {userInfo.setText("\n\tServer error, please restart");}  
+        
+        try { Thread.sleep(2000);} catch (InterruptedException ex) {}
+        //Close Login Info POP-UP
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
+        //Close Login/Register window
+        if(p.getMsg().equals("OK"))
+        sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));        
+    }
+    
+    private void setRegisterMessage(Package p) {
+        infoPopup = new Information();
+        if(p.getInfo().equals("")){
+            userInfo.setText("\n\tRegister successfull!!");
+            //Ask server to get users and send current user
+            askForUsersOnline(p.getNick());
+            
+        } else{userInfo.setText(p.getMsg()+p.getNick());}         
+        
+        try { Thread.sleep(5000);} catch (InterruptedException ex) {}
+        //Close Login Info POP-UP
+        infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
+        //Close Login/Register window
+        if(p.getMsg().equals(""))
+        sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));
+    }
+    
+    private void askForUsersOnline(String nick){
+        nickLabel.setText("username: "+nick);
+        Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers");
+    }
+    
+    private void setUsersOnline(Package p){
+        for(String ip : p.getIps().keySet()){
+            boolean own = (
+//                GetIP.getPublicIP().contains(p.getIps().get(user)) || 
+                GetIP.getLocalIp().contains(ip)
+            );
+            
+          if(!own){                       
+                JToggleButton btn = new JToggleButton(p.getIps().get(ip), CHATLOGO);
+                btn.addActionListener((ActionEvent e) -> {
+                    adress = ip;                
+                });
+
+                users.add(btn);         
+                users.setVisible(false);
+                users.setVisible(true);  
+            }
+        }            
+            
+    }
+       
+    private void sendMessage(Package p){
+        chatxt.append(p.getMsg()+"\n");
+    }     
+    
+    
+//=======================================================================
+// POP-UPS
+//=======================================================================
+    private class Information extends JFrame{
+        Information(){            
+            userInfo.setBackground(Color.black);
+            userInfo.setForeground(Color.green);
+            
+            add(userInfo);
+            setUndecorated(true);
+            pack();
+            setLocationRelativeTo(null);
+            setVisible(true);
+            
+            if(serverIP.equals(""))
+                new Timer(20000, (ActionEvent e) -> {
+                    if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
+                    else{getServerIP();}                    
+                }).start();
+        }        
+    }
+    
+    private class StartOptions extends JPanel implements ActionListener{   
+    private String selection = "";
+    
+    public StartOptions (){
+        JButton log = new JButton("Login");        
+        JButton reg = new JButton("Register");        
+        JButton guest = new JButton("Guesst");
+        log.addActionListener(this);
+        reg.addActionListener(this);
+        guest.addActionListener(this);
+        add(log);
+        add(reg);
+        add(guest);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        selection = e.getActionCommand();
+        Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof JDialog) {
+                        JDialog dialog = (JDialog) window;
+                        if (dialog.getContentPane().getComponentCount() == 1
+                            && dialog.getContentPane().getComponent(0) instanceof JOptionPane){
+                            dialog.dispose();
+                        }
+                    }
+                }
+    }
+    
+    public String getSelection(){
+        return selection;
+    }
+    
+}
+    
 // ======================================================================
 // MAIN
 // ======================================================================
@@ -297,31 +368,30 @@ public class Chat extends JFrame implements ActionListener, KeyListener{
 // EVENTS
 // ======================================================================
     public void actionPerformed(ActionEvent event) {
-        try {                
-            if(event.getSource() == sendbtn){
-                sendMsg();
-                
-                txtArea.append(field.getText() + "\n");
-                field.setText("");
-            } else if (event.getSource() == erasebtn){
-                txtArea.setText("");
-            }else if (event.getSource() == exitbtn){
-                System.exit(0);
-            }
-        } catch (Exception e){e.printStackTrace();}
+        if(adress.length()>1 && event.getSource() == sendbtn){
+            try { 
+                    Send.message( adress,userinput.getText(), "", "messaging");
+
+                    chatxt.append(userinput.getText() + "\n");
+                    userinput.setText("");
+            } catch (Exception e){e.printStackTrace();}
+        }else if(event.getSource() == erasebtn){chatxt.setText("");}
+        else if(event.getSource() == exitbtn){System.exit(0);}
+        else if(event.getSource() == login){sessionFrame = new Login();}
+        else if(event.getSource() == register){sessionFrame = new Register();}
+        else { JOptionPane.showMessageDialog(this, "Select a chat");}
     }
     
-    public void keyPressed(KeyEvent pressed) {
-         try {
-            if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
-                sendMsg();
-                
-                txtArea.append(field.getText() + "\n");
-                field.setText("");
-            }  
-        } catch (Exception e){e.printStackTrace();}
+    public void sendToChat(KeyEvent pressed) {
+        if(adress.length()>1){
+            try {
+                if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
+                    Send.message( adress, userinput.getText(), "", "messaging");
+
+                    chatxt.append(userinput.getText() + "\n");
+                    userinput.setText("");
+                }  
+            } catch (Exception e){e.printStackTrace();}
+        }else { JOptionPane.showMessageDialog(this, "Select a chat");}
     }
-    
-    public void keyTyped (KeyEvent typing){}
-    public void keyReleased(KeyEvent released){}
 }

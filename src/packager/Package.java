@@ -7,7 +7,7 @@ package packager;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Map;
 
 /**
  *
@@ -15,19 +15,19 @@ import java.util.ArrayList;
  */
 public class Package implements Serializable{
     
-    private String nick, ip, move, msg, status;
-    private ArrayList<String> ips;
+    private String nick, ip, info, msg, status;
+    private Map<String, String> ips;
     
     public void setNick(String nick){this.nick = nick;}
     public void setIp(String ip){this.ip = ip;}
-    public void setMove(String move){this.move = move;}
+    public void setInfo(String move){this.info = info;}
     public void setMsg(String msg){this.msg = msg;}
     public void setStatus(String st){this.status = st;}
-    public void setIps(ArrayList<String> ips){this.ips = ips;}
+    public void setIps(Map<String, String> ips){this.ips = ips;}
     public String getNick(){return nick;}
     public String getIp(){return ip;}
-    public String getMove(){return move;}
+    public String getInfo(){return info;}
     public String getMsg(){return msg;}
     public String getStatus(){return status;}
-    public ArrayList<String> getIps(){return ips;}
+    public Map<String,String> getIps(){return ips;}
 }
