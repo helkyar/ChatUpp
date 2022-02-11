@@ -186,7 +186,6 @@ public class Login extends javax.swing.JFrame {
         });
 
         txtPassword.setForeground(new java.awt.Color(153, 153, 153));
-        txtPassword.setText("Username");
         txtPassword.setToolTipText("password");
         txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -289,6 +288,8 @@ public class Login extends javax.swing.JFrame {
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        txtPassword.getAccessibleContext().setAccessibleName("password");
 
         jDesktopPane1.setLayer(jPanel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 

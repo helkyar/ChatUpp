@@ -125,7 +125,6 @@ public class Register extends javax.swing.JFrame {
         userPassword = new javax.swing.JPasswordField();
         userPassword2 = new javax.swing.JPasswordField();
         jLabel_login = new javax.swing.JLabel();
-        frameLogin = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -401,21 +400,12 @@ public class Register extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        frameLogin.setText("jButton1");
-        frameLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                frameLoginActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(frameLogin)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(125, 125, 125)
                 .addComponent(jLabel_minimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -433,9 +423,7 @@ public class Register extends javax.swing.JFrame {
                         .addComponent(jLabel_cerrar))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(frameLogin)
-                            .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -606,12 +594,6 @@ public class Register extends javax.swing.JFrame {
             image_path = path;
         }
     }//GEN-LAST:event_jButton_SeleccionImagenActionPerformed
-
-    private void frameLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_frameLoginActionPerformed
-        Login login1 = new Login();
-        login1.setVisible(true);
-        setVisible(false);
-    }//GEN-LAST:event_frameLoginActionPerformed
 
     private void jButton_RegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RegistroActionPerformed
         // TODO add your handling code here:
@@ -808,7 +790,6 @@ public class Register extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton frameLogin;
     private javax.swing.JButton jButton_Registro;
     private javax.swing.JButton jButton_SeleccionImagen;
     private javax.swing.JDesktopPane jDesktopPane1;

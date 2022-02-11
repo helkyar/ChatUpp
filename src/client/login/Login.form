@@ -302,9 +302,11 @@
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="99" green="99" red="99" type="rgb"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Username"/>
                         <Property name="toolTipText" type="java.lang.String" value="password"/>
                       </Properties>
+                      <AccessibilityProperties>
+                        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="password"/>
+                      </AccessibilityProperties>
                       <Events>
                         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPasswordFocusLost"/>
                         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPasswordFocusGained"/>
