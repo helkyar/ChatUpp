@@ -271,16 +271,16 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     private void setUsersOnline(Package p){
-        for(String user : p.getIps().keySet()){
+        for(String ip : p.getIps().keySet()){
             boolean own = (
-                GetIP.getPublicIP().contains(p.getIps().get(user)) || 
-                GetIP.getLocalIp().contains(p.getIps().get(user))
+//                GetIP.getPublicIP().contains(p.getIps().get(user)) || 
+                GetIP.getLocalIp().contains(ip)
             );
             
           if(!own){                       
-                JToggleButton btn = new JToggleButton(user, CHATLOGO);
+                JToggleButton btn = new JToggleButton(p.getIps().get(ip), CHATLOGO);
                 btn.addActionListener((ActionEvent e) -> {
-                    adress = p.getIps().get(user);                
+                    adress = ip;                
                 });
 
                 users.add(btn);         

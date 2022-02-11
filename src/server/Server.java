@@ -27,6 +27,7 @@ import javax.swing.JTextArea;
  */
 public class Server extends JFrame implements Runnable{
     JTextArea txt = new JTextArea();
+    Map<String, String> ips = new HashMap<>(); 
     
     Server(){
         Thread lintening = new Thread(this);
@@ -107,14 +108,16 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sendUsersOnline(Socket request, Package p) throws IOException{
-        Map<String, String> ips = new HashMap<>();        
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
         
-        if(!ips.containsValue(getip)){ips.put(p.getNick(), getip);}        
+        System.out.println(getip+" : "+p.getNick());
+        
+        if(!ips.containsValue(getip)){ips.put(getip, p.getNick());}        
         p.setIps(ips);
                             
-        for(String userip:ips.values()){
+        for(String userip:ips.keySet()){            
+            System.out.println(userip);
             Socket sendmsg = new Socket(userip, 9090);
             ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
             msgpackage.writeObject(p);
