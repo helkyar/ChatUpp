@@ -425,7 +425,7 @@ public class Login extends javax.swing.JFrame {
         password = String.valueOf(txtPassword.getPassword());
         
     //Login message sets ip adress as its own to recive the server response
-        Send.message((String) GetIP.getLocalIp().get(1), password, loginuser, "login");
+        Send.message((String) GetIP.getLocalIp().get(1), password, loginuser, "login","");
     }
     
     public void setLogin(String registerlogin){

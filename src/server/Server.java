@@ -108,12 +108,15 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sendUsersOnline(Socket request, Package p) throws IOException{
+        //Get host ip
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
+        String nick = p.getNick();
+        //fetch chats from db
+        String[] chats = DBConnection.getChats(nick);
+        if(!chats[0].equals("")){p.setInfo(chats[0]); p.setMsg(chats[1]);}
         
-        System.out.println(getip+" : "+p.getNick());
-        
-        if(!ips.containsValue(getip)){ips.put(getip, p.getNick());}        
+        if(!ips.containsValue(getip)){ips.put(getip, nick);}        
         p.setIps(ips);
                             
         for(String userip:ips.keySet()){            

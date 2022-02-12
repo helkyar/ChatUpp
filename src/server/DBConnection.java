@@ -81,4 +81,26 @@ public class DBConnection {
         } catch (ClassNotFoundException e) {return serverError;}        
         finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
     }
+
+    static String[] getChats(String nick) {
+        String[] result = {"", "ERROR!"};
+        try {
+            Class.forName(driver);
+            
+            try {
+                conn = DriverManager.getConnection(url, user, pass);
+                st = conn.createStatement();
+                rs = st.executeQuery("SELECT chat_id, message FROM messages WHERE username='" + nick + "'");
+                               
+                if (rs.next()) {
+                    result[0] = rs.getString(0);
+                    result[1] = rs.getString(1);
+                    return result;
+                
+                } else {result[1] = ""; return result;}  
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return result;}             
+        } catch (ClassNotFoundException e) {return result;}         
+        finally { try {conn.close();} catch (SQLException ex) {return result;} catch (Exception ex) {return result;}}
+    }
 }
