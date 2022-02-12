@@ -129,6 +129,11 @@ public class Chat extends JFrame implements ActionListener{
             users.add(new JButton("Usermm", send));
             groups.add(new JButton("Group", send));
         }        
+        users.setVisible(false);
+        groups.setVisible(false);
+        users.setVisible(true);
+        groups.setVisible(true);
+        
         userInfo.append("   Waiting response....\n");
         
         //Set message in case it takes too much
