@@ -226,7 +226,7 @@ public class Chat extends JFrame implements ActionListener{
                         else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
                         else if(p.getStatus().equals("messaging")){sendMessage(p);} 
                         else if (p.getStatus().equals("creategroup")){optionUsersGroup = p.getMsg().split("~");}
-                        else if (p.getStatus().equals("groupusers")){informGroupUsers(p.getInfo(), p.getNick());}
+                        else if (p.getStatus().equals("groupusers")){informChatUsers(p.getInfo(), p.getNick(), "");}
                 //=====================================================================================                        
                     } catch(Exception e){}                    
                 }
@@ -261,8 +261,9 @@ public class Chat extends JFrame implements ActionListener{
             userInfo.setText("\n\tLogin successfull!!");
             //Ask server to get users and send current user
             askForUsersOnline(p.getNick());
-            for(String nick : p.getIps().values()){
-                informGroupUsers(p.getIps().get(nick), nick);
+            for(String chatid : p.getObj().keySet()){
+                //chatid, chatname, msgs
+                informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }          
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
           else {userInfo.setText("\n\tServer error, please restart");}  
@@ -281,8 +282,9 @@ public class Chat extends JFrame implements ActionListener{
             userInfo.setText("\n\tRegister successfull!!");
             //Ask server to get users and send current user
             askForUsersOnline(p.getNick());            
-            for(String nick : p.getIps().values()){
-                informGroupUsers(p.getIps().get(nick), nick);
+            for(String chatid : p.getObj().keySet()){
+                //chatid, chatname, msgs
+                informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
         
@@ -303,30 +305,50 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     private void setUsersOnline(Package p){
-        for(String ip : p.getIps().keySet()){
-            String user = p.getIps().get(ip);
+        for(String ip : p.getObj().keySet()){
+            String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip));
-//          || GetIP.getPublicIP().contains(p.getIps().get(user))
+//          || GetIP.getPublicIP().contains(p.getObj().get(user))
             
-            if(!own && !nick.equals(user)){        
+            if(!own && !nick.equals(user)){ 
+//------------------ CHECK IF ALREADY EXISTS!! --------------------------------
+              //Ineficient nested loops!!
               //create chatid and store possible previous chat info
               String chatid =
               p.getInfo().equals("") ? chatid=p.getInfo() :
               nick.compareTo(user)>0 ? nick+"~"+user:user+"~"+nick;
-              chatstorage.put(chatid,p.getMsg());
-              //add user btn
-              final String ihatejava = chatid;
-                JToggleButton btn = new JToggleButton(user, CHATLOGO);
-                btn.addActionListener((ActionEvent e) -> {
-                    chatxt.setText(chatstorage.get(ihatejava));
-                    chatID = ihatejava;
-                    adress = ip;
-                });
-                btn.setName(chatid);
+              
+              if(chatstorage.containsKey(chatid)){
+                  //get the btn, change the listener
+                  for(int i = 0; i < users.getComponentCount(); i++){
+                      JToggleButton btn = (JToggleButton) users.getComponents()[i];
+                      if(btn.getName().equals(chatid)){
+                          final String ihatejava = chatid;
+                          btn.addActionListener((ActionEvent e) -> {
+                            chatxt.setText(chatstorage.get(ihatejava));
+                            chatID = ihatejava;
+                            adress = ip;
+                          });
+                      }
+                  }
+              } else {
+                 chatstorage.put(chatid,p.getMsg()); //mesage in case there is a server error it get anounced in the chat
+                 //add user btn
+                 final String ihatejava = chatid;
+                 JToggleButton btn = new JToggleButton(user, CHATLOGO);
+                 btn.addActionListener((ActionEvent e) -> {
+                     chatxt.setText(chatstorage.get(ihatejava));
+                     chatID = ihatejava;
+                     adress = ip;
+                 });
+                 btn.setName(chatid);
 
-                users.add(btn);         
-                users.setVisible(false);
-                users.setVisible(true);  
+                 users.add(btn);         
+                 users.setVisible(false);
+                 users.setVisible(true); 
+                }
+              
+ 
             }
         }            
             
@@ -415,6 +437,7 @@ public class Chat extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent event) {
         if(adress.length()>1 && event.getSource() == sendbtn){
             try { 
+//-------------- CAREFULL WITH CHATS WITHOUT IPS!! --------------------------------
                 Send.message( adress,userinput.getText(), nick, "messaging", chatID);
 
                 String userin = userinput.getText() + "\n";
@@ -436,6 +459,7 @@ public class Chat extends JFrame implements ActionListener{
         if(/*adress.length()>1*/true){
             String userRef = timeFormat.format(new Date())+"["+nick+"]:";            
             try {
+//-------------- CAREFULL WITH CHATS WITHOUT IPS!! --------------------------------
                 if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
                     Send.message( adress, userinput.getText(), nick, "messaging", chatID);
 
@@ -506,21 +530,40 @@ public class Chat extends JFrame implements ActionListener{
       //Add new user
     }
     
-    private void informGroupUsers(String groupid, String groupname) {
-      //CREATE SWING COMPONENT      
-      groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
+    private void informChatUsers(String chatid, String groupname, String msg) {
+      //CREATE SWING COMPONENT FOR USER-TO-USER
+      if(!chatid.contains("~g~")){
+         String user = chatid.split("~")[0].equals(nick) ? 
+                 chatid.split("~")[1] : chatid.split("~")[0];
+         
+         chatstorage.put(chatid, msg);
+         JToggleButton btn = new JToggleButton(user, CHATLOGO);
+         btn.addActionListener((ActionEvent e) -> {
+            chatxt.setText(chatstorage.get(chatid));
+            chatID = chatid;
+            adress = "";
+         });
+         btn.setName(chatid);
+         
+         users.add(btn);         
+         users.setVisible(false);
+         users.setVisible(true); 
+      } else {        
+     //CREATE SWING COMPONENT FOR GROUPS    
+        groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
 
-      JToggleButton btn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
-      btn.addActionListener((ActionEvent e) -> {
-        chatxt.setText(chatstorage.get(groupid));
-        chatID = groupid;
-        adress = "";
-      });
-      btn.setName(groupid);
+        JToggleButton gbtn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
+        gbtn.addActionListener((ActionEvent e) -> {
+          chatxt.setText(chatstorage.get(chatid));
+          chatID = chatid;
+          adress = "";
+        });
+        gbtn.setName(chatid);
 
-      groups.add(btn);         
-      groups.setVisible(false);
-      groups.setVisible(true);
+        groups.add(gbtn);         
+        groups.setVisible(false);
+        groups.setVisible(true);
+      }
     }
 }
 /**[SERVIDOR]---------------------------------------------------------------

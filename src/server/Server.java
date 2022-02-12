@@ -27,7 +27,7 @@ import javax.swing.JTextArea;
  */
 public class Server extends JFrame implements Runnable{
     JTextArea txt = new JTextArea();
-    Map<String, String> ips = new HashMap<>(); 
+    Map<String, String[]> ips = new HashMap<>(); 
     
     Server(){
         Thread lintening = new Thread(this);
@@ -89,7 +89,7 @@ public class Server extends JFrame implements Runnable{
     private void checkLogin(Package p) throws IOException{
         String resp = DBConnection.checkLogin(p.getMsg(), p.getNick());
         p.setMsg(resp);
-        p.setIps(DBConnection.getGroups(p.getNick()));
+        p.setObj(DBConnection.getRegisteredChats(p.getNick()));
         
         //if OK resgister ip as last for this user        
          if(resp.equals("OK")){DBConnection.setLastIP(p.getNick(), p.getIp());}
@@ -103,10 +103,10 @@ public class Server extends JFrame implements Runnable{
 
     private void registerUser(Package p) throws IOException{
         String[] data = DBConnection.registerUser(p.getMsg(), p.getNick());
+        p.setObj(DBConnection.getRegisteredChats(data[2]));
         p.setMsg(data[0]);
         p.setInfo(data[1]);
         p.setNick(data[2]);
-        p.setIps(DBConnection.getGroups(data[2]));
         
          if(data[0].equals("")){DBConnection.setLastIP(data[2], p.getIp());}
         //if OK resgister ip as last for this user
@@ -126,8 +126,8 @@ public class Server extends JFrame implements Runnable{
         String[] chats = DBConnection.getChats(nick);
         if(!chats[0].equals("")){p.setInfo(chats[0]); p.setMsg(chats[1]);}
         
-        if(!ips.containsValue(getip)){ips.put(getip, nick);}        
-        p.setIps(ips);
+        if(!ips.containsValue(getip)){ips.put(getip, new String[]{nick,""});}        
+        p.setObj(ips);
                             
         for(String userip:ips.keySet()){            
             System.out.println(userip);
@@ -171,8 +171,7 @@ public class Server extends JFrame implements Runnable{
             msgpackage.close(); sendmsg.close();
         }
     }
-    //GUARDAR MENSAJES INDIVIDUALES
-    //REGISTRAR LOS CHATS INDIVIDUALES
+    //RECORDAR CHATS INDIVIDUALES
     //GUARDAR MENSAJES GRUPALES
     //ENVIAR MENSAJES GRUPALES
 }

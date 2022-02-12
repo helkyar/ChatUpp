@@ -208,14 +208,11 @@ public class DBConnection {
 
     }
 
-    static Map getGroups(String nick) {
+    static Map getRegisteredChats(String nick) {
         /**
-         * SELECT column_name(s)
-FROM table1
-INNER JOIN table2
-ON table1.column_name = table2.column_name;
+         * Filter with user, recibe: chat_name, chat_id, message
          */
-        String query = "Select chats.chat_id, chats.chat_name FROM chats INNER JOIN participants ON chats.chat_id = participants.chat_id WHERE user_id = '"+nick+"'";
+        String query = "Select chats.chat_id, chats.chat_name, messages.message FROM chats LEFT JOIN participants ON chats.chat_id = participants.chat_id LEFT JOIN messages ON messages.chat_id = chats.chat_id WHERE participants.user_id = '"+nick+"'";
         Map groups = new HashMap();
         try{     
             Class.forName(driver);
@@ -224,7 +221,7 @@ ON table1.column_name = table2.column_name;
                 st = conn.createStatement();
                 rs = st.executeQuery(query);
                 
-                while (rs.next()) { groups.put(rs.getString(1),rs.getString(2));}
+                while (rs.next()) { groups.put(rs.getString(1), new String[]{rs.getString(2),rs.getString(3)});}
                 return groups;
                 
             } catch (SQLException ex) {ex.printStackTrace(); return new HashMap();}     
