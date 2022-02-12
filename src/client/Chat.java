@@ -72,6 +72,7 @@ public class Chat extends JFrame implements ActionListener{
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
+    String[] optionUsersGroup;
     private String groupUsers = "";
     
     public Chat() {
@@ -200,7 +201,7 @@ public class Chat extends JFrame implements ActionListener{
         
         @Override
         public void run() {
-            try {
+            try { 
                 ServerSocket port = new ServerSocket(9090);
                 String nick, ip, move, msg;
                 Package p;
@@ -220,6 +221,8 @@ public class Chat extends JFrame implements ActionListener{
                         else if(p.getStatus().equals("register")){setRegisterMessage(p);}                        
                         else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
                         else if(p.getStatus().equals("messaging")){sendMessage(p);} 
+                        else if (p.getStatus().equals("creategroup")){optionUsersGroup = p.getMsg().split("~");}
+                        else if (p.getStatus().equals("groupusers")){informGroupUsers(p.getInfo(), p.getNick());}
                 //=====================================================================================                        
                     } catch(Exception e){}                    
                 }
@@ -254,10 +257,11 @@ public class Chat extends JFrame implements ActionListener{
             userInfo.setText("\n\tLogin successfull!!");
             //Ask server to get users and send current user
             askForUsersOnline(p.getNick());
-        
-        }
-        else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
-        else {userInfo.setText("\n\tServer error, please restart");}  
+            for(String nick : p.getIps().values()){
+                informGroupUsers(p.getIps().get(nick), nick);
+            }          
+        } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
+          else {userInfo.setText("\n\tServer error, please restart");}  
         
         try { Thread.sleep(2000);} catch (InterruptedException ex) {}
         //Close Login Info POP-UP
@@ -272,8 +276,10 @@ public class Chat extends JFrame implements ActionListener{
         if(p.getInfo().equals("")){
             userInfo.setText("\n\tRegister successfull!!");
             //Ask server to get users and send current user
-            askForUsersOnline(p.getNick());
-            
+            askForUsersOnline(p.getNick());            
+            for(String nick : p.getIps().values()){
+                informGroupUsers(p.getIps().get(nick), nick);
+            }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
         
         try { Thread.sleep(5000);} catch (InterruptedException ex) {}
@@ -455,35 +461,26 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     private void createNewGroup() {
-      //CALL DB FOR USERS
-      
-      //CREATE SWING COMPONENT
-      String groupname = JOptionPane.showInputDialog("Set group name");
-      groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
-      String groupid = "~g~"+new Date().getTime()+Math.random();
-      JToggleButton btn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
-      btn.addActionListener((ActionEvent e) -> {
-        chatxt.setText(chatstorage.get(groupid));
-        chatID = groupid;
-        adress = "";
-      });
-      btn.setName(groupid);
+//      if(nick.equals("~guest~")){return;}
 
-      groups.add(btn);         
-      groups.setVisible(false);
-      groups.setVisible(true);
+      //CALL DB FOR USERS
+      Send.message((String) GetIP.getLocalIp().get(1), "", "", "creategroup", "");
+      String groupname = JOptionPane.showInputDialog("Set group name");
       
       //ADDING USERS OPTIONS
-      String[] users = {"pep", "culo", "sdf", "queseyp"};
+      String[] users = optionUsersGroup;
       JPanel selectuser = new JPanel();
       for(String user : users){
-          JButton adduser = new JButton(user);
-          adduser.addActionListener((ActionEvent e)->{
-              setGroupUsers(e.getActionCommand());
-              selectuser.remove(adduser);
-              selectuser.setVisible(false); selectuser.setVisible(true);
-          });
-          selectuser.add(adduser);
+          if(!user.equals(nick) && !user.equals("")){
+            JButton adduser = new JButton(user);
+            adduser.addActionListener((ActionEvent e)->{
+                if(!nick.equals("~guest~")){groupUsers += nick;}
+                groupUsers += "~"+e.getActionCommand();
+                selectuser.remove(adduser);
+                selectuser.setVisible(false); selectuser.setVisible(true);
+            });
+            selectuser.add(adduser);
+          }
       }
       JScrollPane scroll = new JScrollPane(selectuser);
       scroll.setPreferredSize(new Dimension(80,60));
@@ -491,7 +488,10 @@ public class Chat extends JFrame implements ActionListener{
       int option =
       JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
       
-      if(option == 0){/*inform the server about the users of the group*/}
+      //SEND SELECTION CONFIRMATION TO SERVER
+      if(option == 0){Send.message("", groupUsers, groupname, "groupusers", "");}
+      
+      //CANCEL PROCES
       
       //[SERVER]
       //create db group entry
@@ -503,10 +503,22 @@ public class Chat extends JFrame implements ActionListener{
       //Add new user
     }
     
-    private void setGroupUsers(String user) {
-        groupUsers += "~"+user;
+    private void informGroupUsers(String groupid, String groupname) {
+      //CREATE SWING COMPONENT      
+      groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
+
+      JToggleButton btn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
+      btn.addActionListener((ActionEvent e) -> {
+        chatxt.setText(chatstorage.get(groupid));
+        chatID = groupid;
+        adress = "";
+      });
+      btn.setName(groupid);
+
+      groups.add(btn);         
+      groups.setVisible(false);
+      groups.setVisible(true);
     }
-    
 }
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente
@@ -554,4 +566,5 @@ public class Chat extends JFrame implements ActionListener{
  * 
  ->Los grupos a los que se pertenece aparecen al iniciar sesión
  * 
+ -> GUEST CAN'T CREATE GROUPS AND CHATS WON'T SAVE TO DB
  */

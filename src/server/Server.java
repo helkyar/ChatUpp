@@ -60,6 +60,9 @@ public class Server extends JFrame implements Runnable{
                     else if (p.getStatus().equals("register")){registerUser(p);}
                     else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}
                     else if (p.getStatus().equals("messaging")){sendMessage(p);}
+                    else if (p.getStatus().equals("creategroup")){sendAllUsers(p);}
+                    else if (p.getStatus().equals("groupusers")){informGroupUsers(p);}
+//                    else if (p.getStatus().equals("groupmessage")){sendGroupMessage(p);}
                     
                     request.close();
                     
@@ -84,9 +87,13 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void checkLogin(Package p) throws IOException{
+        String resp = DBConnection.checkLogin(p.getMsg(), p.getNick());
+        p.setMsg(resp);
+        p.setIps(DBConnection.getGroups(p.getNick()));
         
-        p.setMsg(DBConnection.checkLogin(p.getMsg(), p.getNick()));
-        
+        //if OK resgister ip as last for this user        
+         if(resp.equals("OK")){DBConnection.setLastIP(p.getNick(), p.getIp());}
+         
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
@@ -99,7 +106,10 @@ public class Server extends JFrame implements Runnable{
         p.setMsg(data[0]);
         p.setInfo(data[1]);
         p.setNick(data[2]);
-         
+        p.setIps(DBConnection.getGroups(data[2]));
+        
+         if(data[0].equals("")){DBConnection.setLastIP(data[2], p.getIp());}
+        //if OK resgister ip as last for this user
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
@@ -137,4 +147,31 @@ public class Server extends JFrame implements Runnable{
                         
         msgpackage.close(); sendmsg.close();
     }
+
+    private void sendAllUsers(Package p)  throws IOException{
+        p.setMsg(DBConnection.getAllUsers());
+        
+        Socket sendmsg = new Socket(p.getIp(), 9090);
+        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+        msgpackage.writeObject(p);
+                        
+        msgpackage.close(); sendmsg.close(); 
+    }
+
+    private void informGroupUsers(Package p)  throws IOException{
+        p.setMsg(DBConnection.createNewGroup(p.getMsg(), p.getNick()));
+        String[] ips = DBConnection.notifyUsers(p.getMsg());
+        
+        for(String userip:ips){      
+            Socket sendmsg = new Socket(userip, 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close();
+        }
+    }
+    //REGISTRAR LOS CHATS INDIVIDUALES
+    //GUARDAR MENSAJES INDIVIDUALES
+    //GUARDAR MENSAJES GRUPALES
+    //ENVIAR MENSAJES GRUPALES
 }

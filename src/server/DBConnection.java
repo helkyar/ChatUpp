@@ -10,6 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,13 +79,29 @@ public class DBConnection {
                     ps.setString(6, data[5]);
                     ps.executeUpdate();
                 }
-                String[] msg = {error, "", data[0]};
-                return msg;
+                
+                return new String[]{error, "", data[0]};
+                
             } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
         } catch (ClassNotFoundException e) {return serverError;}        
         finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
     }
-
+       
+    static void setLastIP(String nick, String ip) {
+        try{     
+            Class.forName(driver);
+        try {                
+                final String query = "UPDATE `users` SET `last_ip`='"+ip+"' WHERE username='"+nick+"'";
+                
+                conn = DriverManager.getConnection(url, user, pass);
+                ps = conn.prepareStatement(query);      
+                ps.executeUpdate();
+                         
+        } catch (SQLException ex) {ex.printStackTrace();}  
+        } catch (ClassNotFoundException ex) {ex.printStackTrace();}     
+        finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace();}} 
+    }
+    
     static String[] getChats(String nick) {
         String[] result = {"", "ERROR!"};
         try {
@@ -102,5 +122,114 @@ public class DBConnection {
             } catch (SQLException ex) {ex.printStackTrace(); return result;}             
         } catch (ClassNotFoundException e) {return result;}         
         finally { try {conn.close();} catch (SQLException ex) {return result;} catch (Exception ex) {return result;}}
+    }
+
+    static String getAllUsers() {
+        String allUsers = "";
+        try {
+            Class.forName(driver);
+            
+            try {
+                conn = DriverManager.getConnection(url, user, pass);
+                st = conn.createStatement();
+                rs = st.executeQuery("SELECT username FROM users");
+                               
+                while (rs.next()) { allUsers += "~"+rs.getString(1);}
+                return allUsers;
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return "S";}             
+        } catch (ClassNotFoundException e) {return "S";}         
+        finally { try {conn.close();} catch (SQLException ex) {return "S";} catch (Exception ex) {return "S";}}
+        
+    }
+
+    static String createNewGroup(String msg, String nick) {
+        String id =  "~g~"+new Date().getTime()+Math.random();
+        System.out.println(id);
+        String chat = "INSERT INTO `chats` (`chat_id`, `chat_name`) VALUES (?, ?)";  
+        int j = msg.split("~")[0].equals("") ? 1 : 0; 
+        String join = "INSERT INTO `participants` (`chat_id`, `user_id`) VALUES ('"+id+"', '"+msg.split("~")[j]+"')";        
+        for(int i = 1+j; i < msg.split("~").length; i++){
+            join += ", ('"+id+"', '"+msg.split("~")[i]+"')";
+        }
+        System.out.println(join);
+        String serverError ="";
+        try{     
+            Class.forName(driver);
+            try{
+                //chats: chat_id 	chat_name
+                conn = DriverManager.getConnection(url, user, pass);
+                ps = conn.prepareStatement(chat);
+                ps.setString(1, id);
+                ps.setString(2, nick);
+                ps.executeUpdate(); 
+
+//                return "OK";
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
+            finally{
+                try{
+                    //participants: user_id 	chat_id 
+                    conn = DriverManager.getConnection(url, user, pass);
+                    ps = conn.prepareStatement(join);
+                    ps.executeUpdate(); 
+
+                    return "OK";
+
+                } catch (SQLException ex) {return serverError;} 
+            }  
+        } catch (ClassNotFoundException e) {return serverError;}          
+        finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
+        
+    }
+
+    static String[] notifyUsers(String msg) {
+        String query = "Select last_ip FROM users WHERE username IN ('"+msg.split("~")[0]+"'";
+        for(int i = 1; i < msg.split("~").length; i++){
+            query += ", '"+msg.split("~")[i]+"'";
+        }   query +=")";
+        
+        String[] ips = new String[msg.split("~").length];
+        
+        try{     
+            Class.forName(driver);
+          try {
+                conn = DriverManager.getConnection(url, user, pass);
+                st = conn.createStatement();
+                rs = st.executeQuery(query);
+                int i = 0;               
+                while (rs.next()) { ips[i] = rs.getString(1); i++;}
+                return ips;
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return new String[]{"S"};}     
+          catch ( Exception e){return new String[]{"S"};}
+        }catch (ClassNotFoundException e) {return new String[]{"S"};}         
+        finally { try {conn.close();} catch (SQLException ex) {return new String[]{"S"};} catch (Exception ex) {return new String[]{"S"};}}
+
+    }
+
+    static Map getGroups(String nick) {
+        /**
+         * SELECT column_name(s)
+FROM table1
+INNER JOIN table2
+ON table1.column_name = table2.column_name;
+         */
+        String query = "Select chats.chat_id, chats.chat_name FROM chats INNER JOIN participants ON chats.chat_id = participants.chat_id WHERE user_id = '"+nick+"'";
+        Map groups = new HashMap();
+        try{     
+            Class.forName(driver);
+          try {
+                conn = DriverManager.getConnection(url, user, pass);
+                st = conn.createStatement();
+                rs = st.executeQuery(query);
+                
+                while (rs.next()) { groups.put(rs.getString(1),rs.getString(2));}
+                return groups;
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return new HashMap();}     
+             catch ( Exception e){return  new HashMap();}
+        }catch (ClassNotFoundException e) {return  new HashMap();}         
+        finally { try {conn.close();} catch (SQLException ex) {return  new HashMap();} catch (Exception ex) {return  new HashMap();}}
     }
 }
