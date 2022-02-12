@@ -18,11 +18,14 @@ import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.text.AttributedString;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +37,7 @@ import javax.swing.Timer;
  */
 public class Chat extends JFrame implements ActionListener{
     
+    private DateFormat timeFormat = new SimpleDateFormat("kk:mm ");
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
     
@@ -429,14 +433,15 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     public void sendToChat(KeyEvent pressed) {
-        if(adress.length()>1){
+        if(/*adress.length()>1*/true){
+            String userRef = timeFormat.format(new Date())+"["+nick+"]:";            
             try {
                 if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
                     Send.message( adress, userinput.getText(), nick, "messaging", chatID);
 
                     String userin = userinput.getText() + "\n";
                     String txt = chatstorage.get(chatID)+userin;
-                    chatxt.append(userinput.getText() + "\n");
+                    chatxt.append(userRef+"\n"+userinput.getText() + "\n");
                     chatstorage.put(chatID, txt);
                     userinput.setText("");
                 }  
@@ -488,11 +493,9 @@ public class Chat extends JFrame implements ActionListener{
       int option =
       JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
       
-      //SEND SELECTION CONFIRMATION TO SERVER
+      //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
       if(option == 0){Send.message("", groupUsers, groupname, "groupusers", "");}
-      
-      //CANCEL PROCES
-      
+  
       //[SERVER]
       //create db group entry
       //update DB group-users

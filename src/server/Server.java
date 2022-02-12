@@ -140,7 +140,8 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sendMessage(Package p) throws IOException{
-
+        DBConnection.saveNormalChat(p.getMsg(),p.getInfo());
+        
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
@@ -170,8 +171,8 @@ public class Server extends JFrame implements Runnable{
             msgpackage.close(); sendmsg.close();
         }
     }
-    //REGISTRAR LOS CHATS INDIVIDUALES
     //GUARDAR MENSAJES INDIVIDUALES
+    //REGISTRAR LOS CHATS INDIVIDUALES
     //GUARDAR MENSAJES GRUPALES
     //ENVIAR MENSAJES GRUPALES
 }
