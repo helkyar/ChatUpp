@@ -318,20 +318,20 @@ public class Chat extends JFrame implements ActionListener{
               p.getInfo().equals("") ? chatid=p.getInfo() :
               nick.compareTo(user)>0 ? nick+"~"+user:user+"~"+nick;
               
-              if(chatstorage.containsKey(chatid)){
-                  //get the btn, change the listener
-                  for(int i = 0; i < users.getComponentCount(); i++){
-                      JToggleButton btn = (JToggleButton) users.getComponents()[i];
-                      if(btn.getName().equals(chatid)){
-                          final String ihatejava = chatid;
-                          btn.addActionListener((ActionEvent e) -> {
-                            chatxt.setText(chatstorage.get(ihatejava));
-                            chatID = ihatejava;
-                            adress = ip;
-                          });
-                      }
-                  }
-              } else {
+//              if(chatstorage.containsKey(chatid)){
+//                  //get the btn, change the listener
+//                  for(int i = 0; i < users.getComponentCount(); i++){
+//                      JToggleButton btn = (JToggleButton) users.getComponents()[i];
+//                      if(btn.getName().equals(chatid)){
+//                          final String ihatejava = chatid;
+//                          btn.addActionListener((ActionEvent e) -> {
+//                            chatxt.setText(chatstorage.get(ihatejava));
+//                            chatID = ihatejava;
+//                            adress = ip;
+//                          });
+//                      }
+//                  }
+//              } else {
                  chatstorage.put(chatid,p.getMsg()); //mesage in case there is a server error it get anounced in the chat
                  //add user btn
                  final String ihatejava = chatid;
@@ -346,7 +346,7 @@ public class Chat extends JFrame implements ActionListener{
                  users.add(btn);         
                  users.setVisible(false);
                  users.setVisible(true); 
-                }
+//                }
               
  
             }

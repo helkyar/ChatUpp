@@ -110,13 +110,13 @@ public class DBConnection {
             try {
                 conn = DriverManager.getConnection(url, user, pass);
                 st = conn.createStatement();
-                rs = st.executeQuery("SELECT chat_id, message FROM messages WHERE username='" + nick + "'");
+                rs = st.executeQuery("SELECT messages.chat_id, message FROM messages LEFT JOIN participants ON messages.chat_id = participants.chat_id WHERE participants.user_id= '" + nick + "'");
                                
                 if (rs.next()) {
                     result[0] = rs.getString(0);
                     result[1] = rs.getString(1);
                     return result;
-                
+                 
                 } else {result[1] = ""; return result;}  
                 
             } catch (SQLException ex) {ex.printStackTrace(); return result;}             

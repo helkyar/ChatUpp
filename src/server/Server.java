@@ -171,7 +171,6 @@ public class Server extends JFrame implements Runnable{
             msgpackage.close(); sendmsg.close();
         }
     }
-    //RECORDAR CHATS INDIVIDUALES
-    //GUARDAR MENSAJES GRUPALES
-    //ENVIAR MENSAJES GRUPALES
+    //GUARDAR MENSAJES GRUPALES--
+    //ENVIAR MENSAJES GRUPALES--
 }
