@@ -313,7 +313,7 @@ public class Chat extends JFrame implements ActionListener{
     private void setUsersOnline(Package p){     
         this.nick = p.getNick();   
         nickLabel.setText("username: "+nick);
-        System.out.println(p.getNick());
+        
         for(String ip : p.getObj().keySet()){
             String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip));
@@ -330,6 +330,7 @@ public class Chat extends JFrame implements ActionListener{
                           final String ihatejava = chatid;
                           btn.addActionListener((ActionEvent e) -> {
                             chatxt.setText(chatstorage.get(ihatejava));
+                            System.out.println("userbutton updated from server online: "+ip+"//"+adress);
                             chatID = ihatejava;
                             adress = ip;
                           });
@@ -343,6 +344,7 @@ public class Chat extends JFrame implements ActionListener{
                  btn.addActionListener((ActionEvent e) -> {
                      chatID = ihatejava;
                      unselectButtons(e);
+                     System.out.println("userbutton from server online: "+ip+"//"+adress);
                      adress = ip;
                      
                  });
@@ -368,12 +370,9 @@ public class Chat extends JFrame implements ActionListener{
     }
 
     private void sendMessage(Package p){
-        if(!p.getNick().equals(nick)){
-            chatxt.append(p.getMsg()+"\n");
-            System.out.println(p.getInfo());
+        chatxt.append(p.getMsg()+"\n");
             //chatid needed
-            chatstorage.put(chatID,chatxt.getText());
-        }
+        chatstorage.put(chatID,chatxt.getText());
     }     
     
 //=======================================================================
@@ -451,8 +450,9 @@ public class Chat extends JFrame implements ActionListener{
         if(adress.length()>1 && event.getSource() == sendbtn){
             try { 
                 String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";
+                System.out.println("sending msg: "+adress+", "+msg+", "+nick+", "+chatID);
                 Send.message( adress, msg, nick, "messaging", chatID);
-                    
+                 
                 chatxt.append(msg);
                 String txt = chatxt.getText() + "\n";                   
                 chatstorage.put(chatID, txt); //overwrite previous
@@ -472,7 +472,7 @@ public class Chat extends JFrame implements ActionListener{
         if(adress.length()>1){
             String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";            
             try {
-                if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
+                if(pressed.getKeyCode() == KeyEvent.VK_ENTER && !userinput.getText().equals("")){
                     Send.message( adress, msg, nick, "messaging", chatID);
                     
                     chatxt.append(msg);
@@ -553,6 +553,7 @@ public class Chat extends JFrame implements ActionListener{
          btn.addActionListener((ActionEvent e) -> {
             chatxt.setText(chatstorage.get(chatid));
             chatID = chatid;
+            System.out.println("userbutton from server memory: "+adress);
             adress = "";
          });
          btn.setName(chatid);
@@ -568,6 +569,7 @@ public class Chat extends JFrame implements ActionListener{
         gbtn.addActionListener((ActionEvent e) -> {
           chatxt.setText(chatstorage.get(chatid));
           chatID = chatid;
+          System.out.println("grupbutton from server memory: "+adress);
           adress = "";
         });
         gbtn.setName(chatid);
@@ -580,6 +582,8 @@ public class Chat extends JFrame implements ActionListener{
 }
 //(X)TOGGLE TOGGLE-BUTTONS
 //(X)2 CHATS AT THE SAME TIME BREAKS THINGS
+//(X)(?)USER SWAP
+//(X)NEW USER NOT ADDED (no actualiza)
 //(>)Send msg if usser is not connected
 
 

@@ -147,6 +147,7 @@ public class Server extends JFrame implements Runnable{
         DBConnection.saveNormalChat(p.getMsg(),p.getInfo());
         
         Socket sendmsg = new Socket(p.getIp(), 9090);
+        System.out.println("message to: "+p.getIp());
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
                         
