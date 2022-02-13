@@ -36,4 +36,4 @@ User/Group photo
 Clean own chat  
 Search user/group/text  
 Edit message
-
+Remember user

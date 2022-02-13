@@ -37,30 +37,30 @@ import javax.swing.Timer;
  */
 public class Chat extends JFrame implements ActionListener{
     
-    private DateFormat timeFormat = new SimpleDateFormat("kk:mm ");
+    private final DateFormat timeFormat = new SimpleDateFormat("kk:mm ");
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
     
-    private JPanel chat = new JPanel();
-    private JPanel options = new JPanel();
-    private JPanel screen = new JPanel(); //text chat and cam
-    private JPanel input = new JPanel(); //facilitate adding componnents
-    private JPanel connect = new JPanel();
-    private JPanel users = new JPanel();
-    private JPanel groups = new JPanel();
-    private JScrollPane scrollUsers;
-    private JScrollPane scrollGroups; 
+    private final JPanel chat = new JPanel();
+    private final JPanel options = new JPanel();
+    private final JPanel screen = new JPanel(); //text chat and cam
+    private final JPanel input = new JPanel(); //facilitate adding componnents
+    private final JPanel connect = new JPanel();
+    private final JPanel users = new JPanel();
+    private final JPanel groups = new JPanel();
+    private final JScrollPane scrollUsers;
+    private final JScrollPane scrollGroups; 
         
-    private JButton sendbtn = new JButton(new ImageIcon("img/send.png"));
-    private JButton exitbtn = new JButton("X");
-    private JButton erasebtn = new JButton("#");
-    private JButton login = new JButton("Login");
-    private JButton register = new JButton("Register");
-    private JButton call = new JButton("Call");
-    private JButton newgroup = new JButton("         +          ");
+    private final JButton sendbtn = new JButton(new ImageIcon("img/send.png"));
+    private final JButton exitbtn = new JButton("X");
+    private final JButton erasebtn = new JButton("#");
+    private final JButton login = new JButton("Login");
+    private final JButton register = new JButton("Register");
+    private final JButton call = new JButton("Call");
+    private final JButton newgroup = new JButton("         +          ");
     
-    private JTextField userinput = new JTextField(38);
-    private JTextArea chatxt = new JTextArea(20,50);
+    private final JTextField userinput = new JTextField(38);
+    private final JTextArea chatxt = new JTextArea(20,50);
         
     private JTextArea userInfo;
     private JFrame infoPopup;    
@@ -149,8 +149,8 @@ public class Chat extends JFrame implements ActionListener{
     //=====================================================================
     //                      SERVER CONNECTION         
     //=====================================================================
-        infoPopup = new Information();
-        new RecieveMsg();
+        infoPopup = new Information(); //POP-UP
+        new RecieveMsg(); //Start listening for server response
         getServerIP();
     }  
            
@@ -172,25 +172,22 @@ public class Chat extends JFrame implements ActionListener{
         }
         
         //Set message in case it takes too much
-        new Timer(15000, (ActionEvent e) -> {
-            userInfo.append("   Maybe your Internet is down?\n");
-            userInfo.append("   Or our server is fucked...\n"); 
+        new Timer(15000, (ActionEvent e) -> { 
             if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
+            userInfo.append("   Maybe your Internet is down?\n");
+            userInfo.append("   Or our server is fucked...\n");
         }).start();
     }
 //=====================================================================
 //                     USER SESSION
 //=====================================================================
     private void  processSessionStart(){ 
-        if(onlyonce){
             StartOptions options = new StartOptions();
             JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
             String slc = options.getSelection();
 
             if(slc.equals("Login")){sessionFrame = new Login();}
             else if(slc.equals("Register")){sessionFrame = new Register();}
-            onlyonce = false;
-        }
     }
 
 //===========================================================================================
@@ -263,6 +260,7 @@ public class Chat extends JFrame implements ActionListener{
             askForUsersOnline(p.getNick());
             for(String chatid : p.getObj().keySet()){
                 //chatid, chatname, msgs
+                System.out.println(chatid+"  "+p.getObj().get(chatid)[0]+"  "+p.getObj().get(chatid)[1]);
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }          
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
@@ -284,6 +282,7 @@ public class Chat extends JFrame implements ActionListener{
             askForUsersOnline(p.getNick());            
             for(String chatid : p.getObj().keySet()){
                 //chatid, chatname, msgs
+                System.out.println(chatid+"  "+p.getObj().get(chatid)[0]+"  "+p.getObj().get(chatid)[1]);
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
@@ -301,6 +300,7 @@ public class Chat extends JFrame implements ActionListener{
 //===========================================================================================
     private void askForUsersOnline(String nick){
         nickLabel.setText("username: "+nick);
+        this.nick = nick;
         Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
     }
     
@@ -309,15 +309,17 @@ public class Chat extends JFrame implements ActionListener{
             String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip));
 //          || GetIP.getPublicIP().contains(p.getObj().get(user))
-            
+            System.out.println(nick);
             if(!own && !nick.equals(user)){ 
+                
+            System.out.println("Setting swing comp: "+p.getObj().get(ip)[0]);
 //------------------ CHECK IF ALREADY EXISTS!! --------------------------------
               //Ineficient nested loops!!
               //create chatid and store possible previous chat info
-              String chatid =
-              p.getInfo().equals("") ? chatid=p.getInfo() :
+//              p.getInfo().equals("") ? chatid=p.getInfo() : WTF IS THIS???
+              String chatid =              
               nick.compareTo(user)>0 ? nick+"~"+user:user+"~"+nick;
-              
+              System.out.println(chatid);
 //              if(chatstorage.containsKey(chatid)){
 //                  //get the btn, change the listener
 //                  for(int i = 0; i < users.getComponentCount(); i++){
