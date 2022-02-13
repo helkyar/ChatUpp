@@ -70,7 +70,7 @@ public class Chat extends JFrame implements ActionListener{
     private String serverIP = "";
     private boolean onlyonce = true;
     private String adress = "";
-    private String nick = "~guest~";
+    private String nick = "~guest";
     private String chatID;
     private JLabel nickLabel = new JLabel("username: "+nick);
     
@@ -304,12 +304,13 @@ public class Chat extends JFrame implements ActionListener{
             options.remove(login);
             options.remove(register);            
         }
-        nickLabel.setText("username: "+nick);
-        this.nick = nick;
         Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
     }
     
-    private void setUsersOnline(Package p){
+    private void setUsersOnline(Package p){     
+        this.nick = p.getNick();   
+        nickLabel.setText("username: "+nick);
+        System.out.println(p.getNick());
         for(String ip : p.getObj().keySet()){
             String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip));
@@ -575,6 +576,8 @@ public class Chat extends JFrame implements ActionListener{
     }
 }
 //(X)TOGGLE TOGGLE-BUTTONS
+//(X)2 CHATS AT THE SAME TIME BREAKS THINGS
+//(>)Send msg if usser is not connected
 
 
 /**[SERVIDOR]---------------------------------------------------------------

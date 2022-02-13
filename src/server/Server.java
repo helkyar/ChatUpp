@@ -26,8 +26,9 @@ import javax.swing.JTextArea;
  * @author javip
  */
 public class Server extends JFrame implements Runnable{
-    JTextArea txt = new JTextArea();
-    Map<String, String[]> ips = new HashMap<>(); 
+    private static int guest = 0;
+    private JTextArea txt = new JTextArea();
+    private Map<String, String[]> ips = new HashMap<>(); 
     
     Server(){
         Thread lintening = new Thread(this);
@@ -58,7 +59,6 @@ public class Server extends JFrame implements Runnable{
                     if(p.getStatus().equals("online")){sayHelloToChat(request, p);}
                     else if (p.getStatus().equals("login")){checkLogin(p);}
                     else if (p.getStatus().equals("register")){registerUser(p);}
-                    //(!!!)careful ~guest~ may be send in the response
                     else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}                    
                     //(!!!)careful ~guest~ may be send in the response
                     else if (p.getStatus().equals("messaging")){sendMessage(p);}
@@ -124,6 +124,8 @@ public class Server extends JFrame implements Runnable{
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
         String nick = p.getNick();
+        if(nick.equals("~guest")){nick += guest+"~";}
+        p.setNick(nick);
         //fetch chats from db
         String[] chats = DBConnection.getChats(nick);
         if(!chats[0].equals("")){p.setInfo(chats[0]); p.setMsg(chats[1]);}
@@ -175,4 +177,5 @@ public class Server extends JFrame implements Runnable{
     }
     //GUARDAR MENSAJES GRUPALES--
     //ENVIAR MENSAJES GRUPALES--
+    //~guest~ may be send in the response
 }
