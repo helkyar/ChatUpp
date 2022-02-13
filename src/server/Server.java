@@ -58,7 +58,9 @@ public class Server extends JFrame implements Runnable{
                     if(p.getStatus().equals("online")){sayHelloToChat(request, p);}
                     else if (p.getStatus().equals("login")){checkLogin(p);}
                     else if (p.getStatus().equals("register")){registerUser(p);}
-                    else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}
+                    //(!!!)careful ~guest~ may be send in the response
+                    else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}                    
+                    //(!!!)careful ~guest~ may be send in the response
                     else if (p.getStatus().equals("messaging")){sendMessage(p);}
                     else if (p.getStatus().equals("creategroup")){sendAllUsers(p);}
                     else if (p.getStatus().equals("groupusers")){informGroupUsers(p);}

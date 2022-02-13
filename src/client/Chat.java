@@ -98,6 +98,7 @@ public class Chat extends JFrame implements ActionListener{
         scrollUsers.setPreferredSize(new Dimension(115,210));
         scrollGroups.setPreferredSize(new Dimension(115,210));
         
+        chat.setVisible(false);
         chat.setLayout(new BorderLayout(10,10));
         input.setLayout(new FlowLayout());
         chatxt.setEditable(false);
@@ -188,6 +189,7 @@ public class Chat extends JFrame implements ActionListener{
 
             if(slc.equals("Login")){sessionFrame = new Login();}
             else if(slc.equals("Register")){sessionFrame = new Register();}
+            else{askForUsersOnline(nick);}
     }
 
 //===========================================================================================
@@ -297,6 +299,11 @@ public class Chat extends JFrame implements ActionListener{
 //                     USER-TO-USER LINK
 //===========================================================================================
     private void askForUsersOnline(String nick){
+        //remove login and register btns if guest
+        if(!nick.equals("~guest~")){
+            options.remove(login);
+            options.remove(register);            
+        }
         nickLabel.setText("username: "+nick);
         this.nick = nick;
         Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
@@ -330,9 +337,10 @@ public class Chat extends JFrame implements ActionListener{
                  final String ihatejava = chatid;
                  JToggleButton btn = new JToggleButton(user+"                ", CHATLOGO);
                  btn.addActionListener((ActionEvent e) -> {
-                     chatxt.setText(chatstorage.get(ihatejava));
                      chatID = ihatejava;
+                     unselectButtons(e);
                      adress = ip;
+                     
                  });
                  btn.setName(chatid);
 
@@ -344,15 +352,25 @@ public class Chat extends JFrame implements ActionListener{
         }            
             
     }
-        
+           
+    private void unselectButtons(ActionEvent e) {
+        for(Component btn : connect.getComponents()){            
+            try{((JToggleButton)btn).setSelected(true);
+            } catch (Exception ex){continue;}
+        }
+        ((JToggleButton)e.getSource()).setSelected(true);
+        chatxt.setText(chatstorage.get(chatID));
+        chat.setVisible(true);
+    }
+
     private void sendMessage(Package p){
         if(!p.getNick().equals(nick)){
             chatxt.append(p.getMsg()+"\n");
-            String txt = chatstorage.get(p.getInfo());
-            chatstorage.put(p.getInfo(),p.getMsg()+"\n");
+            System.out.println(p.getInfo());
+            //chatid needed
+            chatstorage.put(chatID,chatxt.getText());
         }
     }     
-    
     
 //=======================================================================
 // POP-UPS
@@ -480,7 +498,7 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     private void createNewGroup() {
-//      if(nick.equals("~guest~")){return;}
+      if(nick.equals("~guest~")){return;}
 
       //CALL DB FOR USERS
       Send.message((String) GetIP.getLocalIp().get(1), "", "", "creategroup", "");
@@ -556,6 +574,9 @@ public class Chat extends JFrame implements ActionListener{
       }
     }
 }
+//(X)TOGGLE TOGGLE-BUTTONS
+
+
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente
  + (comprobar si el chat existe)
