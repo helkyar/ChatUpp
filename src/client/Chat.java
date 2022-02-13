@@ -260,7 +260,6 @@ public class Chat extends JFrame implements ActionListener{
             askForUsersOnline(p.getNick());
             for(String chatid : p.getObj().keySet()){
                 //chatid, chatname, msgs
-                System.out.println(chatid+"  "+p.getObj().get(chatid)[0]+"  "+p.getObj().get(chatid)[1]);
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }          
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
@@ -282,7 +281,6 @@ public class Chat extends JFrame implements ActionListener{
             askForUsersOnline(p.getNick());            
             for(String chatid : p.getObj().keySet()){
                 //chatid, chatname, msgs
-                System.out.println(chatid+"  "+p.getObj().get(chatid)[0]+"  "+p.getObj().get(chatid)[1]);
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
@@ -309,35 +307,28 @@ public class Chat extends JFrame implements ActionListener{
             String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip));
 //          || GetIP.getPublicIP().contains(p.getObj().get(user))
-            System.out.println(nick);
             if(!own && !nick.equals(user)){ 
-                
-            System.out.println("Setting swing comp: "+p.getObj().get(ip)[0]);
-//------------------ CHECK IF ALREADY EXISTS!! --------------------------------
-              //Ineficient nested loops!!
-              //create chatid and store possible previous chat info
-//              p.getInfo().equals("") ? chatid=p.getInfo() : WTF IS THIS???
+            //create chatid and store possible previous chat info
               String chatid =              
               nick.compareTo(user)>0 ? nick+"~"+user:user+"~"+nick;
-              System.out.println(chatid);
-//              if(chatstorage.containsKey(chatid)){
-//                  //get the btn, change the listener
-//                  for(int i = 0; i < users.getComponentCount(); i++){
-//                      JToggleButton btn = (JToggleButton) users.getComponents()[i];
-//                      if(btn.getName().equals(chatid)){
-//                          final String ihatejava = chatid;
-//                          btn.addActionListener((ActionEvent e) -> {
-//                            chatxt.setText(chatstorage.get(ihatejava));
-//                            chatID = ihatejava;
-//                            adress = ip;
-//                          });
-//                      }
-//                  }
-//              } else {
+              if(chatstorage.containsKey(chatid)){
+                  //get the btn, change the listener
+                  for(int i = 0; i < users.getComponentCount(); i++){
+                      JToggleButton btn = (JToggleButton) users.getComponents()[i];
+                      if(btn.getName().equals(chatid)){
+                          final String ihatejava = chatid;
+                          btn.addActionListener((ActionEvent e) -> {
+                            chatxt.setText(chatstorage.get(ihatejava));
+                            chatID = ihatejava;
+                            adress = ip;
+                          });
+                      }
+                  }
+              } else {
                  chatstorage.put(chatid,p.getMsg()); //mesage in case there is a server error it get anounced in the chat
                  //add user btn
                  final String ihatejava = chatid;
-                 JToggleButton btn = new JToggleButton(user, CHATLOGO);
+                 JToggleButton btn = new JToggleButton(user+"                ", CHATLOGO);
                  btn.addActionListener((ActionEvent e) -> {
                      chatxt.setText(chatstorage.get(ihatejava));
                      chatID = ihatejava;
@@ -348,9 +339,7 @@ public class Chat extends JFrame implements ActionListener{
                  users.add(btn);         
                  users.setVisible(false);
                  users.setVisible(true); 
-//                }
-              
- 
+                }
             }
         }            
             
@@ -439,14 +428,14 @@ public class Chat extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent event) {
         if(adress.length()>1 && event.getSource() == sendbtn){
             try { 
-//-------------- CAREFULL WITH CHATS WITHOUT IPS!! --------------------------------
-                Send.message( adress,userinput.getText(), nick, "messaging", chatID);
-
-                String userin = userinput.getText() + "\n";
-                String txt = chatstorage.get(chatID)+userin;
-                chatxt.append(userinput.getText() + "\n");
-                chatstorage.put(chatID, txt);
+                String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";
+                Send.message( adress, msg, nick, "messaging", chatID);
+                    
+                chatxt.append(msg);
+                String txt = chatxt.getText() + "\n";                   
+                chatstorage.put(chatID, txt); //overwrite previous
                 userinput.setText("");
+                        
             } catch (Exception e){e.printStackTrace();}
         }else if(event.getSource() == erasebtn){chatxt.setText("");}
         else if(event.getSource() == exitbtn){System.exit(0);}
@@ -458,16 +447,15 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     public void sendToChat(KeyEvent pressed) {
-        if(/*adress.length()>1*/true){
-            String userRef = timeFormat.format(new Date())+"["+nick+"]:";            
+        if(adress.length()>1){
+            String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";            
             try {
-//-------------- CAREFULL WITH CHATS WITHOUT IPS!! --------------------------------
                 if(pressed.getKeyCode() == KeyEvent.VK_ENTER){
-                    Send.message( adress, userinput.getText(), nick, "messaging", chatID);
-
-                    String userin = userinput.getText() + "\n";
-                    String txt = chatstorage.get(chatID)+userin;
-                    chatxt.append(userRef+"\n"+userinput.getText() + "\n");
+                    Send.message( adress, msg, nick, "messaging", chatID);
+                    
+                    chatxt.append(msg);
+                    String txt = chatxt.getText() + "\n";
+                    
                     chatstorage.put(chatID, txt);
                     userinput.setText("");
                 }  
@@ -539,7 +527,7 @@ public class Chat extends JFrame implements ActionListener{
                  chatid.split("~")[1] : chatid.split("~")[0];
          
          chatstorage.put(chatid, msg);
-         JToggleButton btn = new JToggleButton(user, CHATLOGO);
+         JToggleButton btn = new JToggleButton(user+"                   ", CHATLOGO);
          btn.addActionListener((ActionEvent e) -> {
             chatxt.setText(chatstorage.get(chatid));
             chatID = chatid;
