@@ -376,8 +376,11 @@ public class Chat extends JFrame implements ActionListener{
         if(!p.getNick().equals(nick)){
             if(chatID.equals(id)){chatxt.append(p.getMsg()+"\n");}
             //chatid needed
+            
+            System.out.println(p.getMsg());
+            System.out.println(id);
             String msg = chatstorage.get(id)+p.getMsg()+"\n";
-            chatstorage.put(id,msg);
+            chatstorage.replace(id, msg);
         }
     }     
     
