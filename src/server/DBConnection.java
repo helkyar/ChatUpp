@@ -231,11 +231,8 @@ public class DBConnection {
     }
 
     static void saveNormalChat(String msg, String chatid) {
-        String query = "SELECT chat_id FROM participants";
-        
-        //user_id chat_id (only once)
-        //chat_id chat_name (only once)
-        //Update msg
+        String query = "SELECT chat_id FROM participants WHERE chat_id= '"+chatid+"'";
+
         try{     
             Class.forName(driver);
           try {
@@ -243,7 +240,8 @@ public class DBConnection {
                 st = conn.createStatement();
                 rs = st.executeQuery(query);
                 
-                if(!rs.next()){
+                if(!rs.next() && (!chatid.startsWith("~guest") || !chatid.contains("~~guest"))){
+                    
                     String addChat = "INSERT INTO chats (`chat_id`, `chat_name`) VALUES ('"+chatid+"','NOONECARES');"
                             + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');";
                     ps = conn.prepareStatement(addChat);
@@ -256,6 +254,7 @@ public class DBConnection {
                 st = conn.createStatement();
                 rs = st.executeQuery(getMsg);
                 if(rs.next()) {newmsg = rs.getString(1)+msg;}
+                
                 String addMsg = "UPDATE messages SET `message`='"+newmsg+"' WHERE chat_id='"+chatid+"'";
                 ps = conn.prepareStatement(addMsg);
                 ps.executeUpdate();

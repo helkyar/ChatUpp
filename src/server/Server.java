@@ -124,14 +124,16 @@ public class Server extends JFrame implements Runnable{
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
         String nick = p.getNick();
-        if(nick.equals("~guest")){nick += guest+"~";}
+        //Set unique guest user
+        if(nick.equals("~guest")){nick += guest+++"~";}
         p.setNick(nick);
         //fetch chats from db
         String[] chats = DBConnection.getChats(nick);
         if(!chats[0].equals("")){p.setInfo(chats[0]); p.setMsg(chats[1]);}
-        
+        //Avoid ip duplication
         if(!ips.containsValue(getip)){ips.put(getip, new String[]{nick,""});}        
         p.setObj(ips);
+        p.setIp(p.getIp());
                             
         for(String userip:ips.keySet()){            
             System.out.println(userip);
@@ -145,9 +147,8 @@ public class Server extends JFrame implements Runnable{
     
     private void sendMessage(Package p) throws IOException{
         DBConnection.saveNormalChat(p.getMsg(),p.getInfo());
-        
+        System.out.println(p.getInfo());
         Socket sendmsg = new Socket(p.getIp(), 9090);
-        System.out.println("message to: "+p.getIp());
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
                         

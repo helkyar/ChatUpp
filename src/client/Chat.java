@@ -190,7 +190,9 @@ public class Chat extends JFrame implements ActionListener{
 
             if(slc.equals("Login")){sessionFrame = new Login();}
             else if(slc.equals("Register")){sessionFrame = new Register();}
-            else{askForUsersOnline(nick);}
+            else{ //remove login and register btns if guest
+                options.remove(login); options.remove(register);        
+                askForUsersOnline(nick);}
             onlyonce = false;
         }
     }
@@ -302,22 +304,19 @@ public class Chat extends JFrame implements ActionListener{
 //                     USER-TO-USER LINK
 //===========================================================================================
     private void askForUsersOnline(String nick){
-        //remove login and register btns if guest
-        if(!nick.equals("~guest~")){
-            options.remove(login);
-            options.remove(register);            
-        }
-        Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
+       Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
     }
     
-    private void setUsersOnline(Package p){     
-        this.nick = p.getNick();   
-        nickLabel.setText("username: "+nick);
+    private void setUsersOnline(Package p){ 
+        if(p.getIp().equals((String) GetIP.getLocalIp().get(1))){
+            this.nick = p.getNick();   
+            nickLabel.setText("username: "+nick);
+        }
         
         for(String ip : p.getObj().keySet()){
             String user = p.getObj().get(ip)[0];
-            boolean own = (GetIP.getLocalIp().contains(ip));
-//          || GetIP.getPublicIP().contains(p.getObj().get(user))
+            boolean own = (GetIP.getLocalIp().contains(ip) || GetIP.getPublicIP().contains(ip));
+         
             if(!own && !nick.equals(user)){ 
             //create chatid and store possible previous chat info
               String chatid =              
@@ -370,9 +369,11 @@ public class Chat extends JFrame implements ActionListener{
     }
 
     private void sendMessage(Package p){
-        chatxt.append(p.getMsg()+"\n");
+        if(!p.getNick().equals(nick)){
+            chatxt.append(p.getMsg()+"\n");
             //chatid needed
-        chatstorage.put(chatID,chatxt.getText());
+            chatstorage.put(chatID,chatxt.getText());
+        }
     }     
     
 //=======================================================================
@@ -450,7 +451,6 @@ public class Chat extends JFrame implements ActionListener{
         if(adress.length()>1 && event.getSource() == sendbtn){
             try { 
                 String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";
-                System.out.println("sending msg: "+adress+", "+msg+", "+nick+", "+chatID);
                 Send.message( adress, msg, nick, "messaging", chatID);
                  
                 chatxt.append(msg);
@@ -474,7 +474,7 @@ public class Chat extends JFrame implements ActionListener{
             try {
                 if(pressed.getKeyCode() == KeyEvent.VK_ENTER && !userinput.getText().equals("")){
                     Send.message( adress, msg, nick, "messaging", chatID);
-                    
+                    System.out.println(chatID);
                     chatxt.append(msg);
                     String txt = chatxt.getText() + "\n";
                     
@@ -485,6 +485,9 @@ public class Chat extends JFrame implements ActionListener{
         }else { JOptionPane.showMessageDialog(this, "Select a chat");}
     }
     
+// ===========================================================================
+//                      CAM
+// ===========================================================================
     public void makeCamCall(){
         if(call.getText().equals("Call")){
             call.setText("HangUp");
@@ -501,8 +504,11 @@ public class Chat extends JFrame implements ActionListener{
         }
     }
     
+// ===========================================================================
+//                      GROUP CREATION
+// ===========================================================================
     private void createNewGroup() {
-      if(nick.equals("~guest~")){return;}
+      if(nick.startsWith("~guest")){return;}
 
       //CALL DB FOR USERS
       Send.message((String) GetIP.getLocalIp().get(1), "", "", "creategroup", "");
@@ -542,6 +548,9 @@ public class Chat extends JFrame implements ActionListener{
       //Add new user
     }
     
+// ===========================================================================
+//                      CHAT MEMORY
+// ===========================================================================
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
       if(!chatid.contains("~g~")){
