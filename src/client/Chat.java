@@ -183,6 +183,7 @@ public class Chat extends JFrame implements ActionListener{
 //                     USER SESSION
 //=====================================================================
     private void  processSessionStart(){ 
+        if(onlyonce){
             StartOptions options = new StartOptions();
             JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
             String slc = options.getSelection();
@@ -190,6 +191,8 @@ public class Chat extends JFrame implements ActionListener{
             if(slc.equals("Login")){sessionFrame = new Login();}
             else if(slc.equals("Register")){sessionFrame = new Register();}
             else{askForUsersOnline(nick);}
+            onlyonce = false;
+        }
     }
 
 //===========================================================================================
