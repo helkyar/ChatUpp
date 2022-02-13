@@ -243,7 +243,8 @@ public class DBConnection {
                 if(!rs.next() && (!chatid.startsWith("~guest") || !chatid.contains("~~guest"))){
                     
                     String addChat = "INSERT INTO chats (`chat_id`, `chat_name`) VALUES ('"+chatid+"','NOONECARES');"
-                            + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');";
+                            + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');"
+                            + "INSERT INTO messages (`chat_id`) VALUES ('"+chatid+"');";
                     ps = conn.prepareStatement(addChat);
                     ps.executeUpdate(); 
                 } 
@@ -263,6 +264,25 @@ public class DBConnection {
              catch ( Exception ex){ex.printStackTrace();}
         }catch (ClassNotFoundException ex) {ex.printStackTrace();}         
         finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace();} catch (Exception ex) {ex.printStackTrace();}}
+   
+    }
+
+    static ArrayList getGroupParticipants(String id) {
+        ArrayList ips = new ArrayList();
+        String query = "Select last_ip FROM users INNER JOIN participants ON users.username = participants.user_id WHERE participants.chat_id = '"+id+"'";
+        try{     
+            Class.forName(driver);
+          try {
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
+            while(rs.next()) {ips.add(rs.getString(1));}
+
+            return ips;
+        
+        } catch (SQLException ex) {ex.printStackTrace(); return ips;}     
+             catch ( Exception ex){ex.printStackTrace(); return ips;}
+        }catch (ClassNotFoundException ex) {ex.printStackTrace(); return ips;}         
+        finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace(); return ips;} catch (Exception ex) {ex.printStackTrace(); return ips;}}
    
     }
 }

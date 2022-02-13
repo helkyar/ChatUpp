@@ -147,12 +147,22 @@ public class Server extends JFrame implements Runnable{
     
     private void sendMessage(Package p) throws IOException{
         DBConnection.saveNormalChat(p.getMsg(),p.getInfo());
-        System.out.println(p.getInfo());
-        Socket sendmsg = new Socket(p.getIp(), 9090);
-        ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-        msgpackage.writeObject(p);
-                        
-        msgpackage.close(); sendmsg.close();
+        if(!p.getInfo().contains("~g~")){
+            System.out.println(p.getIp()+", "+p.getInfo());
+            Socket sendmsg = new Socket(p.getIp(), 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+            msgpackage.close(); sendmsg.close();
+        }else{
+           ArrayList ips = DBConnection.getGroupParticipants(p.getInfo());
+           for (Object ip : ips.toArray()){
+               System.out.println(ip);
+                Socket sendmsg = new Socket((String)ip, 9090);
+                ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+                msgpackage.writeObject(p);
+                msgpackage.close(); sendmsg.close();
+           }
+        }            
     }
 
     private void sendAllUsers(Package p)  throws IOException{

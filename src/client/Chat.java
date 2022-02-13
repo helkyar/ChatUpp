@@ -190,9 +190,7 @@ public class Chat extends JFrame implements ActionListener{
 
             if(slc.equals("Login")){sessionFrame = new Login();}
             else if(slc.equals("Register")){sessionFrame = new Register();}
-            else{ //remove login and register btns if guest
-                options.remove(login); options.remove(register);        
-                askForUsersOnline(nick);}
+            else{askForUsersOnline(nick);}
             onlyonce = false;
         }
     }
@@ -264,9 +262,10 @@ public class Chat extends JFrame implements ActionListener{
         if(p.getMsg().equals("OK")){
             userInfo.setText("\n\tLogin successfull!!");
             //Ask server to get users and send current user
+            nick = p.getNick();
             askForUsersOnline(p.getNick());
             for(String chatid : p.getObj().keySet()){
-                //chatid, chatname, msgs
+                //chatid, chatname, msgs, last_ip
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
             }          
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
@@ -284,8 +283,9 @@ public class Chat extends JFrame implements ActionListener{
         infoPopup = new Information();
         if(p.getInfo().equals("")){
             userInfo.setText("\n\tRegister successfull!!");
-            //Ask server to get users and send current user
-            askForUsersOnline(p.getNick());            
+            //Ask server to get users and send current user            
+            nick = p.getNick();
+            askForUsersOnline(p.getNick());             
             for(String chatid : p.getObj().keySet()){
                 //chatid, chatname, msgs
                 informChatUsers(chatid, p.getObj().get(chatid)[0], p.getObj().get(chatid)[1]);
@@ -311,6 +311,9 @@ public class Chat extends JFrame implements ActionListener{
         if(p.getIp().equals((String) GetIP.getLocalIp().get(1))){
             this.nick = p.getNick();   
             nickLabel.setText("username: "+nick);
+            if(!nick.contains("~guest")){
+                options.remove(login); options.remove(register);
+            }
         }
         
         for(String ip : p.getObj().keySet()){
@@ -361,7 +364,7 @@ public class Chat extends JFrame implements ActionListener{
     private void unselectButtons(ActionEvent e) {
         for(Component btn : connect.getComponents()){            
             try{((JToggleButton)btn).setSelected(true);
-            } catch (Exception ex){continue;}
+            } catch (Exception ex){System.out.println("fuck");continue;}
         }
         ((JToggleButton)e.getSource()).setSelected(true);
         chatxt.setText(chatstorage.get(chatID));
@@ -369,10 +372,12 @@ public class Chat extends JFrame implements ActionListener{
     }
 
     private void sendMessage(Package p){
+        String id = p.getInfo();
         if(!p.getNick().equals(nick)){
-            chatxt.append(p.getMsg()+"\n");
+            if(chatID.equals(id)){chatxt.append(p.getMsg()+"\n");}
             //chatid needed
-            chatstorage.put(chatID,chatxt.getText());
+            String msg = chatstorage.get(id)+p.getMsg()+"\n";
+            chatstorage.put(id,msg);
         }
     }     
     
@@ -448,7 +453,7 @@ public class Chat extends JFrame implements ActionListener{
 // EVENTS
 // ======================================================================
     public void actionPerformed(ActionEvent event) {
-        if(adress.length()>1 && event.getSource() == sendbtn){
+        if(event.getSource() == sendbtn){
             try { 
                 String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";
                 Send.message( adress, msg, nick, "messaging", chatID);
@@ -469,20 +474,18 @@ public class Chat extends JFrame implements ActionListener{
     }
     
     public void sendToChat(KeyEvent pressed) {
-        if(adress.length()>1){
-            String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";            
-            try {
-                if(pressed.getKeyCode() == KeyEvent.VK_ENTER && !userinput.getText().equals("")){
-                    Send.message( adress, msg, nick, "messaging", chatID);
-                    System.out.println(chatID);
-                    chatxt.append(msg);
-                    String txt = chatxt.getText() + "\n";
-                    
-                    chatstorage.put(chatID, txt);
-                    userinput.setText("");
-                }  
-            } catch (Exception e){e.printStackTrace();}
-        }else { JOptionPane.showMessageDialog(this, "Select a chat");}
+        String msg = timeFormat.format(new Date())+"["+nick+"]:\n"+userinput.getText() + "\n";            
+        try {
+            if(pressed.getKeyCode() == KeyEvent.VK_ENTER && !userinput.getText().equals("")){
+                Send.message( adress, msg, nick, "messaging", chatID);
+                System.out.println(chatID);
+                chatxt.append(msg);
+                String txt = chatxt.getText() + "\n";
+                  
+                chatstorage.put(chatID, txt);
+                userinput.setText("");
+            }  
+        } catch (Exception e){e.printStackTrace();}            
     }
     
 // ===========================================================================
@@ -555,15 +558,16 @@ public class Chat extends JFrame implements ActionListener{
       //CREATE SWING COMPONENT FOR USER-TO-USER
       if(!chatid.contains("~g~")){
          String user = chatid.split("~")[0].equals(nick) ? 
-                 chatid.split("~")[1] : chatid.split("~")[0];
+                chatid.split("~")[1] : chatid.split("~")[0];
          
          chatstorage.put(chatid, msg);
          JToggleButton btn = new JToggleButton(user+"                   ", CHATLOGO);
          btn.addActionListener((ActionEvent e) -> {
+            unselectButtons(e);
             chatxt.setText(chatstorage.get(chatid));
             chatID = chatid;
             System.out.println("userbutton from server memory: "+adress);
-            adress = "";
+//            adress = ""; 
          });
          btn.setName(chatid);
          
@@ -576,6 +580,7 @@ public class Chat extends JFrame implements ActionListener{
 
         JToggleButton gbtn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
         gbtn.addActionListener((ActionEvent e) -> {
+          unselectButtons(e);
           chatxt.setText(chatstorage.get(chatid));
           chatID = chatid;
           System.out.println("grupbutton from server memory: "+adress);
@@ -590,11 +595,13 @@ public class Chat extends JFrame implements ActionListener{
     }
 }
 //(X)TOGGLE TOGGLE-BUTTONS
-//(X)2 CHATS AT THE SAME TIME BREAKS THINGS
-//(X)(?)USER SWAP
-//(X)NEW USER NOT ADDED (no actualiza)
-//(>)Send msg if usser is not connected
-
+//(X)CHATS REPEAT IF THERE IS POST-LOGIN
+//(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
+//(X)USER FROM MEMORY AND ONLINE PERSIST
+//(X)LOS CHATS SE PISAN (detectar el chat activo y solo envíar el mensaje si coincide)
+//(X)LOS USUARIOS NO SE COMUNICAN BIEN (ver el servidor)
+//(>)MESSAGE IF USER IS NOT CONNECTED
+//(>)Send groups chat
 
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente
