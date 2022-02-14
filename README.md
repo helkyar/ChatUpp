@@ -22,18 +22,27 @@ Chat based in java
 ### Run
 
 ## Known issues
-Sometimes connection to server doesn't stop looping (reestart server to solve this issue).  
+Sometimes connection to server doesn't stop looping -> (reestart server to solve this issue).  
 Register panel returns a Frame with previous information (instead of new one).  
 Lost connection message repeats itself.
 Session frames don't close if changed between them (login to register || resgister to login)
+2 CHATS AT THE SAME TIME BREAKS THINGS -> Use just one
+TOGGLE TOGGLE-BUTTONS
+CHATS REPEAT IF THERE IS POST-LOGIN
+BOTHS USER CHATS (FROM MEMORY AND ONLINE) PERSIST
+
 ## Design
 
 ## Next Steps
 User/Group info 
 Show Only saved friends/groups  
+Add usera as a friend
+Set user visibility (public/private)
+User configuration JPanel
+Show if user online
+Put updated chat at the top
 Block user  
 User/Group photo  
-Clean own chat  
 Search user/group/text  
 Edit message
 Remember user

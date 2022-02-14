@@ -80,7 +80,7 @@ public class Server extends JFrame implements Runnable{
     private void sayHelloToChat(Socket request, Package p) throws IOException{
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
-                        
+                        System.out.println(getip);
         txt.append("New connection: "+getip);
         p.setStatus("imserver");   
         Socket sendmsg = new Socket(getip, 9090);

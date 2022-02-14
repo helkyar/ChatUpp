@@ -389,6 +389,30 @@ public class Chat extends JFrame implements ActionListener{
             String msg = chatstorage.get(id)+p.getMsg()+"\n";
             chatstorage.replace(id, msg);
         }
+        JToggleButton chat = null;
+        if(p.getInfo().contains("~g~")){
+        for(Component btn : groups.getComponents()){
+            try{
+                if(((JToggleButton)btn).getName().equals(p.getInfo())){
+                    chat = (JToggleButton)btn;
+                    groups.remove(chat);
+                    break;
+                }
+            } catch (Exception ex){System.out.println("fuck");continue;}
+        } groups.add(chat, 1);
+        }else{
+        for(Component btn : users.getComponents()){
+            try{
+                if(((JToggleButton)btn).getName().equals(p.getInfo())){
+                    chat = (JToggleButton)btn;
+                    users.remove(chat);
+                    break;
+                }
+            } catch (Exception ex){System.out.println("fuck");continue;}
+        }users.add(chat, 0);
+        }
+        connect.setVisible(false); connect.setVisible(true);
+        
     }     
     
 //=======================================================================
@@ -634,31 +658,30 @@ public class Chat extends JFrame implements ActionListener{
         
           if(p.getNick().equals("add")){
               for(Component btn : groups.getComponents()){
-              //add if !allbtns.getName().equals(id)
+              try{
+                //add if !allbtns.getName().equals(id)
               if(!((JToggleButton)btn).getName().equals(p.getInfo())){
                     groups.add((JToggleButton)btn);
-                }
+                }}catch (Exception e){continue;}
               }
           }
           else{                            
               for(Component btn : groups.getComponents()){
+                  try{
               //remove if allbtns.getName().equals(id)
                 if(((JToggleButton)btn).getName().equals(p.getInfo())){
                     groups.remove((JToggleButton)btn);
-                }
+                }}catch (Exception e){continue;}
               }
           }
         
           groups.setVisible(false); groups.setVisible(true);
     }
 }
-//*(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
+//(X)2 CHATS AT THE SAME TIME BREAKS THINGS -> Use just one
 //(X)TOGGLE TOGGLE-BUTTONS
 //(X)CHATS REPEAT IF THERE IS POST-LOGIN
 //(X)USER FROM MEMORY AND ONLINE PERSIST
-//(>)ADD GROUP USER
-//(>)DELETE GROUP USER
-//(>)CHANGE CHAT ORDER ON MESAGE
 
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente
