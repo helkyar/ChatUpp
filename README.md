@@ -35,14 +35,14 @@ BOTHS USER CHATS (FROM MEMORY AND ONLINE) PERSIST
 
 ## Next Steps
 User/Group info 
-Show Only saved friends/groups  
-Add usera as a friend
-Set user visibility (public/private)
-User configuration JPanel
-Show if user online
-Put updated chat at the top
+Show Only saved friends/groups    
+Add usera as a friend  
+Set user visibility (public/private)  
+User configuration JPanel  
+Show if user online  
+Put updated chat at the top  
 Block user  
 User/Group photo  
 Search user/group/text  
-Edit message
-Remember user
+Edit message  
+Remember user  
