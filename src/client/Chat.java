@@ -58,6 +58,8 @@ public class Chat extends JFrame implements ActionListener{
     private final JButton register = new JButton("Register");
     private final JButton call = new JButton("Call");
     private final JButton newgroup = new JButton("         +          ");
+    private final JButton addmember = new JButton("(+)Member");
+    private final JButton delmember = new JButton("(-)Member");
     
     private final JTextField userinput = new JTextField(38);
     private final JTextArea chatxt = new JTextArea(20,50);
@@ -133,6 +135,8 @@ public class Chat extends JFrame implements ActionListener{
         login.addActionListener(this);    
         register.addActionListener(this); 
         newgroup.addActionListener(this); 
+        addmember.addActionListener(this);
+        delmember.addActionListener(this);
         call.addActionListener(this);
         userinput.addKeyListener(new KeyAdapter(){
             public void keyPressed(KeyEvent pressed){sendToChat(pressed);}            
@@ -346,6 +350,7 @@ public class Chat extends JFrame implements ActionListener{
                  btn.addActionListener((ActionEvent e) -> {
                      chatID = ihatejava;
                      unselectButtons(e);
+                     removeGroupButtons();
                      System.out.println("userbutton from server online: "+ip+"//"+adress);
                      adress = ip;
                      
@@ -472,6 +477,8 @@ public class Chat extends JFrame implements ActionListener{
         else if(event.getSource() == login){sessionFrame = new Login();}
         else if(event.getSource() == register){sessionFrame = new Register();}
         else if(event.getSource() == newgroup){createNewGroup();}
+        else if(event.getSource() == addmember){addGroupMember();}
+        else if(event.getSource() == delmember){delGroupMember();}
         else if(event.getSource() == call){makeCamCall();}
         else { JOptionPane.showMessageDialog(this, "Select a chat");}
     }
@@ -567,6 +574,7 @@ public class Chat extends JFrame implements ActionListener{
          JToggleButton btn = new JToggleButton(user+"                   ", CHATLOGO);
          btn.addActionListener((ActionEvent e) -> {
             unselectButtons(e);
+            removeGroupButtons();
             chatxt.setText(chatstorage.get(chatid));
             chatID = chatid;
             System.out.println("userbutton from server memory: "+adress);
@@ -584,6 +592,7 @@ public class Chat extends JFrame implements ActionListener{
         JToggleButton gbtn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
         gbtn.addActionListener((ActionEvent e) -> {
           unselectButtons(e);
+          addGroupButtons();
           chatxt.setText(chatstorage.get(chatid));
           chatID = chatid;
           System.out.println("grupbutton from server memory: "+adress);
@@ -596,15 +605,41 @@ public class Chat extends JFrame implements ActionListener{
         groups.setVisible(true);
       }
     }
+
+    private void removeGroupButtons(){
+        options.remove(addmember);
+        options.remove(delmember);
+        options.setVisible(false); options.setVisible(true);
+    }
+
+    private void addGroupButtons(){        
+        options.add(addmember);
+        options.add(delmember);
+        options.setVisible(false); options.setVisible(true);
+    }
+
+    private void addGroupMember(){
+        //Ask database for non participants
+        //JOption with nonparticipaants
+        //Set array with the ones clicked
+        //Connect to database search chat and add them
+        //INSERT INTO participants (chat_id, user_id) VALUES ()
+    }
+
+    private void delGroupMember(){ 
+        //ask database for paticipants          
+        //JOption with participaants        
+        //Set array with the ones clicked        
+        //Connect to database search chat and delete them
+        //DELETE FROM participants where user_id = ' ' AND chat_id = ''
+    }
 }
 //(X)TOGGLE TOGGLE-BUTTONS
 //(X)CHATS REPEAT IF THERE IS POST-LOGIN
-//(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
 //(X)USER FROM MEMORY AND ONLINE PERSIST
-//(X)LOS CHATS SE PISAN (detectar el chat activo y solo envíar el mensaje si coincide)
-//(X)LOS USUARIOS NO SE COMUNICAN BIEN (ver el servidor)
-//(>)MESSAGE IF USER IS NOT CONNECTED
-//(>)Send groups chat
+//*(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
+//(>)ADD GROUP USER
+//(>)DELETE GROUP USER
 
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente

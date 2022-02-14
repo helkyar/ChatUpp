@@ -187,7 +187,5 @@ public class Server extends JFrame implements Runnable{
             msgpackage.close(); sendmsg.close();
         }
     }
-    //GUARDAR MENSAJES GRUPALES--
-    //ENVIAR MENSAJES GRUPALES--
     //~guest~ may be send in the response
 }
