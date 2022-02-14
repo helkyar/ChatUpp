@@ -62,8 +62,10 @@ public class Server extends JFrame implements Runnable{
                     else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}                    
                     //(!!!)careful ~guest~ may be send in the response
                     else if (p.getStatus().equals("messaging")){sendMessage(p);}
-                    else if (p.getStatus().equals("creategroup")){sendAllUsers(p);}
+                    else if (p.getStatus().equals("managegroup")){sendUsers(p);}
                     else if (p.getStatus().equals("groupusers")){informGroupUsers(p);}
+                    else if (p.getStatus().equals("changeusers")){changeGroupUsers(p);}                    
+                    
 //                    else if (p.getStatus().equals("groupmessage")){sendGroupMessage(p);}
                     
                     request.close();
@@ -165,8 +167,8 @@ public class Server extends JFrame implements Runnable{
         }            
     }
 
-    private void sendAllUsers(Package p)  throws IOException{
-        p.setMsg(DBConnection.getAllUsers());
+    private void sendUsers(Package p)  throws IOException{
+        p.setMsg(DBConnection.getUsers(p.getMsg(), p.getInfo()));
         
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
@@ -186,6 +188,20 @@ public class Server extends JFrame implements Runnable{
 
             msgpackage.close(); sendmsg.close();
         }
-    }
-    //~guest~ may be send in the response
+    }   
+
+    private void changeGroupUsers(Package p) throws IOException{
+        //info = id; mesage = users; nick = action
+        p.setMsg(DBConnection.changeGroup(p.getMsg(), p.getNick(), p.getInfo()));
+        String[] ips = DBConnection.notifyUsers(p.getMsg()); //gets ip's of target user
+        
+        for(String userip:ips){      
+            Socket sendmsg = new Socket(userip, 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close();
+        }
+     }
 }
+ //~guest~ may be send in the response

@@ -78,8 +78,9 @@ public class Chat extends JFrame implements ActionListener{
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
-    String[] optionUsersGroup;
+    private String[] optionUsersGroup;
     private String groupUsers = "";
+    private String gid = ""; //id of the group currently being modified
     
     public Chat() {
         
@@ -231,8 +232,9 @@ public class Chat extends JFrame implements ActionListener{
                         else if(p.getStatus().equals("register")){setRegisterMessage(p);}                        
                         else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
                         else if(p.getStatus().equals("messaging")){sendMessage(p);} 
-                        else if (p.getStatus().equals("creategroup")){optionUsersGroup = p.getMsg().split("~");}
-                        else if (p.getStatus().equals("groupusers")){informChatUsers(p.getInfo(), p.getNick(), "");}
+                        else if (p.getStatus().equals("managegroup")){optionUsersGroup = p.getMsg().split("~"); gid=p.getInfo();}
+                        else if (p.getStatus().equals("groupusers")){informChatUsers(p.getInfo(), p.getNick(), "");}                        
+                        else if (p.getStatus().equals("changeusers")){refreshGroups(p);}                        
                 //=====================================================================================                        
                     } catch(Exception e){}                    
                 }
@@ -524,41 +526,10 @@ public class Chat extends JFrame implements ActionListener{
       if(nick.startsWith("~guest")){return;}
 
       //CALL DB FOR USERS
-      Send.message((String) GetIP.getLocalIp().get(1), "", "", "creategroup", "");
       String groupname = JOptionPane.showInputDialog("Set group name");
-      
-      //ADDING USERS OPTIONS
-      String[] users = optionUsersGroup;
-      JPanel selectuser = new JPanel();
-      for(String user : users){
-          if(!user.equals(nick) && !user.equals("")){
-            JButton adduser = new JButton(user);
-            adduser.addActionListener((ActionEvent e)->{
-                if(!nick.equals("~guest~")){groupUsers += nick;}
-                groupUsers += "~"+e.getActionCommand();
-                selectuser.remove(adduser);
-                selectuser.setVisible(false); selectuser.setVisible(true);
-            });
-            selectuser.add(adduser);
-          }
-      }
-      JScrollPane scroll = new JScrollPane(selectuser);
-      scroll.setPreferredSize(new Dimension(80,60));
-      
-      int option =
-      JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
-      
+      int option = manageMembersGroup(0);
       //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
       if(option == 0){Send.message("", groupUsers, groupname, "groupusers", "");}
-  
-      //[SERVER]
-      //create db group entry
-      //update DB group-users
-      //requests from status gruop get ips from db using groupname
-      //msg is send like get users online
-      //-------------------------------------------------------------------
-      //Delete group & delete user (is the same)
-      //Add new user
     }
     
 // ===========================================================================
@@ -619,27 +590,75 @@ public class Chat extends JFrame implements ActionListener{
     }
 
     private void addGroupMember(){
-        //Ask database for non participants
-        //JOption with nonparticipaants
-        //Set array with the ones clicked
-        //Connect to database search chat and add them
-        //INSERT INTO participants (chat_id, user_id) VALUES ()
+        int option = manageMembersGroup(1);
+        //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
+        if(option == 0){Send.message("", groupUsers, "add", "cahngeusers", gid);}
     }
 
     private void delGroupMember(){ 
-        //ask database for paticipants          
-        //JOption with participaants        
-        //Set array with the ones clicked        
-        //Connect to database search chat and delete them
-        //DELETE FROM participants where user_id = ' ' AND chat_id = ''
+        int option = manageMembersGroup(2);
+        //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
+        if(option == 0){Send.message("", groupUsers, "del", "changeusers", gid);}
+    }
+    
+    private int manageMembersGroup(int action){  
+        String retrieve = "";
+        if(action == 0){retrieve = "all";}
+        else if(action == 1){retrieve = "add";}
+        else if(action == 2){retrieve = "del";}
+      //retrieves all users and asigns them to cre
+      Send.message((String) GetIP.getLocalIp().get(1), retrieve, "", "managegroup", chatID);
+      
+      //ADDING USERS OPTIONS
+      String[] users = optionUsersGroup;
+      JPanel selectuser = new JPanel();
+      for(String user : users){
+          if(!user.equals(nick) && !user.equals("")){
+            JButton adduser = new JButton(user);
+            adduser.addActionListener((ActionEvent e)->{
+                if(!nick.equals("~guest~")){groupUsers += nick;}
+                groupUsers += "~"+e.getActionCommand();
+                selectuser.remove(adduser);
+                selectuser.setVisible(false); selectuser.setVisible(true);
+            });
+            selectuser.add(adduser);
+          }
+      }
+      JScrollPane scroll = new JScrollPane(selectuser);
+      scroll.setPreferredSize(new Dimension(80,60));
+      
+      return JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
+    }
+    
+    private void refreshGroups(Package p) {
+        
+          if(p.getNick().equals("add")){
+              for(Component btn : groups.getComponents()){
+              //add if !allbtns.getName().equals(id)
+              if(!((JToggleButton)btn).getName().equals(p.getInfo())){
+                    groups.add((JToggleButton)btn);
+                }
+              }
+          }
+          else{                            
+              for(Component btn : groups.getComponents()){
+              //remove if allbtns.getName().equals(id)
+                if(((JToggleButton)btn).getName().equals(p.getInfo())){
+                    groups.remove((JToggleButton)btn);
+                }
+              }
+          }
+        
+          groups.setVisible(false); groups.setVisible(true);
     }
 }
+//*(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
 //(X)TOGGLE TOGGLE-BUTTONS
 //(X)CHATS REPEAT IF THERE IS POST-LOGIN
 //(X)USER FROM MEMORY AND ONLINE PERSIST
-//*(X)2 CHATS AT THE SAME TIME BREAKS THINGS fuck them
 //(>)ADD GROUP USER
 //(>)DELETE GROUP USER
+//(>)CHANGE CHAT ORDER ON MESAGE
 
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente

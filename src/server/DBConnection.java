@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Mateo
+ * @authors Mateo and Javi
  */
 public class DBConnection {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -124,15 +124,20 @@ public class DBConnection {
         finally { try {conn.close();} catch (SQLException ex) {return result;} catch (Exception ex) {return result;}}
     }
 
-    static String getAllUsers() {
+    static String getUsers(String msg, String id) {
         String allUsers = "";
+        String query = "";
+        if(msg.equals("all")){ query = "SELECT username FROM users";}
+        else if(msg.equals("add")){ query = "SELECT username FROM participants WHERE chat_id != '"+id+"'";}
+        else if(msg.equals("del")){ query = "SELECT username FROM participants WHERE chat_id = '"+id+"'";}
+        
         try {
             Class.forName(driver);
             
             try {
                 conn = DriverManager.getConnection(url, user, pass);
                 st = conn.createStatement();
-                rs = st.executeQuery("SELECT username FROM users");
+                rs = st.executeQuery(query);
                                
                 while (rs.next()) { allUsers += "~"+rs.getString(1);}
                 return allUsers;
@@ -288,6 +293,44 @@ public class DBConnection {
         }catch (ClassNotFoundException ex) {ex.printStackTrace(); return ips;}         
         finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace(); return ips;} catch (Exception ex) {ex.printStackTrace(); return ips;}}
    
+    }
+
+    static String changeGroup(String users, String action, String id) {
+        String allgroupmembers="";
+        String query = "";
+        try {
+            Class.forName(driver);
+            System.out.println(users);
+            try {
+                if(action.equals("add")){                    
+                    int j = users.split("~")[0].equals("") ? 1 : 0; 
+                    query = "INSERT INTO `participants` (`chat_id`, `user_id`) VALUES ('"+id+"', '"+users.split("~")[j]+"')";        
+                    for(int i = 1+j; i < users.split("~").length; i++){
+                        query += ", ('"+id+"', '"+users.split("~")[i]+"')";
+                    }           
+                    
+                } else{query="DELETE FROM participants where user_id = '"+users+"' AND chat_id = '"+id+"'";}
+
+                conn = DriverManager.getConnection(url, user, pass);
+                ps = conn.prepareStatement(query);
+                ps.executeUpdate(); 
+                
+                if(action.equals("del")){return users;}
+                
+                query = "SELECT username FROM participants WHERE chat_id != '"+id+"'";        
+
+                conn = DriverManager.getConnection(url, user, pass);
+                st = conn.createStatement();
+                rs = st.executeQuery(query);
+
+                while (rs.next()) { allgroupmembers += "~"+rs.getString(1);}
+
+                return allgroupmembers;
+                
+            } catch (SQLException ex) {ex.printStackTrace(); return "S";}             
+        } catch (ClassNotFoundException e) {return "S";}         
+        finally { try {conn.close();} catch (SQLException ex) {return "S";} catch (Exception ex) {return "S";}}
+        
     }
 }
 //(>)DELETE CHAT_USER RELATION IN GOUPS
