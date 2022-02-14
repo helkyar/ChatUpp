@@ -26,8 +26,9 @@ import javax.swing.JTextArea;
  * @author javip
  */
 public class Server extends JFrame implements Runnable{
-    JTextArea txt = new JTextArea();
-    Map<String, String> ips = new HashMap<>(); 
+    private static int guest = 0;
+    private JTextArea txt = new JTextArea();
+    private Map<String, String[]> ips = new HashMap<>(); 
     
     Server(){
         Thread lintening = new Thread(this);
@@ -58,8 +59,14 @@ public class Server extends JFrame implements Runnable{
                     if(p.getStatus().equals("online")){sayHelloToChat(request, p);}
                     else if (p.getStatus().equals("login")){checkLogin(p);}
                     else if (p.getStatus().equals("register")){registerUser(p);}
-                    else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}
+                    else if (p.getStatus().equals("getusers")){sendUsersOnline(request, p);}                    
+                    //(!!!)careful ~guest~ may be send in the response
                     else if (p.getStatus().equals("messaging")){sendMessage(p);}
+                    else if (p.getStatus().equals("managegroup")){sendUsers(p);}
+                    else if (p.getStatus().equals("groupusers")){informGroupUsers(p);}
+                    else if (p.getStatus().equals("changeusers")){changeGroupUsers(p);}                    
+                    
+//                    else if (p.getStatus().equals("groupmessage")){sendGroupMessage(p);}
                     
                     request.close();
                     
@@ -84,9 +91,13 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void checkLogin(Package p) throws IOException{
+        String resp = DBConnection.checkLogin(p.getMsg(), p.getNick());
+        p.setMsg(resp);
+        p.setObj(DBConnection.getRegisteredChats(p.getNick()));
         
-        p.setMsg(DBConnection.checkLogin(p.getMsg(), p.getNick()));
-        
+        //if OK resgister ip as last for this user        
+         if(resp.equals("OK")){DBConnection.setLastIP(p.getNick(), p.getIp());}
+         
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
@@ -96,10 +107,13 @@ public class Server extends JFrame implements Runnable{
 
     private void registerUser(Package p) throws IOException{
         String[] data = DBConnection.registerUser(p.getMsg(), p.getNick());
+        p.setObj(DBConnection.getRegisteredChats(data[2]));
         p.setMsg(data[0]);
         p.setInfo(data[1]);
         p.setNick(data[2]);
-         
+        
+         if(data[0].equals("")){DBConnection.setLastIP(data[2], p.getIp());}
+        //if OK resgister ip as last for this user
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
@@ -108,13 +122,20 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sendUsersOnline(Socket request, Package p) throws IOException{
+        //Get host ip
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
-        
-        System.out.println(getip+" : "+p.getNick());
-        
-        if(!ips.containsValue(getip)){ips.put(getip, p.getNick());}        
-        p.setIps(ips);
+        String nick = p.getNick();
+        //Set unique guest user
+        if(nick.equals("~guest")){nick += guest+++"~";}
+        p.setNick(nick);
+        //fetch chats from db
+        String[] chats = DBConnection.getChats(nick);
+        if(!chats[0].equals("")){p.setInfo(chats[0]); p.setMsg(chats[1]);}
+        //Avoid ip duplication
+        if(!ips.containsValue(getip)){ips.put(getip, new String[]{nick,""});}        
+        p.setObj(ips);
+        p.setIp(p.getIp());
                             
         for(String userip:ips.keySet()){            
             System.out.println(userip);
@@ -127,11 +148,60 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sendMessage(Package p) throws IOException{
+        DBConnection.saveNormalChat(p.getMsg(),p.getInfo());
+        if(!p.getInfo().contains("~g~")){
+            System.out.println(p.getIp()+", "+p.getInfo());
+            Socket sendmsg = new Socket(p.getIp(), 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+            msgpackage.close(); sendmsg.close();
+        }else{
+           ArrayList ips = DBConnection.getGroupParticipants(p.getInfo());
+           for (Object ip : ips.toArray()){
+               System.out.println(ip);
+                Socket sendmsg = new Socket((String)ip, 9090);
+                ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+                msgpackage.writeObject(p);
+                msgpackage.close(); sendmsg.close();
+           }
+        }            
+    }
 
+    private void sendUsers(Package p)  throws IOException{
+        p.setMsg(DBConnection.getUsers(p.getMsg(), p.getInfo()));
+        
         Socket sendmsg = new Socket(p.getIp(), 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
         msgpackage.writeObject(p);
                         
-        msgpackage.close(); sendmsg.close();
+        msgpackage.close(); sendmsg.close(); 
     }
+
+    private void informGroupUsers(Package p)  throws IOException{
+        p.setMsg(DBConnection.createNewGroup(p.getMsg(), p.getNick()));
+        String[] ips = DBConnection.notifyUsers(p.getMsg());
+        
+        for(String userip:ips){      
+            Socket sendmsg = new Socket(userip, 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close();
+        }
+    }   
+
+    private void changeGroupUsers(Package p) throws IOException{
+        //info = id; mesage = users; nick = action
+        p.setMsg(DBConnection.changeGroup(p.getMsg(), p.getNick(), p.getInfo()));
+        String[] ips = DBConnection.notifyUsers(p.getMsg()); //gets ip's of target user
+        
+        for(String userip:ips){      
+            Socket sendmsg = new Socket(userip, 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close();
+        }
+     }
 }
+ //~guest~ may be send in the response

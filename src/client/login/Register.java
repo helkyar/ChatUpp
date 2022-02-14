@@ -543,7 +543,7 @@ public class Register extends javax.swing.JFrame {
         }                 
         if (!pwd.equals(pwd2)) {registerFail += "\n\tLas contraseñas no coinciden";}
       
-        Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register");
+        Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register", "");
     }//GEN-LAST:event_jButton_RegistroActionPerformed
     
     //crear una funcion para verificar las casillas vacias
