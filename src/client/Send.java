@@ -25,6 +25,7 @@ public class Send {
      * @param msg message to be send
      * @param nick username of the remitent
      * @param status status of the request (server filters with this param)
+     * @param chatid id of the current chat
      */
     public static void message(String adress, String msg, String nick, String status, String chatid) {
             
@@ -36,7 +37,7 @@ public class Send {
                 p.setStatus(status);
                 p.setMsg(msg);
                 p.setInfo(chatid);
-                    
+                
                 ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
                 objp.writeObject(p);
                 socket.close();

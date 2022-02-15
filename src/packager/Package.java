@@ -20,7 +20,7 @@ public class Package implements Serializable{
     
     public void setNick(String nick){this.nick = nick;}
     public void setIp(String ip){this.ip = ip;}
-    public void setInfo(String move){this.info = info;}
+    public void setInfo(String info){this.info = info;}
     public void setMsg(String msg){this.msg = msg;}
     public void setStatus(String st){this.status = st;}
     public void setObj(Map<String, String[]> ips){this.ips = ips;}
