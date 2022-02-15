@@ -161,29 +161,6 @@ public class Chat extends JFrame implements ActionListener{
     }  
            
     private void getServerIP() {
-        //Get user local ip
-<<<<<<< HEAD
-        userInfo.setText("\n   Starting connection...\n");
-        String ip = (String) GetIP.getLocalIp().get(1);
-        ip = ip.substring(0, ip.lastIndexOf(".")+1);
-        //Test last 255 local ips searching for server
-        for(int i = 0; i<=255; i++){
-            Thread t = new Thread(new SearchServer(i, ip));
-            
-            java.util.Timer timer = new java.util.Timer();
-            timer.schedule(new KillSearchThread(t, timer), 100);
-            t.start();
-            
-            users.add(new JButton("Usermm", send));
-            groups.add(new JButton("Group", send));
-        }        
-        users.setVisible(false);
-        groups.setVisible(false);
-        users.setVisible(true);
-        groups.setVisible(true);
-        
-        userInfo.append("   Waiting response....\n");
-=======
         if(serverIP.equals("")){
             userInfo.setText("\n   Starting connection...\n");
             String ip = (String) GetIP.getLocalIp().get(1);
@@ -198,8 +175,6 @@ public class Chat extends JFrame implements ActionListener{
             }           
             userInfo.append("   Waiting response....\n");
         }
->>>>>>> 63dba0aa9b08882d124e37c11d3eba778b8e5eaa
-        
         //Set message in case it takes too much
         new Timer(15000, (ActionEvent e) -> { 
             if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
@@ -633,8 +608,11 @@ public class Chat extends JFrame implements ActionListener{
       Send.message((String) GetIP.getLocalIp().get(1), retrieve, "", "managegroup", chatID);
       
       //ADDING USERS OPTIONS
-      String[] users = optionUsersGroup;
+      int i = 0;
       JPanel selectuser = new JPanel();
+      //(!)avoid sending empty parameters
+      while(i < 2){ try{ //wait for server response
+      String[] users = optionUsersGroup;
       for(String user : users){
           if(!user.equals(nick) && !user.equals("")){
             JButton adduser = new JButton(user);
@@ -646,7 +624,8 @@ public class Chat extends JFrame implements ActionListener{
             });
             selectuser.add(adduser);
           }
-      }
+      }}catch (Exception e){i = 0;} i++;}
+      
       JScrollPane scroll = new JScrollPane(selectuser);
       scroll.setPreferredSize(new Dimension(80,60));
       
