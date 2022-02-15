@@ -78,9 +78,9 @@ public class Chat extends JFrame implements ActionListener{
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
-    private String[] optionUsersGroup;
-    private String groupUsers = "";
-    private String gid = ""; //id of the group currently being modified
+    private String groupUsers;
+    private String groupname;
+    private int op = 5;
     
     public Chat() {
         
@@ -232,7 +232,7 @@ public class Chat extends JFrame implements ActionListener{
                         else if(p.getStatus().equals("register")){setRegisterMessage(p);}                        
                         else if(p.getStatus().equals("getusers")){setUsersOnline(p);}
                         else if(p.getStatus().equals("messaging")){sendMessage(p);} 
-                        else if (p.getStatus().equals("managegroup")){optionUsersGroup = p.getMsg().split("~"); gid=p.getInfo();}
+                        else if (p.getStatus().equals("managegroup")){serverMembersResponse(p);}
                         else if (p.getStatus().equals("groupusers")){informChatUsers(p.getInfo(), p.getNick(), "");}                        
                         else if (p.getStatus().equals("changeusers")){refreshGroups(p);}                        
                 //=====================================================================================                        
@@ -551,9 +551,7 @@ public class Chat extends JFrame implements ActionListener{
 
       //CALL DB FOR USERS
       String groupname = JOptionPane.showInputDialog("Set group name");
-      int option = manageMembersGroup(0);
-      //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
-      if(option == 0){Send.message("", groupUsers, groupname, "groupusers", "");}
+      manageMembersGroup(0);
     }
     
 // ===========================================================================
@@ -575,11 +573,10 @@ public class Chat extends JFrame implements ActionListener{
             System.out.println("userbutton from server memory: "+adress);
 //            adress = ""; 
          });
-         btn.setName(chatid);
-         
+         btn.setName(chatid);         
          users.add(btn);         
-         users.setVisible(false);
-         users.setVisible(true); 
+         users.repaint();
+         
       } else {        
      //CREATE SWING COMPONENT FOR GROUPS    
         groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
@@ -599,6 +596,8 @@ public class Chat extends JFrame implements ActionListener{
         groups.setVisible(false);
         groups.setVisible(true);
       }
+      this.groupname = groupname;
+      op = 2;
     }
 
     private void removeGroupButtons(){
@@ -614,27 +613,28 @@ public class Chat extends JFrame implements ActionListener{
     }
 
     private void addGroupMember(){
-        int option = manageMembersGroup(1);
-        //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
-        if(option == 0){Send.message("", groupUsers, "add", "cahngeusers", gid);}
+        manageMembersGroup(1);
+        op = 0;
     }
 
     private void delGroupMember(){ 
-        int option = manageMembersGroup(2);
-        //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
-        if(option == 0){Send.message("", groupUsers, "del", "changeusers", gid);}
+        manageMembersGroup(2);
+        op = 1;
     }
     
-    private int manageMembersGroup(int action){  
+    private void manageMembersGroup(int action){  
         String retrieve = "";
         if(action == 0){retrieve = "all";}
         else if(action == 1){retrieve = "add";}
         else if(action == 2){retrieve = "del";}
       //retrieves all users and asigns them to cre
       Send.message((String) GetIP.getLocalIp().get(1), retrieve, "", "managegroup", chatID);
-      
+    }
+    
+    private void serverMembersResponse(Package p){
+        if(p.getMsg().equals("")){return;}
       //ADDING USERS OPTIONS
-      String[] users = optionUsersGroup;
+      String[] users = p.getMsg().split("~");
       JPanel selectuser = new JPanel();
       for(String user : users){
           if(!user.equals(nick) && !user.equals("")){
@@ -651,7 +651,12 @@ public class Chat extends JFrame implements ActionListener{
       JScrollPane scroll = new JScrollPane(selectuser);
       scroll.setPreferredSize(new Dimension(80,60));
       
-      return JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
+      int option = JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null);
+        
+        //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
+      if(option == 0 && op==0){Send.message("", groupUsers, "add", "cahngeusers", p.getInfo());}
+      else if(option == 0&& op==1){Send.message("", groupUsers, "del", "changeusers", p.getInfo());}
+      else if(option == 0&& op==2){Send.message("", groupUsers, groupname, "groupusers", "");}
     }
     
     private void refreshGroups(Package p) {

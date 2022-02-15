@@ -149,6 +149,7 @@ public class DBConnection {
     }
 
     static String createNewGroup(String msg, String nick) {
+        //(!)Catch error if no username is send
         String id =  "~g~"+new Date().getTime()+Math.random();
         System.out.println(id);
         String chat = "INSERT INTO `chats` (`chat_id`, `chat_name`) VALUES (?, ?)";  
