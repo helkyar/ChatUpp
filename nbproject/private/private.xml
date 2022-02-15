@@ -10,6 +10,17 @@
             <file>file:/C:/Users/admin/Desktop/chat/src/server/DBConnection.java</file>
             <file>file:/C:/Users/admin/Desktop/chat/src/client/Chat.java</file>
         </group>
+<<<<<<< HEAD
         <group/>
+=======
+        <group>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/client/Chat.java</file>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/server/Server.java</file>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/client/login/Login.java</file>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/client/login/Register.java</file>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/client/Send.java</file>
+            <file>file:/C:/Users/javier/Desktop/chat/Chat-app/src/server/DBConnection.java</file>
+        </group>
+>>>>>>> ebaf78ab4fd461b3db8fcbc4bf6e91dcb6dcb370
     </open-files>
 </project-private>

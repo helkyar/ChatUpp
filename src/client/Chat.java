@@ -161,7 +161,6 @@ public class Chat extends JFrame implements ActionListener{
     }  
            
     private void getServerIP() {
-        //Get user local ip
         if(serverIP.equals("")){
             userInfo.setText("\n   Starting connection...\n");
             String ip = (String) GetIP.getLocalIp().get(1);
@@ -176,7 +175,6 @@ public class Chat extends JFrame implements ActionListener{
             }           
             userInfo.append("   Waiting response....\n");
         }
-        
         //Set message in case it takes too much
         new Timer(15000, (ActionEvent e) -> { 
             if(!serverIP.equals("")){((Timer)e.getSource()).stop();}
