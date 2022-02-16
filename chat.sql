@@ -20,7 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `chat`
 --
-DROP IF EXISTS `chat`;
+DROP DATABASE IF EXISTS `chat`;
 CREATE DATABASE `chat`;
 USE `chat`;
 -- --------------------------------------------------------
