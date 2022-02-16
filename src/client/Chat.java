@@ -583,7 +583,7 @@ public class Chat extends JFrame implements ActionListener{
         //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
       if(option == 0 && op==0){Send.message("", groupUsers, "add", "changeusers", p.getInfo());}
       else if(option == 0&& op==1){Send.message("", groupUsers, "del", "changeusers", p.getInfo());}
-      else if(option == 0&& op==2){Send.message("", groupUsers, groupname, "groupusers", chatID);}
+      else if(option == 0&& op==2){Send.message("", groupUsers, groupname, "groupusers", "");}
       groupUsers = "";
     }
         
@@ -633,7 +633,7 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
-      System.out.println(chatid);
+      System.out.println(chatid+" | "+groupname+" | "+msg);
       if(!chatid.contains("~g~")){
          String user = chatid.split("~")[0].equals(nick) ? 
                 chatid.split("~")[1] : chatid.split("~")[0];
@@ -653,26 +653,26 @@ public class Chat extends JFrame implements ActionListener{
          users.add(btn);         
          users.repaint();
          
-      } else {        
+      } else {   
+          System.out.println("creating group");
      //CREATE SWING COMPONENT FOR GROUPS    
         groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
 
         JToggleButton gbtn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
         gbtn.addActionListener((ActionEvent e) -> {
-          //unselectButtons(e);
-          addGroupButtons();
-          chatxt.setText(chatstorage.get(chatid));
-          chatID = chatid;
-          chat.setVisible(true);
-          adress = "";
-        });
-        gbtn.setName(chatid);
-        bg.add(gbtn);
-        groups.add(gbtn);         
-        groups.repaint();
+            //unselectButtons(e);
+            addGroupButtons();
+            chatxt.setText(chatstorage.get(chatid));
+            chatID = chatid;
+            chat.setVisible(true);
+            adress = "";
+          });
+          gbtn.setName(chatid);
+          bg.add(gbtn);
+          groups.add(gbtn);         
+          groups.repaint();
+          groups.validate();
         }
-      this.groupname = groupname;
-      op = 2;
     }
 
 }

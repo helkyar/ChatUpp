@@ -179,11 +179,15 @@ public class Server extends JFrame implements Runnable{
     }
 
     private void informGroupUsers(Package p)  throws IOException{
-        p.setMsg(DBConnection.createNewGroup(p.getMsg(), p.getNick()));
+        p.setInfo(DBConnection.createNewGroup(p.getMsg(), p.getNick()));
         String[] ips = DBConnection.notifyUsers(p.getMsg());
-        
-        for(String userip:ips){      
-            Socket sendmsg = new Socket(userip, 9090);
+        ArrayList<String> checker = new ArrayList<>();
+        for(String userip:ips){            
+            if(!checker.contains(userip)){checker.add(userip);}
+        }
+        for(int i = 0; i < checker.size(); i++){
+            String userid = checker.get(i);
+            Socket sendmsg = new Socket(userid, 9090);
             ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
             msgpackage.writeObject(p);
 
