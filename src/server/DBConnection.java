@@ -128,8 +128,8 @@ public class DBConnection {
         String allUsers = "";
         String query = "";
         if(msg.equals("all")){ query = "SELECT username FROM users";}
-        else if(msg.equals("add")){ query = "SELECT username FROM participants WHERE chat_id != '"+id+"'";}
-        else if(msg.equals("del")){ query = "SELECT username FROM participants WHERE chat_id = '"+id+"'";}
+        else if(msg.equals("add")){ query = "SELECT user_id FROM participants WHERE chat_id != '"+id+"'";}
+        else if(msg.equals("del")){ query = "SELECT user_id FROM participants WHERE chat_id = '"+id+"'";}
         
         try {
             Class.forName(driver);
@@ -150,16 +150,17 @@ public class DBConnection {
 
     static String createNewGroup(String msg, String nick) {
         //(!)Catch error if no username is send
+        String serverError ="";
         String id =  "~g~"+new Date().getTime()+Math.random();
-        System.out.println(id);
-        String chat = "INSERT INTO `chats` (`chat_id`, `chat_name`) VALUES (?, ?)";  
+        
+        String chat = "INSERT INTO `chats` (`chat_id`, `chat_name`) VALUES (?, ?)";
+        
         int j = msg.split("~")[0].equals("") ? 1 : 0; 
         String join = "INSERT INTO `participants` (`chat_id`, `user_id`) VALUES ('"+id+"', '"+msg.split("~")[j]+"')";        
         for(int i = 1+j; i < msg.split("~").length; i++){
             join += ", ('"+id+"', '"+msg.split("~")[i]+"')";
         }
-        System.out.println(join);
-        String serverError ="";
+        
         try{     
             Class.forName(driver);
             try{
@@ -182,7 +183,7 @@ public class DBConnection {
 
                     return "OK";
 
-                } catch (SQLException ex) {return serverError;} 
+                } catch (SQLException ex) {ex.printStackTrace();return serverError;} 
             }  
         } catch (ClassNotFoundException e) {return serverError;}          
         finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
@@ -246,11 +247,11 @@ public class DBConnection {
                 st = conn.createStatement();
                 rs = st.executeQuery(query);
                 
-                if(!rs.next() && (!chatid.startsWith("~guest") || !chatid.contains("~~guest"))){
-                    
+                if(!rs.next() && !chatid.contains("~guest")){                    
                     String addChat = "INSERT INTO chats (`chat_id`, `chat_name`) VALUES ('"+chatid+"','NOONECARES');"
-                            + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');"
-                            + "INSERT INTO messages (`chat_id`) VALUES ('"+chatid+"');";
+                            + "INSERT INTO messages (`chat_id`) VALUES ('"+chatid+"');"
+                            + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');";
+                    
                     ps = conn.prepareStatement(addChat);
                     ps.executeUpdate(); 
                 } 
@@ -299,9 +300,10 @@ public class DBConnection {
     static String changeGroup(String users, String action, String id) {
         String allgroupmembers="";
         String query = "";
+        System.out.println(action);
+        System.out.println(users);
         try {
             Class.forName(driver);
-            System.out.println(users);
             try {
                 if(action.equals("add")){                    
                     int j = users.split("~")[0].equals("") ? 1 : 0; 
@@ -310,15 +312,22 @@ public class DBConnection {
                         query += ", ('"+id+"', '"+users.split("~")[i]+"')";
                     }           
                     
-                } else{query="DELETE FROM participants where user_id = '"+users+"' AND chat_id = '"+id+"'";}
+                } else{
+                    query="DELETE FROM participants WHERE chat_id = '"+id+"' AND user_id IN ('"+users.split("~")[0]+"'";
+                    for(int i = 1; i < users.split("~").length; i++){
+                        query += ", '"+users.split("~")[i]+"'";
+                    }   query +=")";
+                }
 
+                System.out.println(query);
+                
                 conn = DriverManager.getConnection(url, user, pass);
                 ps = conn.prepareStatement(query);
                 ps.executeUpdate(); 
                 
                 if(action.equals("del")){return users;}
                 
-                query = "SELECT username FROM participants WHERE chat_id != '"+id+"'";        
+                query = "SELECT user_id FROM participants WHERE chat_id != '"+id+"'";        
 
                 conn = DriverManager.getConnection(url, user, pass);
                 st = conn.createStatement();
