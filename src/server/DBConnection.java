@@ -181,7 +181,7 @@ public class DBConnection {
                     ps = conn.prepareStatement(join);
                     ps.executeUpdate(); 
 
-                    return "OK";
+                    return id;
 
                 } catch (SQLException ex) {ex.printStackTrace();return serverError;} 
             }  
@@ -191,12 +191,14 @@ public class DBConnection {
     }
 
     static String[] notifyUsers(String msg) {
-        String query = "Select last_ip FROM users WHERE username IN ('"+msg.split("~")[0]+"'";
+        String query = "";
+        String[] ips;
+        
+        query = "Select last_ip FROM users WHERE username IN ('"+msg.split("~")[0]+"'";
         for(int i = 1; i < msg.split("~").length; i++){
             query += ", '"+msg.split("~")[i]+"'";
-        }   query +=")";
-        
-        String[] ips = new String[msg.split("~").length];
+        }   query +=")";            
+        ips = new String[msg.split("~").length];
         
         try{     
             Class.forName(driver);
@@ -300,8 +302,6 @@ public class DBConnection {
     static String changeGroup(String users, String action, String id) {
         String allgroupmembers="";
         String query = "";
-        System.out.println(action);
-        System.out.println(users);
         try {
             Class.forName(driver);
             try {
