@@ -358,6 +358,7 @@ public class Chat extends JFrame implements ActionListener{
                  bg.add(btn);
                  users.add(btn);         
                  users.repaint();
+                 users.validate();
                 }
             }
         }            
@@ -652,6 +653,7 @@ public class Chat extends JFrame implements ActionListener{
          bg.add(btn);
          users.add(btn);         
          users.repaint();
+         users.validate();
          
       } else {   
           System.out.println("creating group");
