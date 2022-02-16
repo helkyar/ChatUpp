@@ -29,6 +29,7 @@ public class Server extends JFrame implements Runnable{
     private static int guest = 0;
     private JTextArea txt = new JTextArea();
     private Map<String, String[]> ips = new HashMap<>(); 
+    private String ip = "";
     
     Server(){
         Thread lintening = new Thread(this);
@@ -78,6 +79,10 @@ public class Server extends JFrame implements Runnable{
     }
     
     private void sayHelloToChat(Socket request, Package p) throws IOException{
+        //Trying to save time cutting response
+//        if(p.getIp().equals(ip)){return;}
+//        ip = p.getIp();
+        
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
                         System.out.println(getip);
