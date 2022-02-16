@@ -250,10 +250,15 @@ public class DBConnection {
                 rs = st.executeQuery(query);
                 
                 if(!rs.next() && !chatid.contains("~guest")){                    
-                    String addChat = "INSERT INTO chats (`chat_id`, `chat_name`) VALUES ('"+chatid+"','NOONECARES');"
-                            + "INSERT INTO messages (`chat_id`) VALUES ('"+chatid+"');"
-                            + " INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');";
+                    String addChat = "INSERT INTO chats (`chat_id`, `chat_name`) VALUES ('"+chatid+"','NOONECARES');";
+                    ps = conn.prepareStatement(addChat);
+                    ps.executeUpdate(); 
+                
+                    addChat= "INSERT INTO messages (`chat_id`) VALUES ('"+chatid+"');";
+                    ps = conn.prepareStatement(addChat);
+                    ps.executeUpdate(); 
                     
+                    addChat = "INSERT INTO participants (`chat_id`, `user_id`) VALUES ('"+chatid+"','"+chatid.split("~")[0]+"'),('"+chatid+"','"+chatid.split("~")[1]+"');";
                     ps = conn.prepareStatement(addChat);
                     ps.executeUpdate(); 
                 } 
