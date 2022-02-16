@@ -369,8 +369,6 @@ public class Chat extends JFrame implements ActionListener{
         if(!p.getNick().equals(nick)){
             if(chatID.equals(id)){chatxt.append(p.getMsg()+"\n");}
             //chatid needed
-            
-            System.out.println(p.getMsg());
             String msg = chatstorage.get(id)+p.getMsg()+"\n";
             chatstorage.replace(id, msg);
         }
@@ -558,14 +556,11 @@ public class Chat extends JFrame implements ActionListener{
     private void serverMembersResponse(Package p){
         if(p.getMsg().equals("")){return;}
       //ADDING USERS OPTIONS
-      System.out.println("Message: "+p.getMsg());
       String[] users = p.getMsg().split("~");
       JPanel selectuser = new JPanel();
       for(String user : users){
         //Avoid creator to be selected = mistake
           if(/*!user.equals(nick) && */!user.equals("")){
-              System.out.println("Nick: "+nick);              
-              System.out.println("User: "+user);
             JButton adduser = new JButton(user);
             adduser.addActionListener((ActionEvent e)->{
 //                if(!nick.equals("~guest~")){groupUsers += nick;}
@@ -638,6 +633,7 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
+      System.out.println(chatid);
       if(!chatid.contains("~g~")){
          String user = chatid.split("~")[0].equals(nick) ? 
                 chatid.split("~")[1] : chatid.split("~")[0];

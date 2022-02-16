@@ -150,17 +150,17 @@ public class DBConnection {
 
     static String createNewGroup(String msg, String nick) {
         //(!)Catch error if no username is send
+        String serverError ="";
         String id =  "~g~"+new Date().getTime()+Math.random();
         
         String chat = "INSERT INTO `chats` (`chat_id`, `chat_name`) VALUES (?, ?)";
+        
         int j = msg.split("~")[0].equals("") ? 1 : 0; 
-            System.out.println(msg.split("~")[j]);        
         String join = "INSERT INTO `participants` (`chat_id`, `user_id`) VALUES ('"+id+"', '"+msg.split("~")[j]+"')";        
         for(int i = 1+j; i < msg.split("~").length; i++){
             join += ", ('"+id+"', '"+msg.split("~")[i]+"')";
         }
-        System.out.println(join);
-        String serverError ="";
+        
         try{     
             Class.forName(driver);
             try{
@@ -300,9 +300,10 @@ public class DBConnection {
     static String changeGroup(String users, String action, String id) {
         String allgroupmembers="";
         String query = "";
+        System.out.println(action);
+        System.out.println(users);
         try {
             Class.forName(driver);
-            System.out.println(users);
             try {
                 if(action.equals("add")){                    
                     int j = users.split("~")[0].equals("") ? 1 : 0; 
@@ -311,8 +312,15 @@ public class DBConnection {
                         query += ", ('"+id+"', '"+users.split("~")[i]+"')";
                     }           
                     
-                } else{query="DELETE FROM participants where user_id = '"+users+"' AND chat_id = '"+id+"'";}
+                } else{
+                    query="DELETE FROM participants WHERE chat_id = '"+id+"' AND user_id IN ('"+users.split("~")[0]+"'";
+                    for(int i = 1; i < users.split("~").length; i++){
+                        query += ", '"+users.split("~")[i]+"'";
+                    }   query +=")";
+                }
 
+                System.out.println(query);
+                
                 conn = DriverManager.getConnection(url, user, pass);
                 ps = conn.prepareStatement(query);
                 ps.executeUpdate(); 
