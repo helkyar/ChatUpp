@@ -540,70 +540,26 @@ public class Register extends javax.swing.JFrame {
         if(nick.trim().equals("") || name.trim().equals("") || surname.trim().equals("") ||
                 email.trim().equals("") || pwd.trim().equals("") || pwd2.trim().equals("")){
             registerFail += "\n\tLos campos no pueden estar vacíos";
-        }                 
-        if (!pwd.equals(pwd2)) {registerFail += "\n\tLas contraseñas no coinciden";}
-      
-        Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register", "");
+            
+            JOptionPane.showMessageDialog(new JFrame(), 
+                    "Por favor, rellena todos los campos del formulario.",
+                    "Formulario incompleto", 
+                    JOptionPane.ERROR_MESSAGE);
+        
+        } else if (!pwd.equals(pwd2)) {
+            registerFail += "\n\tLas contraseñas no coinciden";
+            
+            JOptionPane.showMessageDialog(new JFrame(), 
+                    "Las contraseñas no coinciden.",
+                    "Error en doble comprobación", 
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        
+        else {
+            Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register", "");
+        }
+        
     }//GEN-LAST:event_jButton_RegistroActionPerformed
-    
-    //crear una funcion para verificar las casillas vacias
-//    public boolean verifyFields()
-//    {
-//        String usuario = userUser.getText();
-//        String nombreReal = userName.getText();
-//        String apellidos = userSurname.getText();
-//        String nickname= userNick.getText();
-//        String pass1 = String.valueOf(userPassword.getPassword());
-//        String pass2 = String.valueOf(userPassword2.getPassword());
-//        
-//         // mirar casillas vacias
-//        if(usuario.trim().equals("") || nombreReal.trim().equals("") || apellidos.trim().equals("") ||
-//                nickname.trim().equals("") || pass1.trim().equals("") || pass2.trim().equals(""))
-//        {
-//            JOptionPane.showMessageDialog(null, "Una o más casillas están vacias","Casilla vacía",2);
-//            return false;
-//        }
-//        
-//        // comprobasr si las dos contraseñas son iguales o no
-//        else if(!pass1.equals(pass2))
-//        {
-//           JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden","Confirmar la contraseña",2); 
-//           return false;
-//        }
-//        
-//        // Si todo está bien se continua
-//        else{
-//            return true;
-//    }
-//    }
-    //crear una funcion para comprobar si el usuario creado ya existe en la base de datos
-//      public boolean checkUsername(String username){
-//        
-//        PreparedStatement st;
-//        ResultSet rs;
-//        boolean username_exist = false;
-//        
-//        String query = "SELECT * FROM `users` WHERE `username` = ?";
-//        
-//        try {
-//            
-////            st = My_CNX.getConnection().prepareStatement(query);
-//            st.setString(1, username);
-//            rs = st.executeQuery();
-//        
-//            if(rs.next())
-//            {
-//                username_exist = true;
-//                JOptionPane.showMessageDialog(null, "Este usuario ya existe", "Usuario incorrecto", 2);
-//            }
-//            
-//        } catch (SQLException ex) {
-//            Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
-//        return username_exist;
-//    }
-//    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton frameLogin;

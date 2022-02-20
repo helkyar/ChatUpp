@@ -395,18 +395,19 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_loginActionPerformed
 
     private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
-        if(txtPassword.getPassword().equals("Username")){
+        // Limpiamos el campo contraseña al seleccionarlo
+        //if(txtPassword.getPassword().equals("Username")){
             txtPassword.setText("");
             txtPassword.setForeground(Color.black);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
             jLabel_user.setBorder(jlabel_icon);
-        }
+        //}
     }//GEN-LAST:event_txtPasswordFocusGained
 
     private void txtPasswordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusLost
-        if(txtPassword.getPassword().equals(""))
-        {
+        // Si el ussuario NO ha escrito nada en el campo contraseña, colocamos el texto placeholder
+        if(txtPassword.getPassword().length < 1){
             txtPassword.setText("Username");
             txtPassword.setForeground(Color.gray);
             //poner un borde amarillo al jlabel 

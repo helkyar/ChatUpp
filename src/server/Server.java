@@ -38,6 +38,7 @@ public class Server extends JFrame implements Runnable{
         add(txt);
         setSize(100,200);
         setVisible(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     }
     
     public static void main(String[] args) {
@@ -85,7 +86,7 @@ public class Server extends JFrame implements Runnable{
         
         InetAddress locateip = request.getInetAddress();
         String getip = locateip.getHostAddress();
-        txt.append("New connection: "+getip);
+        txt.append("New connection: "+getip+"\n");
         p.setStatus("imserver");   
         Socket sendmsg = new Socket(getip, 9090);
         ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
