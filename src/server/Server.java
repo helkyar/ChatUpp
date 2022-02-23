@@ -70,6 +70,10 @@ public class Server extends JFrame implements Runnable{
                     
 //                    else if (p.getStatus().equals("groupmessage")){sendGroupMessage(p);}
                     
+                    else if (p.getStatus().equals("calluser")){callUser(p);}
+                    //else if (p.getStatus().equals("sendcam")){sendCam(p);}
+                    //else if (p.getStatus().equals("endcall")){endCall(p);}
+                    
                     request.close();
                     
                 } catch (ClassNotFoundException ex) {System.out.println("Class not found");}
@@ -209,5 +213,25 @@ public class Server extends JFrame implements Runnable{
             msgpackage.close(); sendmsg.close();
         }
      }
+    
+    private void callUser(Package p) throws IOException{
+        // nick=calling user name, ip=calling user ip, msg= chatID, status=calluser
+        // package private String nick, ip, info, msg, status;
+        // private Map<String, String[]> ips;
+        ArrayList<String> usuarios = DBConnection.getGroupParticipants(p.getMsg());
+        if(!usuarios.isEmpty()){
+            
+            for (String user : usuarios){
+            Socket sendmsg = new Socket(p.getIp(), 9090);
+            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            msgpackage.writeObject(p);
+
+            msgpackage.close(); sendmsg.close();
+        }
+        
+        
+        }
+
+    }
 }
  //~guest~ may be send in the response

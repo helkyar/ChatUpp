@@ -76,6 +76,7 @@ public class Chat extends JFrame implements ActionListener{
     private String nick = "~guest";
     private String chatID;
     private JLabel nickLabel = new JLabel("username: "+nick);
+    private String groupSlug = "~g~";
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
@@ -374,7 +375,7 @@ public class Chat extends JFrame implements ActionListener{
             chatstorage.replace(id, msg);
         }
         JToggleButton chat = null;
-        if(p.getInfo().contains("~g~")){
+        if(p.getInfo().contains(groupSlug)){
         for(Component btn : groups.getComponents()){
             try{
                 if(((JToggleButton)btn).getName().equals(p.getInfo())){
@@ -512,6 +513,20 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
     public void makeCamCall(){
         if(call.getText().equals("Call")){
+            
+            System.out.println(adress);
+            System.out.println(chatID);
+            
+            //TODO selecionamos un usuario no conectado, no tendrá adress pero si chatID
+            // si seleccionamos un usuario conectado y luego uno no coenctado, se quedará la IP del conectado
+            if (!chatID.isEmpty() && chatID.contains(groupSlug)){
+                System.out.println("grupo seleccionado");
+            } else if (!chatID.isEmpty() && !adress.isEmpty()){
+                System.out.println("usuario seleccionado");
+            } else {
+                System.out.println("Chat no seleccionado o usuario offline");
+            }
+         
             call.setText("HangUp");
             JPanel cam = new JPanel();
             cam.add(new JLabel(new ImageIcon("img/activo.png")));
@@ -523,6 +538,7 @@ public class Chat extends JFrame implements ActionListener{
             screen.repaint();
         }
     }
+    
     
 // ===========================================================================
 //                      GROUP CREATION
@@ -635,7 +651,7 @@ public class Chat extends JFrame implements ActionListener{
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
       System.out.println(chatid+" | "+groupname+" | "+msg);
-      if(!chatid.contains("~g~")){
+      if(!chatid.contains(groupSlug)){
          String user = chatid.split("~")[0].equals(nick) ? 
                 chatid.split("~")[1] : chatid.split("~")[0];
          
