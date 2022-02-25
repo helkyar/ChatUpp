@@ -214,24 +214,22 @@ public class Server extends JFrame implements Runnable{
         }
      }
     
+    // El ussuario quiere hacer una llamada en grupo, hay que darle las IPs
+    // de los integrantes. Datos necesarios: IP del emisor e ID del grupal.
     private void callUser(Package p) throws IOException{
         // nick=calling user name, ip=calling user ip, msg= chatID, status=calluser
         // package private String nick, ip, info, msg, status;
         // private Map<String, String[]> ips;
-        ArrayList<String> usuarios = DBConnection.getGroupParticipants(p.getMsg());
+
+        ArrayList<String> usuarios = DBConnection.getGroupParticipants(p.getInfo());
         if(!usuarios.isEmpty()){
-            
-            for (String user : usuarios){
+            String ips = String.join(", ", usuarios);
             Socket sendmsg = new Socket(p.getIp(), 9090);
             ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+            p.setMsg(String.join(",", usuarios));
             msgpackage.writeObject(p);
-
             msgpackage.close(); sendmsg.close();
         }
-        
-        
-        }
-
     }
 }
  //~guest~ may be send in the response

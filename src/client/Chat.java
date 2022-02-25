@@ -14,11 +14,13 @@ import client.helpers.KillSearchThread;
 import client.helpers.SearchServer;
 import client.login.Login;
 import client.login.Register;
+import com.github.sarxos.webcam.Webcam;
 import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.awt.font.TextAttribute;
+import java.awt.image.BufferedImage;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -26,10 +28,13 @@ import java.net.Socket;
 import java.text.AttributedString;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Timer;
+import packager.VideoPackage;
 
 /**
  * 
@@ -76,7 +81,16 @@ public class Chat extends JFrame implements ActionListener{
     private String nick = "~guest";
     private String chatID;
     private JLabel nickLabel = new JLabel("username: "+nick);
-    private String groupSlug = "~g~";
+    private final String groupSlug = "~g~";
+    
+    //VIDEOCALL MANAGEMENT VARIABLES____________________________________________
+    private String clientIp = "";
+    private ArrayList<String> callParticipants;
+    private ArrayList<P2P> socketCallList;
+    private boolean onCall = false;
+    private int videoCallPort = 9091;
+    private JPanel camFrame;
+    private Map<String, JLabel> userCam; 
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
@@ -159,6 +173,7 @@ public class Chat extends JFrame implements ActionListener{
     //=====================================================================
         infoPopup = new Information(); //POP-UP
         new RecieveMsg(); //Start listening for server response
+        new RecieveFrame(); //Start listening for P2P communications, not used until onCall.
         getServerIP();
     }  
            
@@ -216,7 +231,7 @@ public class Chat extends JFrame implements ActionListener{
                 ServerSocket port = new ServerSocket(9090);
                 String nick, ip, move, msg;
                 Package p;
-
+                
                 while(true){
                     try (Socket mysocket = port.accept()) {
                         ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
@@ -235,7 +250,14 @@ public class Chat extends JFrame implements ActionListener{
                         else if (p.getStatus().equals("managegroup")){serverMembersResponse(p);}
                         else if (p.getStatus().equals("groupusers")){informChatUsers(p.getInfo(), p.getNick(), "");}                        
                         else if (p.getStatus().equals("changeusers")){refreshGroups(p);}                        
-                //=====================================================================================                        
+                //=====================================================================================    
+                
+                //=====================================================================================
+                //                 CLIENT-TO-CLIENT COMMUNICACTION MANAGING
+                //=====================================================================================
+                        else if (p.getStatus().equals("calluser")){prepareIpsForCall(p);} 
+                
+                //===================================================================================== 
                     } catch(Exception e){}                    
                 }
             } catch (Exception e){}
@@ -514,24 +536,12 @@ public class Chat extends JFrame implements ActionListener{
     public void makeCamCall(){
         if(call.getText().equals("Call")){
             
-            System.out.println(adress);
-            System.out.println(chatID);
-            
-            //TODO selecionamos un usuario no conectado, no tendrá adress pero si chatID
-            // si seleccionamos un usuario conectado y luego uno no coenctado, se quedará la IP del conectado
-            if (!chatID.isEmpty() && chatID.contains(groupSlug)){
-                System.out.println("grupo seleccionado");
-            } else if (!chatID.isEmpty() && !adress.isEmpty()){
-                System.out.println("usuario seleccionado");
-            } else {
-                System.out.println("Chat no seleccionado o usuario offline");
+            clientIp = (String) GetIP.getLocalIp().get(1);
+
+            if (!chatID.isEmpty()){
+                Send.message( clientIp, "", nick, "calluser", chatID);
             }
-         
-            call.setText("HangUp");
-            JPanel cam = new JPanel();
-            cam.add(new JLabel(new ImageIcon("img/activo.png")));
-            screen.add(cam,0);
-            screen.repaint();
+
         } else {
             call.setText("Call");
             screen.remove(0);
@@ -539,7 +549,94 @@ public class Chat extends JFrame implements ActionListener{
         }
     }
     
+    public void prepareIpsForCall(Package p){
+        
+        if( !p.getMsg().isEmpty() && p.getMsg().contains(",")){
+            
+            callParticipants = new ArrayList<String>(Arrays.asList(p.getMsg().split(",")));
+            call.setText("HangUp");
+            camFrame = new JPanel();
+            for(String nombre : callParticipants){
+                JLabel aux = new JLabel();
+                aux.setName(nombre);
+                camFrame.add(aux);
+                userCam.put(nombre, aux);
+            }
+            screen.add(camFrame,0);
+            screen.repaint();
+            onCall=true;
+            new ImageSender();
+        }
+    }
     
+    public void showFrame( VideoPackage p){
+        if(onCall)
+        userCam.get(p.getIp()).setIcon(p.getFrame());
+    }
+    
+    class ImageSender implements Runnable{
+       
+        ImageSender(){
+            Thread sender = new Thread(this);
+            sender.start();
+        }
+        
+        @Override
+        public void run() {
+            try {
+                while(onCall){
+                    
+                    if ( !socketCallList.isEmpty() ){
+                        
+                        for(String ip : callParticipants){
+                            socketCallList.add(new P2P( clientIp,  ip, videoCallPort));
+                        }
+                    }
+                    // TODO if no cam, send resource/icon.   
+                    Webcam cam= Webcam.getDefault();
+                    cam.open();
+                    BufferedImage br;
+                    br= cam.getImage();
+                    ImageIcon ic;
+                    ic= new ImageIcon(br);
+                    
+                    for(P2P conection : socketCallList){
+                            conection.message(ic);
+                    }
+                }
+            } catch (Exception e){}
+        }                     
+    }
+    
+    class RecieveFrame implements Runnable{
+       
+        RecieveFrame(){
+            Thread lintening = new Thread(this);
+            lintening.start();
+        }
+        
+        @Override
+        public void run() {
+            try { 
+                ServerSocket port = new ServerSocket(videoCallPort);
+                VideoPackage p;
+                
+                while(true){
+                    try (Socket mysocket = port.accept()) {
+                        ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
+                        p = (VideoPackage) entrada.readObject();
+                        
+                //=====================================================================================
+                //                 CLIENT-TO-CLIENT VIDEO SHARE MANAGING
+                //=====================================================================================                        
+                        if(p.getStatus().equals("videotransfer")){showFrame(p);}                    
+
+                //===================================================================================== 
+                    } catch(Exception e){}                    
+                }
+            } catch (Exception e){}
+        }                     
+    }
 // ===========================================================================
 //                      GROUP CREATION
 // ===========================================================================
