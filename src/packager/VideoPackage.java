@@ -5,13 +5,14 @@
  */
 package packager;
 
+import java.io.Serializable;
 import javax.swing.ImageIcon;
 
 /**
  *
  * @author Admin
  */
-public class VideoPackage {
+public class VideoPackage implements Serializable{
     String ip, status;
     ImageIcon frame;
 

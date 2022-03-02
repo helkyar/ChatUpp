@@ -15,6 +15,7 @@ import client.helpers.SearchServer;
 import client.login.Login;
 import client.login.Register;
 import com.github.sarxos.webcam.Webcam;
+import org.slf4j.*;
 import packager.Package;
 import javax.swing.*;
 import java.awt.event.*;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.Timer;
 import packager.VideoPackage;
 
@@ -69,6 +71,8 @@ public class Chat extends JFrame implements ActionListener{
     
     private final JTextField userinput = new JTextField(38);
     private final JTextArea chatxt = new JTextArea(20,50);
+    private final JScrollPane chatTxtContainer = new JScrollPane (chatxt, 
+    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         
     private JTextArea userInfo;
     private JFrame infoPopup;    
@@ -85,12 +89,12 @@ public class Chat extends JFrame implements ActionListener{
     
     //VIDEOCALL MANAGEMENT VARIABLES____________________________________________
     private String clientIp = "";
-    private ArrayList<String> callParticipants;
-    private ArrayList<P2P> socketCallList;
-    private boolean onCall = false;
+    private ArrayList<String> callParticipants = new ArrayList<>();
+    private ArrayList<P2P> socketCallList = new ArrayList<>();
+    private AtomicBoolean onCall = new AtomicBoolean(); // default value is false
     private int videoCallPort = 9091;
     private JPanel camFrame;
-    private Map<String, JLabel> userCam; 
+    private static Map<String, JLabel> userCam = new HashMap<>(); 
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
     private Map<String, String> chatstorage = new HashMap<>();
@@ -130,7 +134,7 @@ public class Chat extends JFrame implements ActionListener{
         input.add(sendbtn);
         input.add(userinput);
         input.add(nickLabel);
-        screen.add(chatxt);
+        screen.add(chatTxtContainer);
         chat.add("Center",screen);
         chat.add("South",input); 
         
@@ -174,6 +178,7 @@ public class Chat extends JFrame implements ActionListener{
         infoPopup = new Information(); //POP-UP
         new RecieveMsg(); //Start listening for server response
         new RecieveFrame(); //Start listening for P2P communications, not used until onCall.
+        new ImageSender(); //Sends image to other users, not used until onCall.
         getServerIP();
     }  
            
@@ -258,9 +263,13 @@ public class Chat extends JFrame implements ActionListener{
                         else if (p.getStatus().equals("calluser")){prepareIpsForCall(p);} 
                 
                 //===================================================================================== 
-                    } catch(Exception e){}                    
+                    } catch(Exception e){
+                        System.out.println(e);
+                    }                    
                 }
-            } catch (Exception e){}
+            } catch (Exception e){
+                System.out.println(e);
+            }
         }                     
     }
     
@@ -278,7 +287,7 @@ public class Chat extends JFrame implements ActionListener{
         serverIP = locateip.getHostAddress();            
 
         userInfo.append("   Use responsibly, don't be a jerk  ;)");
-        try { Thread.sleep(3000);} catch (InterruptedException ex) {}
+        try { Thread.sleep(3000);} catch (InterruptedException ex) {System.out.println(ex);}
         //Close Server Connection Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         new Send(serverIP);
@@ -299,7 +308,7 @@ public class Chat extends JFrame implements ActionListener{
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
           else {userInfo.setText("\n\tServer error, please restart");}  
         
-        try { Thread.sleep(2000);} catch (InterruptedException ex) {}
+        try { Thread.sleep(2000);} catch (InterruptedException ex) {System.out.println(ex);}
         //Close Login Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
@@ -320,7 +329,7 @@ public class Chat extends JFrame implements ActionListener{
             }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
         
-        try { Thread.sleep(5000);} catch (InterruptedException ex) {}
+        try { Thread.sleep(5000);} catch (InterruptedException ex) {System.out.println(ex);}
         //Close Login Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
@@ -415,7 +424,7 @@ public class Chat extends JFrame implements ActionListener{
                     users.remove(chat);
                     break;
                 }
-            } catch (Exception ex){System.out.println("fuck");continue;}
+            } catch (Exception ex){System.out.println(ex);continue;}
         }users.add(chat, 0);
         }
         connect.repaint();
@@ -504,7 +513,7 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt); //overwrite previous
                 userinput.setText("");
                         
-            } catch (Exception e){e.printStackTrace();}
+            } catch (Exception e){System.out.println(e);}
         }else if(event.getSource() == erasebtn){chatxt.setText("");}
         else if(event.getSource() == exitbtn){System.exit(0);}
         else if(event.getSource() == login){sessionFrame = new Login();}
@@ -527,13 +536,13 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt);
                 userinput.setText("");
             }  
-        } catch (Exception e){e.printStackTrace();}            
+        } catch (Exception e){System.out.println(e);}            
     }
     
 // ===========================================================================
 //                      CAM
 // ===========================================================================
-    public void makeCamCall(){
+    public synchronized void makeCamCall(){
         if(call.getText().equals("Call")){
             
             clientIp = (String) GetIP.getLocalIp().get(1);
@@ -546,31 +555,36 @@ public class Chat extends JFrame implements ActionListener{
             call.setText("Call");
             screen.remove(0);
             screen.repaint();
+            onCall.set(false);
         }
     }
     
     public void prepareIpsForCall(Package p){
         
         if( !p.getMsg().isEmpty() && p.getMsg().contains(",")){
-            
             callParticipants = new ArrayList<String>(Arrays.asList(p.getMsg().split(",")));
             call.setText("HangUp");
             camFrame = new JPanel();
+            onCall.set(true);
             for(String nombre : callParticipants){
+                System.out.println("añadiendo "+nombre);
                 JLabel aux = new JLabel();
+                System.out.println("peta 1");
                 aux.setName(nombre);
+                System.out.println("peta 2");
+                aux.setText(nombre);
+                System.out.println("peta 3");
                 camFrame.add(aux);
+                System.out.println("peta 4");
                 userCam.put(nombre, aux);
+                System.out.println("peta 5");
             }
             screen.add(camFrame,0);
             screen.repaint();
-            onCall=true;
-            new ImageSender();
         }
     }
     
     public void showFrame( VideoPackage p){
-        if(onCall)
         userCam.get(p.getIp()).setIcon(p.getFrame());
     }
     
@@ -584,27 +598,34 @@ public class Chat extends JFrame implements ActionListener{
         @Override
         public void run() {
             try {
-                while(onCall){
+                while(true){
                     
-                    if ( !socketCallList.isEmpty() ){
-                        
-                        for(String ip : callParticipants){
-                            socketCallList.add(new P2P( clientIp,  ip, videoCallPort));
+                    Thread.sleep(500);
+                    if(onCall.get()){
+                        chatxt.append("Image sender está enviando\n");
+                        if ( !callParticipants.isEmpty() && socketCallList.isEmpty()){
+                            chatxt.append("rellenando socketCallList");
+                            for(String ip : callParticipants){
+                                socketCallList.add(new P2P( clientIp,  ip, videoCallPort));
+                            }
+                        }
+                        // TODO if no cam, send resource/icon.   
+                        Webcam cam= Webcam.getDefault();
+                        cam.open();
+                        BufferedImage br;
+                        br= cam.getImage();
+                        ImageIcon ic;
+                        ic= new ImageIcon(br);
+                        chatxt.append("Hemos obtenido la imagen de la camara");
+                        for(P2P conection : socketCallList){
+                            chatxt.append("enviando imagen.\n");
+                                conection.message(ic);
                         }
                     }
-                    // TODO if no cam, send resource/icon.   
-                    Webcam cam= Webcam.getDefault();
-                    cam.open();
-                    BufferedImage br;
-                    br= cam.getImage();
-                    ImageIcon ic;
-                    ic= new ImageIcon(br);
-                    
-                    for(P2P conection : socketCallList){
-                            conection.message(ic);
-                    }
                 }
-            } catch (Exception e){}
+            } catch (Exception e){
+                chatxt.append("Error al enviar imagen\n"+e.getMessage());
+            }
         }                     
     }
     
