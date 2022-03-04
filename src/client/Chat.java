@@ -15,6 +15,7 @@ import client.helpers.SearchServer;
 import client.login.Login;
 import client.login.Register;
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamException;
 import org.slf4j.*;
 import packager.Package;
 import javax.swing.*;
@@ -88,7 +89,7 @@ public class Chat extends JFrame implements ActionListener{
     private final String groupSlug = "~g~";
     
     //VIDEOCALL MANAGEMENT VARIABLES____________________________________________
-    private String clientIp = "";
+    private String clientIp = (String) GetIP.getLocalIp().get(1);
     private ArrayList<String> callParticipants = new ArrayList<>();
     private ArrayList<P2P> socketCallList = new ArrayList<>();
     private AtomicBoolean onCall = new AtomicBoolean(); // default value is false
@@ -545,8 +546,6 @@ public class Chat extends JFrame implements ActionListener{
     public synchronized void makeCamCall(){
         if(call.getText().equals("Call")){
             
-            clientIp = (String) GetIP.getLocalIp().get(1);
-
             if (!chatID.isEmpty()){
                 Send.message( clientIp, "", nick, "calluser", chatID);
             }
@@ -561,23 +560,17 @@ public class Chat extends JFrame implements ActionListener{
     
     public void prepareIpsForCall(Package p){
         
-        if( !p.getMsg().isEmpty() && p.getMsg().contains(",")){
-            callParticipants = new ArrayList<String>(Arrays.asList(p.getMsg().split(",")));
+        if( !p.getMsg().isEmpty() && p.getMsg().contains(",") && !onCall.get()){
+            callParticipants = new ArrayList<>(Arrays.asList(p.getMsg().split(",")));
             call.setText("HangUp");
             camFrame = new JPanel();
             onCall.set(true);
             for(String nombre : callParticipants){
-                System.out.println("añadiendo "+nombre);
                 JLabel aux = new JLabel();
-                System.out.println("peta 1");
                 aux.setName(nombre);
-                System.out.println("peta 2");
                 aux.setText(nombre);
-                System.out.println("peta 3");
                 camFrame.add(aux);
-                System.out.println("peta 4");
                 userCam.put(nombre, aux);
-                System.out.println("peta 5");
             }
             screen.add(camFrame,0);
             screen.repaint();
@@ -602,9 +595,7 @@ public class Chat extends JFrame implements ActionListener{
                     
                     Thread.sleep(500);
                     if(onCall.get()){
-                        chatxt.append("Image sender está enviando\n");
                         if ( !callParticipants.isEmpty() && socketCallList.isEmpty()){
-                            chatxt.append("rellenando socketCallList");
                             for(String ip : callParticipants){
                                 socketCallList.add(new P2P( clientIp,  ip, videoCallPort));
                             }
@@ -616,14 +607,13 @@ public class Chat extends JFrame implements ActionListener{
                         br= cam.getImage();
                         ImageIcon ic;
                         ic= new ImageIcon(br);
-                        chatxt.append("Hemos obtenido la imagen de la camara");
                         for(P2P conection : socketCallList){
-                            chatxt.append("enviando imagen.\n");
-                                conection.message(ic);
+                            System.out.println("SE HA ENVIADO IMAGEN A : "+ conection.getReceiver());
+                            conection.message(ic);
                         }
                     }
                 }
-            } catch (Exception e){
+            } catch (WebcamException | InterruptedException e){
                 chatxt.append("Error al enviar imagen\n"+e.getMessage());
             }
         }                     
@@ -644,9 +634,12 @@ public class Chat extends JFrame implements ActionListener{
                 
                 while(true){
                     try (Socket mysocket = port.accept()) {
+                        System.out.println("HEMOS RECIBIDO PACKETE");
+                        chatxt.append("HEMOS RECIBIDO PACKETE");
                         ObjectInputStream entrada = new ObjectInputStream(mysocket.getInputStream());
                         p = (VideoPackage) entrada.readObject();
-                        
+                        System.out.println("SE HA RECIBIDO IMAGEN DE LA IP "+ p.getIp());
+                        chatxt.append("SE HA RECIBIDO IMAGEN DE LA IP "+ p.getIp());
                 //=====================================================================================
                 //                 CLIENT-TO-CLIENT VIDEO SHARE MANAGING
                 //=====================================================================================                        

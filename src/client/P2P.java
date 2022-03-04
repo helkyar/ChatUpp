@@ -5,6 +5,7 @@
  */
 package client;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -34,7 +35,7 @@ public class P2P{
             
         try {
             try (Socket socket = new Socket(receiver, port)) {
-                packager.VideoPackage videopack = new packager.VideoPackage(sender, "videotransfer", frame);
+                packager.VideoPackage videopack = new packager.VideoPackage(sender, "videotransfer", scaleImage(frame, 100, 100));
                 ObjectOutputStream objp = new ObjectOutputStream(socket.getOutputStream());
                 objp.writeObject(videopack);
                 //objp.flush();
@@ -68,6 +69,27 @@ public class P2P{
         P2P.port = port;
     }
     
+    
+    //This will keep the right aspect ratio.
+    private static ImageIcon scaleImage(ImageIcon icon, int w, int h)
+    {
+        int nw = icon.getIconWidth();
+        int nh = icon.getIconHeight();
+
+        if(icon.getIconWidth() > w)
+        {
+          nw = w;
+          nh = (nw * icon.getIconHeight()) / icon.getIconWidth();
+        }
+
+        if(nh > h)
+        {
+          nh = h;
+          nw = (icon.getIconWidth() * nh) / icon.getIconHeight();
+        }
+
+        return new ImageIcon(icon.getImage().getScaledInstance(nw, nh, Image.SCALE_DEFAULT));
+    }
     
 
 }

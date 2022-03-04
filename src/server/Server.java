@@ -223,12 +223,14 @@ public class Server extends JFrame implements Runnable{
 
         ArrayList<String> usuarios = DBConnection.getGroupParticipants(p.getInfo());
         if(!usuarios.isEmpty()){
-            String ips = String.join(", ", usuarios);
-            Socket sendmsg = new Socket(p.getIp(), 9090);
-            ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
-            p.setMsg(String.join(",", usuarios));
-            msgpackage.writeObject(p);
-            msgpackage.close(); sendmsg.close();
+            String ips = String.join(",", usuarios);
+            for (String usuario : usuarios){
+                Socket sendmsg = new Socket(usuario, 9090);
+                ObjectOutputStream msgpackage = new ObjectOutputStream(sendmsg.getOutputStream());
+                p.setMsg(ips);
+                msgpackage.writeObject(p);
+                msgpackage.close(); sendmsg.close();
+            }
         }
     }
 }
