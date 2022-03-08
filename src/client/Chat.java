@@ -266,10 +266,12 @@ public class Chat extends JFrame implements ActionListener{
                 //===================================================================================== 
                     } catch(Exception e){
                         System.out.println(e);
+                        JOptionPane.showMessageDialog(null, e.getMessage());
                     }                    
                 }
             } catch (Exception e){
                 System.out.println(e);
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         }                     
     }
@@ -288,7 +290,7 @@ public class Chat extends JFrame implements ActionListener{
         serverIP = locateip.getHostAddress();            
 
         userInfo.append("   Use responsibly, don't be a jerk  ;)");
-        try { Thread.sleep(3000);} catch (InterruptedException ex) {System.out.println(ex);}
+        try { Thread.sleep(3000);} catch (InterruptedException ex) {System.out.println(ex); JOptionPane.showMessageDialog(null, ex.getMessage());}
         //Close Server Connection Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         new Send(serverIP);
@@ -309,7 +311,7 @@ public class Chat extends JFrame implements ActionListener{
         } else if(p.getMsg().equals("X")){userInfo.setText("\n\tWrong credentials");}        
           else {userInfo.setText("\n\tServer error, please restart");}  
         
-        try { Thread.sleep(2000);} catch (InterruptedException ex) {System.out.println(ex);}
+        try { Thread.sleep(2000);} catch (InterruptedException ex) {System.out.println(ex); JOptionPane.showMessageDialog(null, ex.getMessage());}
         //Close Login Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
@@ -330,7 +332,7 @@ public class Chat extends JFrame implements ActionListener{
             }            
         } else{userInfo.setText(p.getMsg()+p.getNick());}         
         
-        try { Thread.sleep(5000);} catch (InterruptedException ex) {System.out.println(ex);}
+        try { Thread.sleep(5000);} catch (InterruptedException ex) {System.out.println(ex); JOptionPane.showMessageDialog(null, ex.getMessage());}
         //Close Login Info POP-UP
         infoPopup.dispatchEvent(new WindowEvent(infoPopup, WindowEvent.WINDOW_CLOSING));
         //Close Login/Register window
@@ -415,7 +417,7 @@ public class Chat extends JFrame implements ActionListener{
                     groups.remove(chat);
                     break;
                 }
-            } catch (Exception ex){System.out.println("fuck");continue;}
+            } catch (Exception ex){System.out.println(ex.getMessage());JOptionPane.showMessageDialog(null, ex.getMessage());}
         } groups.add(chat, 1);
         }else{
         for(Component btn : users.getComponents()){
@@ -425,7 +427,7 @@ public class Chat extends JFrame implements ActionListener{
                     users.remove(chat);
                     break;
                 }
-            } catch (Exception ex){System.out.println(ex);continue;}
+            } catch (Exception ex){System.out.println(ex.getMessage());JOptionPane.showMessageDialog(null, ex.getMessage());}
         }users.add(chat, 0);
         }
         connect.repaint();
@@ -514,7 +516,7 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt); //overwrite previous
                 userinput.setText("");
                         
-            } catch (Exception e){System.out.println(e);}
+            } catch (Exception e){System.out.println(e.getMessage());JOptionPane.showMessageDialog(null, e.getMessage());}
         }else if(event.getSource() == erasebtn){chatxt.setText("");}
         else if(event.getSource() == exitbtn){System.exit(0);}
         else if(event.getSource() == login){sessionFrame = new Login();}
@@ -537,7 +539,7 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt);
                 userinput.setText("");
             }  
-        } catch (Exception e){System.out.println(e);}            
+        } catch (Exception e){System.out.println(e);JOptionPane.showMessageDialog(null, e.getMessage());}            
     }
     
 // ===========================================================================
@@ -615,6 +617,7 @@ public class Chat extends JFrame implements ActionListener{
                 }
             } catch (WebcamException | InterruptedException e){
                 chatxt.append("Error al enviar imagen\n"+e.getMessage());
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         }                     
     }
@@ -646,9 +649,9 @@ public class Chat extends JFrame implements ActionListener{
                         if(p.getStatus().equals("videotransfer")){showFrame(p);}                    
 
                 //===================================================================================== 
-                    } catch(Exception e){}                    
+                    } catch(Exception e){JOptionPane.showMessageDialog(null, e.getMessage());}                    
                 }
-            } catch (Exception e){}
+            } catch (Exception e){JOptionPane.showMessageDialog(null, e.getMessage());}
         }                     
     }
 // ===========================================================================
@@ -739,7 +742,7 @@ public class Chat extends JFrame implements ActionListener{
               if(!((JToggleButton)btn).getName().equals(p.getInfo())){
                     groups.add((JToggleButton)btn);
                     bg.add((JToggleButton)btn);
-                }}catch (Exception e){continue;}
+                }}catch (Exception e){JOptionPane.showMessageDialog(null, e.getMessage());}
               }
           }
           else{                            
@@ -748,7 +751,7 @@ public class Chat extends JFrame implements ActionListener{
               //remove if btn(name) == id
                 if(((JToggleButton)btn).getName().equals(p.getInfo())){
                     groups.remove((JToggleButton)btn);
-                }}catch (Exception e){continue;}
+                }}catch (Exception e){JOptionPane.showMessageDialog(null, e.getMessage());}
               }
           }
           //repaint() can't be used, generates "floating" buttons
