@@ -92,6 +92,9 @@ public class Login extends javax.swing.JFrame {
         txtUser.setBorder(casilla_bordes);
         txtPassword.setBorder(casilla_bordes);
         
+        /*proporciona soporte para la transferencia de datos dentro y fuera de este
+        componente a través de cortar/copiar/pegar y arrastrar y soltar. Esto puede 
+        ser null si el componente no admite operaciones de transferencia de datos.*/
         txtPassword.setTransferHandler(null);
         
         //Make it visible
