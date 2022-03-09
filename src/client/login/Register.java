@@ -1,6 +1,8 @@
 package client.login;
 
+
 import client.Chat;
+//Te conecta o importa con el paquete de client y la clase java Send
 import client.Send;
 import client.helpers.GetIP;
 import java.awt.Color;
@@ -233,7 +235,7 @@ public class Register extends javax.swing.JFrame {
         jLabel7.setText("Apellidos:");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel8.setText("Imágenes(WIP):");
+        jLabel8.setText("Imágenes:");
 
         userSurname.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 
