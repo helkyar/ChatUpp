@@ -12,7 +12,9 @@ import client.Chat;
 import client.Send;
 import client.helpers.GetIP;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import server.DBConnection;
 
 /**
  *
@@ -73,7 +75,7 @@ public class Login extends javax.swing.JFrame {
         txtUser = new javax.swing.JTextField();
         txtPassword = new javax.swing.JPasswordField();
         login = new javax.swing.JToggleButton();
-        jButton1 = new javax.swing.JButton();
+        jLabel_Create_account = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -188,17 +190,41 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        login.setBackground(new java.awt.Color(0, 84, 140));
+        login.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        login.setForeground(new java.awt.Color(255, 255, 255));
         login.setText("login");
+        login.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        login.setMaximumSize(new java.awt.Dimension(81, 31));
+        login.setMinimumSize(new java.awt.Dimension(81, 31));
+        login.setPreferredSize(new java.awt.Dimension(81, 31));
+        login.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                loginMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                loginMouseExited(evt);
+            }
+        });
         login.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Register");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jLabel_Create_account.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel_Create_account.setForeground(new java.awt.Color(255, 51, 51));
+        jLabel_Create_account.setText(">> ¿No tienes cuenta?  Crea una aquí!");
+        jLabel_Create_account.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_Create_account.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel_Create_accountMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel_Create_accountMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel_Create_accountMouseExited(evt);
             }
         });
 
@@ -210,20 +236,20 @@ public class Login extends javax.swing.JFrame {
                 .addGap(51, 51, 51)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel_password, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtPassword))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel_user, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtUser, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)))
+                        .addComponent(txtUser))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel_password, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(login, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPassword))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(70, 70, 70)
-                .addComponent(login)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(183, 183, 183))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel_Create_account, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(102, 102, 102))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -236,11 +262,11 @@ public class Login extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel_password, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(login)
-                    .addComponent(jButton1))
-                .addGap(22, 22, 22))
+                .addGap(35, 35, 35)
+                .addComponent(login, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(jLabel_Create_account, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jDesktopPane1.setLayer(jPanel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -256,10 +282,10 @@ public class Login extends javax.swing.JFrame {
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+            .addGroup(jDesktopPane1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -267,7 +293,7 @@ public class Login extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(155, Short.MAX_VALUE)
+                .addContainerGap(184, Short.MAX_VALUE)
                 .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(102, 102, 102)
                 .addComponent(jLabel_minimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -416,10 +442,33 @@ public class Login extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtPasswordFocusLost
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       Chat.sessionFrame = new Register();
-       setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jLabel_Create_accountMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_Create_accountMouseClicked
+        Register rf = new Register();
+        rf.setVisible(true);
+        rf.pack();
+        rf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.dispose();
+    }//GEN-LAST:event_jLabel_Create_accountMouseClicked
+
+    private void jLabel_Create_accountMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_Create_accountMouseEntered
+        Border label_border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.red);
+        jLabel_Create_account.setBorder(label_border);
+    }//GEN-LAST:event_jLabel_Create_accountMouseEntered
+
+    private void jLabel_Create_accountMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_Create_accountMouseExited
+        Border label_create_accont_border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray);
+        jLabel_Create_account.setBorder(label_create_accont_border);
+    }//GEN-LAST:event_jLabel_Create_accountMouseExited
+
+    private void loginMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginMouseEntered
+         //fijar el fondo del jbuton
+        login.setBackground(new Color(0,101,183));
+    }//GEN-LAST:event_loginMouseEntered
+
+    private void loginMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginMouseExited
+        //fijar el fondo del jbuton
+        login.setBackground(new Color(0,84,104));
+    }//GEN-LAST:event_loginMouseExited
 
     public void verifyLogin(){
         loginuser = txtUser.getText();
@@ -438,9 +487,9 @@ public class Login extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel_Create_account;
     private javax.swing.JLabel jLabel_cerrar;
     private javax.swing.JLabel jLabel_minimizar;
     private javax.swing.JLabel jLabel_password;
