@@ -20,12 +20,13 @@ import java.util.logging.Logger;
  
 /**
  *
- * @author Javier Palacios
+ * @author Javier Palacios Botejara, Houssam Amrouch, Mateo Crespi, Cristian Echauri, Mildred Rámirez
  */
 public class GetIP {
-    
+    //obtencion de ip publica
     public static String getPublicIP() {
         String publicIP;
+        //Recoje la ip publica y mira si esta conectado y la devuelve en un string publicIP
     	try {
                 URL tempURL = new URL("http://checkip.amazonaws.com/");
                 HttpURLConnection tempConn = (HttpURLConnection)tempURL.openConnection();
@@ -46,11 +47,11 @@ public class GetIP {
     }
     
     public static ArrayList getLocalIp(){
-        
+        //Arrary de String para guardar la interfaces que estan en línea
         ArrayList<String> localIP = new ArrayList<>(); 
         try {
             for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                // Due to the amount of the interfaces, we will only print the ones online
+                // Debido a la cantidad de interfaces, solo imprimiremos las que están en línea
                 if (iface.isUp()) {localIP.add(iface.getInetAddresses().nextElement().getHostAddress());}                
             }           
         } catch (SocketException ex) {
