@@ -66,6 +66,10 @@ public class Register extends javax.swing.JFrame {
         jLabel_minimizar.setBorder(jlabel_borde);
         jLabel_cerrar.setBorder(jlabel_borde);
 
+         // crear un borde para el jlabel de crear cuenta
+        Border label_login_border= BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray);
+        jLabel_login.setBorder(label_login_border);
+        
         //Creamos un borde para las casillas de texto y contraseña
         Border field_border = BorderFactory.createMatteBorder(1, 5, 1, 1, Color.WHITE);
         userUser.setBorder(field_border);
@@ -122,7 +126,7 @@ public class Register extends javax.swing.JFrame {
         jLabel_imgpath = new javax.swing.JLabel();
         userPassword = new javax.swing.JPasswordField();
         userPassword2 = new javax.swing.JPasswordField();
-        frameLogin = new javax.swing.JButton();
+        jLabel_login = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -264,6 +268,22 @@ public class Register extends javax.swing.JFrame {
 
         userPassword2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
+        jLabel_login.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel_login.setForeground(new java.awt.Color(255, 51, 51));
+        jLabel_login.setText("       >> ¿Tienes cuenta?  Inicia Sesión!");
+        jLabel_login.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_login.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel_loginMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel_loginMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jLabel_loginMouseExited(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -313,6 +333,10 @@ public class Register extends javax.swing.JFrame {
                             .addComponent(userUser)
                             .addComponent(userPassword))))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel_login, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(206, 206, 206))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -352,9 +376,11 @@ public class Register extends javax.swing.JFrame {
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton_SeleccionImagen)
                     .addComponent(jLabel_imgpath))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+                .addGap(39, 39, 39)
                 .addComponent(jButton_Registro, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel_login, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         jDesktopPane1.setLayer(jPanel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -376,21 +402,12 @@ public class Register extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        frameLogin.setText("jButton1");
-        frameLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                frameLoginActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(frameLogin)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(125, 125, 125)
                 .addComponent(jLabel_minimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -408,9 +425,7 @@ public class Register extends javax.swing.JFrame {
                         .addComponent(jLabel_cerrar))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(frameLogin)
-                            .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jDesktopPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -490,11 +505,6 @@ public class Register extends javax.swing.JFrame {
         jButton_Registro.setBackground(new Color(235, 47, 6));
     }//GEN-LAST:event_jButton_RegistroMouseExited
                                                                                       
-    private void frameLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_frameLoginActionPerformed
-        Chat.sessionFrame = new Login();
-        setVisible(false);
-    }//GEN-LAST:event_frameLoginActionPerformed
-
     private void jButton_RegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RegistroActionPerformed
         String nick = userUser.getText();
 
@@ -559,6 +569,24 @@ public class Register extends javax.swing.JFrame {
             image_path = path;
         }
     }//GEN-LAST:event_jButton_SeleccionImagenActionPerformed
+
+    private void jLabel_loginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_loginMouseClicked
+        Login rf = new Login ();
+        rf.setVisible(true);
+        rf.pack();
+        rf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.dispose();
+    }//GEN-LAST:event_jLabel_loginMouseClicked
+
+    private void jLabel_loginMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_loginMouseEntered
+        Border label_border = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0,204,0));
+        jLabel_login.setBorder(label_border);
+    }//GEN-LAST:event_jLabel_loginMouseEntered
+
+    private void jLabel_loginMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_loginMouseExited
+        Border label_create_accont_border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray);
+        jLabel_login.setBorder(label_create_accont_border);
+    }//GEN-LAST:event_jLabel_loginMouseExited
     
     //crear una funcion para verificar las casillas vacias
 //    public boolean verifyFields()
@@ -620,7 +648,6 @@ public class Register extends javax.swing.JFrame {
 //    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton frameLogin;
     private javax.swing.JButton jButton_Registro;
     private javax.swing.JButton jButton_SeleccionImagen;
     private javax.swing.JDesktopPane jDesktopPane1;
@@ -635,6 +662,7 @@ public class Register extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel_cerrar;
     private javax.swing.JLabel jLabel_imgpath;
+    private javax.swing.JLabel jLabel_login;
     private javax.swing.JLabel jLabel_minimizar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
