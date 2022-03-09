@@ -1,9 +1,10 @@
 package client.login;
 
-
+//Te conecta o importa con el paquete de client y la clase java chat
 import client.Chat;
 //Te conecta o importa con el paquete de client y la clase java Send
 import client.Send;
+//Te conecta o importa con el paquete de client.helpers y la clase GetIP
 import client.helpers.GetIP;
 import java.awt.Color;
 import java.awt.*;
