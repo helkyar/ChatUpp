@@ -57,13 +57,15 @@ public class Chat extends JFrame implements ActionListener{
     private final JButton erasebtn = new JButton("#");
     private final JButton login = new JButton("Login");
     private final JButton register = new JButton("Register");
-    private final JButton call = new JButton("Call");
+    //private final JButton call = new JButton("Call");
     private final JButton newgroup = new JButton("         +          ");
     private final JButton addmember = new JButton("(+)Member");
     private final JButton delmember = new JButton("(-)Member");
     
     private final JTextField userinput = new JTextField(38);
     private final JTextArea chatxt = new JTextArea(20,50);
+    private final JScrollPane chatTxtContainer = new JScrollPane(chatxt, 
+    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         
     private JTextArea userInfo;
     private JFrame infoPopup;    
@@ -115,11 +117,11 @@ public class Chat extends JFrame implements ActionListener{
         input.add(sendbtn);
         input.add(userinput);
         input.add(nickLabel);
-        screen.add(chatxt);
+        screen.add(chatTxtContainer);
         chat.add("Center",screen);
         chat.add("South",input); 
         
-        options.add(call);
+        //options.add(call);
         options.add(login);
         options.add(register);
         options.add(erasebtn);
@@ -139,7 +141,7 @@ public class Chat extends JFrame implements ActionListener{
         newgroup.addActionListener(this); 
         addmember.addActionListener(this);
         delmember.addActionListener(this);
-        call.addActionListener(this);
+        //call.addActionListener(this);
         userinput.addKeyListener(new KeyAdapter(){
             public void keyPressed(KeyEvent pressed){sendToChat(pressed);}            
         });
@@ -482,14 +484,15 @@ public class Chat extends JFrame implements ActionListener{
                 userinput.setText("");
                         
             } catch (Exception e){e.printStackTrace();}
-        }else if(event.getSource() == erasebtn){chatxt.setText("");}
+        }
+        //else if(event.getSource() == erasebtn){chatxt.setText("");}
         else if(event.getSource() == exitbtn){System.exit(0);}
         else if(event.getSource() == login){sessionFrame = new Login();}
         else if(event.getSource() == register){sessionFrame = new Register();}
         else if(event.getSource() == newgroup){createNewGroup();}
         else if(event.getSource() == addmember){addGroupMember();}
         else if(event.getSource() == delmember){delGroupMember();}
-        else if(event.getSource() == call){makeCamCall();}
+        //else if(event.getSource() == call){makeCamCall();}
         else { JOptionPane.showMessageDialog(this, "Select a chat");}
     }
     
@@ -510,19 +513,19 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
 //                      CAM
 // ===========================================================================
-    public void makeCamCall(){
-        if(call.getText().equals("Call")){
-            call.setText("HangUp");
-            JPanel cam = new JPanel();
-            cam.add(new JLabel(new ImageIcon("img/activo.png")));
-            screen.add(cam,0);
-            screen.repaint();
-        } else {
-            call.setText("Call");
-            screen.remove(0);
-            screen.repaint();
-        }
-    }
+//    public void makeCamCall(){
+//        if(call.getText().equals("Call")){
+//            call.setText("HangUp");
+//            JPanel cam = new JPanel();
+//            cam.add(new JLabel(new ImageIcon("img/activo.png")));
+//            screen.add(cam,0);
+//            screen.repaint();
+//        } else {
+//            call.setText("Call");
+//            screen.remove(0);
+//            screen.repaint();
+//        }
+//    }
     
 // ===========================================================================
 //                      GROUP CREATION
