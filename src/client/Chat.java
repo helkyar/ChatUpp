@@ -5,10 +5,7 @@
 
 package client;
 
-/**
- *
- * @author Javier Palacios Botejara
- */
+
 import client.helpers.GetIP;
 import client.helpers.KillSearchThread;
 import client.helpers.SearchServer;
@@ -32,55 +29,64 @@ import java.util.Map;
 import javax.swing.Timer;
 
 /**
- * 
- * @author Javier Palacios
+ * Proyecto Chat es un programa que permite la comunicación por red local entre los usarios, con un sistema
+ * de registro para poder visualizar el historial de conversaciones previas y un sistema que muestra todos los
+ * usuarios disponibles para conversar en ese momento.
+ * @author Javier Palacios Botejara, Houssam Amrouch, Mateo Crespi, Cristian Echauri, Mildred Rámirez
  */
+
 public class Chat extends JFrame implements ActionListener{
-    
+    //formato de hora para mostrar hora y hora de los mensajes
     private final DateFormat timeFormat = new SimpleDateFormat("kk:mm ");
+    //logo del programa
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
     
-    private final JPanel chat = new JPanel();
-    private final JPanel options = new JPanel();
+    //creacion de jpanels
+    private final JPanel chat = new JPanel(); //chat donde la comunicacion ocurre
+    //panel en la porte superior donde iran las opcioens de login registro y grupos
+    private final JPanel options = new JPanel(); 
     private final JPanel screen = new JPanel(); //text chat and cam
     private final JPanel input = new JPanel(); //facilitate adding componnents
-    private final JPanel connect = new JPanel();
-    private final JPanel users = new JPanel();
-    private final JPanel groups = new JPanel();
-    private final JScrollPane scrollUsers;
-    private final JScrollPane scrollGroups; 
+    private final JPanel connect = new JPanel();//panel de conexión a la red
+    private final JPanel users = new JPanel(); //panel situado superior izquierda donde mostrará la gente conectada
+    //panel situado inferior izquierda donde mostrará los grupos a los que perteneces
+    private final JPanel groups = new JPanel(); 
+    private final JScrollPane scrollUsers; //permite scrollear por si hay mas usuarios de los que se puedan mostrar
+    private final JScrollPane scrollGroups; //permite scrollear si perteneces a mas grupos de los que se pueden mostrar
         
+    //creación de botones
     private ButtonGroup bg = new ButtonGroup();
-    private final JButton sendbtn = new JButton(new ImageIcon("img/send.png"));
-    private final JButton exitbtn = new JButton("X");
-    private final JButton erasebtn = new JButton("#");
-    private final JButton login = new JButton("Login");
-    private final JButton register = new JButton("Register");
+    private final JButton sendbtn = new JButton(new ImageIcon("img/send.png")); //enviar
+    private final JButton exitbtn = new JButton("X"); //salir
+    private final JButton erasebtn = new JButton("#"); //borrar
+    private final JButton login = new JButton("Login"); //confirmar login
+    private final JButton register = new JButton("Register"); //confirmar registro
     //private final JButton call = new JButton("Call");
-    private final JButton newgroup = new JButton("         +          ");
-    private final JButton addmember = new JButton("(+)Member");
-    private final JButton delmember = new JButton("(-)Member");
+    private final JButton newgroup = new JButton("         +          "); //crear grupo nuevo
+    private final JButton addmember = new JButton("(+)Member"); //añadir miembro del grupo
+    private final JButton delmember = new JButton("(-)Member"); //eliminar miembro del grupo
     
-    private final JTextField userinput = new JTextField(38);
-    private final JTextArea chatxt = new JTextArea(20,50);
+    private final JTextField userinput = new JTextField(38); //donde el usuario puede escribir
+    private final JTextArea chatxt = new JTextArea(20,50); // donde se muestra la conversación
     private final JScrollPane chatTxtContainer = new JScrollPane(chatxt, 
-    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS); //scroll del textarea
         
-    private JTextArea userInfo;
+    private JTextArea userInfo; //con quien se habla
     private JFrame infoPopup;    
-    //setting it as static to prevent lossing reference on session change doesn't work
+    //estableciendolo estático para prevenir la perdedida de referencia en los cambios de sesión
     public static JFrame sessionFrame;
     
-    private String serverIP = "";
-    private boolean onlyonce = true;
-    private String adress = "";
-    private String nick = "~guest";
-    private String chatID;
+    
+    private String serverIP = ""; //aqui irá la ip del servidor
+    private boolean onlyonce = true; 
+    private String adress = ""; // dirección
+    private String nick = "~guest"; //nombre del usuario
+    private String chatID; //id del chat para referenciar la conversación
     private JLabel nickLabel = new JLabel("username: "+nick);
     
     //DATA MANAGEMENT VARIABLES_______________________________________________
-    private Map<String, String> chatstorage = new HashMap<>();
+    private Map<String, String> chatstorage = new HashMap<>(); // conservar mensajes al historial(primer valor el id del chat)
     private String groupUsers="";
     private String groupname;
     private int op = 2;
@@ -93,6 +99,7 @@ public class Chat extends JFrame implements ActionListener{
         
     //Set Panels_________________________________________________________
         setLayout(new BorderLayout(5,5));
+         
         connect.setLayout(new GridLayout(2,1));
         scrollUsers = new JScrollPane(users, 22,31); //vertical always [20 for needed], horizontal never
         scrollGroups = new JScrollPane(groups, 22,31); //vertical always [20 for needed], horizontal never
@@ -126,8 +133,8 @@ public class Chat extends JFrame implements ActionListener{
         options.add(register);
         options.add(erasebtn);
         options.add(exitbtn);
-        
-        add("North", options);
+        //adjuntar los botones a los lados de la ventana
+        add("North", options); 
         add("Center", chat);
         add("West", connect);
         add("East", new JPanel()); //Just for style
@@ -253,7 +260,7 @@ public class Chat extends JFrame implements ActionListener{
     private void setServerIP(Socket mysocket, Package p) {
         userInfo.append("   Setting connection \n");
             
-        InetAddress locateip = mysocket.getInetAddress();
+         InetAddress locateip = mysocket.getInetAddress();
         serverIP = locateip.getHostAddress();            
 
         userInfo.append("   Use responsibly, don't be a jerk  ;)");
@@ -263,7 +270,8 @@ public class Chat extends JFrame implements ActionListener{
         new Send(serverIP);
         processSessionStart();
     }
-    
+    //Configura el mensaje a mostrar cuando se intenta iniciar sesión, si funciona o da error
+    //Se comunica con el constructor Package.java
     private void setLoginMessage(Package p) {
         infoPopup = new Information();
         if(p.getMsg().equals("OK")){
@@ -285,7 +293,8 @@ public class Chat extends JFrame implements ActionListener{
         if(p.getMsg().equals("OK"))
         sessionFrame.dispatchEvent(new WindowEvent(sessionFrame, WindowEvent.WINDOW_CLOSING));        
     }
-    
+    //Configura el mensaje a mostrar cuando se intenta registrar, si funciona o da error
+    //Se comunica con el constructor Package.java
     private void setRegisterMessage(Package p) {
         infoPopup = new Information();
         if(p.getInfo().equals("")){
@@ -308,12 +317,17 @@ public class Chat extends JFrame implements ActionListener{
     }
     
 //===========================================================================================
-//                     USER-TO-USER LINK
+//                     USER-TO-USER LINK / ENLACE USUARIO-USUARIO
 //===========================================================================================
+  
+    //manda una instruccion mediante Send.java y GetIP.java para buscar las ips disponibles en el servidor
+    //para mostrar quien esta conectado
     private void askForUsersOnline(String nick){
        Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
     }
     
+    //añadir los usuarios que se ha encontrado conectados
+    //para mostrar quien esta conectado
     private void setUsersOnline(Package p){ 
         if(p.getIp().equals((String) GetIP.getLocalIp().get(1))){
             this.nick = p.getNick();   
@@ -322,17 +336,17 @@ public class Chat extends JFrame implements ActionListener{
                 options.remove(login); options.remove(register);
             }
         }
-        
+        //for loop por cada ip obtenida
         for(String ip : p.getObj().keySet()){
             String user = p.getObj().get(ip)[0];
             boolean own = (GetIP.getLocalIp().contains(ip) || GetIP.getPublicIP().contains(ip));
          
             if(!own && !nick.equals(user)){ 
-            //create chatid and store possible previous chat info
+            //creacion de chatid y almacenamiento de posible informacion previa de chat
               String chatid =              
               nick.compareTo(user)>0 ? nick+"~"+user:user+"~"+nick;
               if(chatstorage.containsKey(chatid)){
-                  //get the btn, change the listener
+                  //conseguir el boton, cambiar el listener
                   for(int i = 0; i < users.getComponentCount(); i++){
                       JToggleButton btn = (JToggleButton) users.getComponents()[i];
                       if(btn.getName().equals(chatid)){
@@ -341,7 +355,7 @@ public class Chat extends JFrame implements ActionListener{
                             chatxt.setText(chatstorage.get(ihatejava));
                             chatID = ihatejava;
                             adress = ip;
-                            chat.setVisible(true); //how to avoid calling allways this
+                            chat.setVisible(true); //how to avoid calling always this
                           });
                       }
                   }
@@ -356,6 +370,7 @@ public class Chat extends JFrame implements ActionListener{
                      adress = ip;                     
                      chat.setVisible(true); //how to avoid calling allways this
                  });
+                 //repintar el panel para mostrar los cambios
                  btn.setName(chatid);
                  bg.add(btn);
                  users.add(btn);         
@@ -366,7 +381,8 @@ public class Chat extends JFrame implements ActionListener{
         }            
             
     }
-
+//recoge el mensaje del textarea para enviar el mensaje del usuario al servidor 
+//y lo añade al hashmap(historial) del chat id
     private void sendMessage(Package p){
         String id = p.getInfo();
         if(!p.getNick().equals(nick)){
@@ -402,8 +418,9 @@ public class Chat extends JFrame implements ActionListener{
     }     
     
 //=======================================================================
-// POP-UPS
+// POP-UPS creación y diseño
 //=======================================================================
+   
     private class Information extends JFrame{
         Information(){            
             userInfo.setBackground(Color.black);
@@ -534,7 +551,7 @@ public class Chat extends JFrame implements ActionListener{
       if(nick.startsWith("~guest")){return;}
 
       //CALL DB FOR USERS
-      groupname = JOptionPane.showInputDialog("Set group name");
+      groupname = JOptionPane.showInputDialog("Set group name"); //ask user to set name
       manageMembersGroup(0);
     }
 
@@ -590,13 +607,13 @@ public class Chat extends JFrame implements ActionListener{
       else if(option == 0&& op==2){Send.message("", groupUsers, groupname, "groupusers", "");}
       groupUsers = "";
     }
-        
+        //añadir las opciones de grupo en la paret superior (jpanel options)
     private void removeGroupButtons(){
         options.remove(addmember);
         options.remove(delmember);
         options.repaint();
     }
-
+//quitar las opciones de grupo en la paret superior (jpanel options) 
     private void addGroupButtons(){        
         options.add(addmember);
         options.add(delmember);
@@ -606,6 +623,7 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
 //                      REFRESH GROUPS CHAT
 // ===========================================================================
+    //refrescar grupos en comando, ya que se hace manualmente
     private void refreshGroups(Package p) {
         
           if(p.getNick().equals("add")){
@@ -635,29 +653,35 @@ public class Chat extends JFrame implements ActionListener{
 // ===========================================================================
 //                      CHAT MEMORY
 // ===========================================================================
+    
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
       System.out.println(chatid+" | "+groupname+" | "+msg);
-      if(!chatid.contains("~g~")){
+      //el chatid es una generacion compleja de numeros que empieza por ~g~
+      //si chatid no lo contiene significa que no existe y lo creamos
+      if(!chatid.contains("~g~")){ 
          String user = chatid.split("~")[0].equals(nick) ? 
                 chatid.split("~")[1] : chatid.split("~")[0];
-         
+         //meter mensaje al hashmap
          chatstorage.put(chatid, msg);
+         
          JToggleButton btn = new JToggleButton(user+"                   ", CHATLOGO);
          btn.addActionListener((ActionEvent e) -> {
             //unselectButtons(e);
             removeGroupButtons();
+            //reescribir el panel con la conversación para reflejar los cambios/mensaje nuevos
             chatxt.setText(chatstorage.get(chatid));
             chatID = chatid;
             chat.setVisible(true);
 //            adress = ""; 
          });
+         //creación del botón del grupo y refrescar el jpanel
          btn.setName(chatid);     
          bg.add(btn);
          users.add(btn);         
          users.repaint();
          users.validate();
-         
+         //de lo contrario se inicia el rpoceso de crear un grupo
       } else {   
           System.out.println("creating group");
      //CREATE SWING COMPONENT FOR GROUPS    
@@ -681,12 +705,7 @@ public class Chat extends JFrame implements ActionListener{
     }
 
 }
-//(XX)REMOVE GROUP FROM DATABASE FAILS
-//(XX)REFRESH GROUPS ON CREATION FAILS
-//(X)2 CHATS AT THE SAME TIME BREAKS THINGS -> Use just one
-//(X)TOGGLE TOGGLE-BUTTONS
-//(X)CHATS REPEAT IF THERE IS POST-LOGIN
-//(X)USER FROM MEMORY AND ONLINE PERSIST
+
 
 /**[SERVIDOR]---------------------------------------------------------------
  ->Al detectar al usuario creo el chat si no existe previamente
@@ -703,23 +722,7 @@ public class Chat extends JFrame implements ActionListener{
  * comprobar si es el que tienen en común sí? -> asignar : crear
  * 
  * --------------------------------------------------------------------------
- * 
- ->Al clicar sobre el usuario busco el chat si existe y lo renderizo
- * btn.getName() en el mapa de <chatid,txt> -> setText();
- * 
- ->Al escribir el chat se guarda en un mapa con clave ip
- * mapa.put(chatid,txt+msg)
- * 
- ->Al enviar el servidor guarda en BD (chatid, nick, msg)
- * chatid ? update : insert;
- * 
- ->Al responder el servidor se busca el chat en el mapa y se añade el msg
- * txt = mapa.get(chatid) -> mapa.put(chatid,txt+msg);
- * 
- ->Al llegar un mensaje o escribir el botón cambia de índice a 0
- * btn:getComponents(); if(btn.getName()==ip)b = btn;
- * remove(b); add(b,0);
- *  
+
  ->Crear grupo -> btn
  * se genera una id compleja ~g~adsfasdfqm243rq2+wÇq23
  * pedirá un nombre para el grupo que se podrá cambiar con menú contextual(*)
@@ -734,5 +737,28 @@ public class Chat extends JFrame implements ActionListener{
  * 
  ->Los grupos a los que se pertenece aparecen al iniciar sesión
  * 
- -> GUEST CAN'T CREATE GROUPS AND CHATS WON'T SAVE TO DB
- */
+ -> Invitados no pueden crear ni unirse a grupos y sus conversaciones
+ * no serán guardadas.
+ */         
+// ->Al clicar sobre el usuario busco el chat si existe y lo renderizo
+// * btn.getName() en el mapa de <chatid,txt> -> setText();
+// * 
+// ->Al escribir el chat se guarda en un mapa con clave ip
+// * mapa.put(chatid,txt+msg)
+// * 
+// ->Al enviar el servidor guarda en BD (chatid, nick, msg)
+// * chatid ? update : insert;
+// * 
+// ->Al responder el servidor se busca el chat en el mapa y se añade el msg
+// * txt = mapa.get(chatid) -> mapa.put(chatid,txt+msg);
+// * 
+// ->Al llegar un mensaje o escribir el botón cambia de índice a 0
+// * btn:getComponents(); if(btn.getName()==ip)b = btn;
+// * remove(b); add(b,0);
+// *  
+//(XX)REMOVE GROUP FROM DATABASE FAILS
+//(XX)REFRESH GROUPS ON CREATION FAILS
+//(X)2 CHATS AT THE SAME TIME BREAKS THINGS -> Use just one
+//(X)TOGGLE TOGGLE-BUTTONS
+//(X)CHATS REPEAT IF THERE IS POST-LOGIN
+//(X)USER FROM MEMORY AND ONLINE PERSIST
