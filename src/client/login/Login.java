@@ -1,19 +1,34 @@
 
 package client.login;
 
+//La clase Color crea color utilizando los valores dados en RGBA (red,green,blue,alpha)
 import java.awt.Color;
-import javax.swing.border.Border; 
+//Proporciona clases e interfaz para dibujar bordes especializados alrededor de un componente Swing
+import javax.swing.border.Border;
+//clase Factory que produce diferentes tipos de bordes (instancias border)
 import javax.swing.BorderFactory;
+/*Java AWT rastrea el evento del teclado a través de KeyListener. El KeyListener
+obtendrá el KeyEvent que revela datos de la interacción del usuario con el teclado
+*/
 import java.awt.event.KeyEvent;
+/*indica que una ventana ha cambiado de estado. Este evento de bajo nivel es generado
+por un objeto Ventana cuando se abre, cierra, activa, desactiva, iconifica o deiconifica,
+o cuando el foco se transfiere dentro o fuera de la Ventana*/
 import java.awt.event.WindowEvent;
+//Esta es una implementación de TableModel que usa un Vector de vectores para almacenar los objetos de valor de celda
 import javax.swing.table.DefaultTableModel;
 
 import client.Chat;
 import client.Send;
 import client.helpers.GetIP;
+//Una implementación de la interfaz Icon que pinta iconos a partir de imágenes.
 import javax.swing.ImageIcon;
+/*Una versión extendida de java.awt.Frame que agrega soporte para la arquitectura de componentes JFC/Swing.
+Construye un nuevo marco que inicialmente es invisible.*/
 import javax.swing.JFrame;
+//facilita la aparición de un cuadro de diálogo estándar que solicita a los usuarios un valor o les informa sobre algo.
 import javax.swing.JOptionPane;
+
 import server.DBConnection;
 
 /**
