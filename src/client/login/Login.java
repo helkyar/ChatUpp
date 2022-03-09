@@ -422,6 +422,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
+        //limpiar la casilla de username cuando se pongan encima
         if(txtUser.getText().trim().toLowerCase().equals("username")){
             txtUser.setText("");
             txtUser.setForeground(Color.black);
@@ -433,13 +434,18 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUserFocusGained
 
     private void txtUserFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusLost
-        if(txtUser.getText().equals("")){
-            txtUser.setText("\tUsername");
-            txtUser.setForeground(Color.gray);
-            //poner un borde amarillo al jlabel 
-            Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-            jLabel_user.setBorder(jlabel_icon);
-        }
+        //si el texto de la casilla es igual a username o está vacía
+       //nosotros fijaremos "username" a la casilla
+       if (txtUser.getText().equals("") || 
+           txtUser.getText().trim().toLowerCase().equals("username")) 
+       {
+         txtUser.setText("username");
+         txtUser.setForeground(new Color (153,153,153));
+       }
+       
+       // crear los bordes de las labels al removerlas
+         Border label_icons_bordes = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(153,153,153));
+        jLabel_user.setBorder(label_icons_bordes);
     }//GEN-LAST:event_txtUserFocusLost
 
     private void jLabel_cerrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseClicked
@@ -467,24 +473,35 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_loginActionPerformed
 
     private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
-        //if(txtPassword.getPassword().equals("Username")){
+        //limpiar la casilla de password cuando se pongan encima 
+        //obtener la contraseña
+        String pass = String.valueOf (txtPassword.getPassword());
+        if(pass.trim().toLowerCase().equals("password"))
+        {
             txtPassword.setText("");
             txtPassword.setForeground(Color.black);
             //poner un borde amarillo al jlabel 
             Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-            jLabel_user.setBorder(jlabel_icon);
-        //}
+       jLabel_password.setBorder(jlabel_icon);
+        }
     }//GEN-LAST:event_txtPasswordFocusGained
 
     private void txtPasswordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusLost
-        if(txtPassword.getPassword().length < 1)
-        {
-            txtPassword.setText("Username");
-            txtPassword.setForeground(Color.gray);
-            //poner un borde amarillo al jlabel 
-            Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-            jLabel_user.setBorder(jlabel_icon);
-        }
+           //si el texto de la casilla es igual a password o está vacía
+       //nosotros fijaremos "password" a la casilla
+       //obtener la contraseña
+        String pass = String.valueOf (txtPassword.getPassword());
+        
+       if (pass.trim().equals("") || 
+           pass.trim().toLowerCase().equals("password")) 
+       {
+         txtPassword.setText("password");
+         txtPassword.setForeground(new Color (153,153,153));
+       }
+       
+       // crear los bordes de las labels al removerlas
+         Border label_icons_bordes = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(153,153,153));
+        jLabel_password.setBorder(label_icons_bordes);
     }//GEN-LAST:event_txtPasswordFocusLost
 
     private void jLabel_Create_accountMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_Create_accountMouseClicked
