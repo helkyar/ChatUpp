@@ -137,6 +137,9 @@ public class Login extends javax.swing.JFrame {
         jLabel_minimizar.setText("-");
         jLabel_minimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_minimizar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel_minimizarMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 jLabel_minimizarMouseEntered(evt);
             }
@@ -396,32 +399,38 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel_minimizarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_minimizarMouseEntered
+        //MouseEntered Se invoca cuando el ratón entra en un componente.
+        //Se pone borde color blanco al jlabel de minimizar y fondo blanco
         Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.white);
         jLabel_minimizar.setBorder(jlabel_borde);
         jLabel_minimizar.setForeground(Color.white);
     }//GEN-LAST:event_jLabel_minimizarMouseEntered
 
     private void jLabel_minimizarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_minimizarMouseExited
+        //MouseExited Se invoca cuando el ratón sale de un componente.
+        //Se pone borde color negro al jlabel de minimizar y fondo negro
         Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black);
         jLabel_minimizar.setBorder(jlabel_borde);
         jLabel_minimizar.setForeground(Color.black);
     }//GEN-LAST:event_jLabel_minimizarMouseExited
 
     private void jLabel_cerrarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseExited
-        // TODO add your handling code here:
+        // Se pone borde color negro al jlabel de cerrar y fondo negro
         Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black);
         jLabel_cerrar.setBorder(jlabel_borde);
         jLabel_cerrar.setForeground(Color.black);
     }//GEN-LAST:event_jLabel_cerrarMouseExited
 
     private void jLabel_cerrarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseEntered
-         Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.white);
+        // Se pone borde color blanco al jlabel de cerrar y fondo blanco
+        Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.white);
         jLabel_cerrar.setBorder(jlabel_borde);
         jLabel_cerrar.setForeground(Color.white);
     }//GEN-LAST:event_jLabel_cerrarMouseEntered
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
+        /*Se crea un JPasswordField que permite la edición de una sola línea de texto donde la vista 
+        indica que se escribió algo, pero no muestra los caracteres originales.*/
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
@@ -442,6 +451,7 @@ public class Login extends javax.swing.JFrame {
        if (txtUser.getText().equals("") || 
            txtUser.getText().trim().toLowerCase().equals("username")) 
        {
+//se fija el texto username y se le da un color de fondo al jtextfield
          txtUser.setText("username");
          txtUser.setForeground(new Color (153,153,153));
        }
@@ -452,14 +462,17 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUserFocusLost
 
     private void jLabel_cerrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_cerrarMouseClicked
-       dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+       //cerrar ventana login
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_jLabel_cerrarMouseClicked
 
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
+        //para que le puedas dar al enter al poner la contraseña
         if(evt.getKeyCode()== KeyEvent.VK_ENTER){verifyLogin();}
     }//GEN-LAST:event_txtPasswordKeyPressed
 
     private void txtUserKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyPressed
+         //para que le puedas dar al enter al poner la contraseña
         if(evt.getKeyCode()== KeyEvent.VK_ENTER){verifyLogin();}
     }//GEN-LAST:event_txtUserKeyPressed
 
@@ -508,6 +521,7 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordFocusLost
 
     private void jLabel_Create_accountMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_Create_accountMouseClicked
+
         Register rf = new Register();
         rf.setVisible(true);
         rf.pack();
@@ -534,6 +548,11 @@ public class Login extends javax.swing.JFrame {
         //fijar el fondo del jbuton
         login.setBackground(new Color(0,84,104));
     }//GEN-LAST:event_loginMouseExited
+
+    private void jLabel_minimizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_minimizarMouseClicked
+        //para minimizar la ventana al hacer click
+        this.setState(JFrame.ICONIFIED);
+    }//GEN-LAST:event_jLabel_minimizarMouseClicked
 
     public void verifyLogin(){
         loginuser = txtUser.getText();
