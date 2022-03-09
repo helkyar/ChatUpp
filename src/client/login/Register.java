@@ -110,6 +110,7 @@ public class Register extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         userSurname = new javax.swing.JTextField();
         userNick = new javax.swing.JTextField();
         userName = new javax.swing.JTextField();
@@ -117,6 +118,8 @@ public class Register extends javax.swing.JFrame {
         jRadioButton_Femenino = new javax.swing.JRadioButton();
         jRadioButton_Otros = new javax.swing.JRadioButton();
         jLabel9 = new javax.swing.JLabel();
+        jButton_SeleccionImagen = new javax.swing.JButton();
+        jLabel_imgpath = new javax.swing.JLabel();
         userPassword = new javax.swing.JPasswordField();
         userPassword2 = new javax.swing.JPasswordField();
         frameLogin = new javax.swing.JButton();
@@ -225,6 +228,9 @@ public class Register extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel7.setText("Apellidos:");
 
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel8.setText("Imágenes(WIP):");
+
         userSurname.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
 
         userNick.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -242,6 +248,17 @@ public class Register extends javax.swing.JFrame {
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel9.setText("Género:");
+
+        jButton_SeleccionImagen.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton_SeleccionImagen.setText("Seleccione Imagen");
+        jButton_SeleccionImagen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_SeleccionImagenActionPerformed(evt);
+            }
+        });
+
+        jLabel_imgpath.setFont(new java.awt.Font("Sylfaen", 0, 11)); // NOI18N
+        jLabel_imgpath.setText("Image Path");
 
         userPassword.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
@@ -261,7 +278,8 @@ public class Register extends javax.swing.JFrame {
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -280,7 +298,12 @@ public class Register extends javax.swing.JFrame {
                                 .addComponent(jRadioButton_Femenino)
                                 .addGap(43, 43, 43)
                                 .addComponent(jRadioButton_Otros)
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGap(0, 186, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton_SeleccionImagen)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel_imgpath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -324,7 +347,12 @@ public class Register extends javax.swing.JFrame {
                     .addComponent(jRadioButton_Masculino)
                     .addComponent(jRadioButton_Femenino)
                     .addComponent(jRadioButton_Otros))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton_SeleccionImagen)
+                    .addComponent(jLabel_imgpath))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
                 .addComponent(jButton_Registro, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(21, 21, 21))
         );
@@ -362,7 +390,7 @@ public class Register extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(frameLogin)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(125, 125, 125)
                 .addComponent(jLabel_minimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -509,6 +537,28 @@ public class Register extends javax.swing.JFrame {
             Send.message((String) GetIP.getLocalIp().get(1), registerFail, data, "register", "");
         }
     }//GEN-LAST:event_jButton_RegistroActionPerformed
+
+    private void jButton_SeleccionImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SeleccionImagenActionPerformed
+        //Seleccionar una imagen y fijarla en la jlabel del image path
+        String path = null;
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+        //extensión archivo
+        FileNameExtensionFilter extension = new FileNameExtensionFilter("*Images", "jpg", "png", "jpeg");
+        chooser.addChoosableFileFilter(extension);
+
+        int filestate = chooser.showSaveDialog(null);
+        //comprobar si el usuario selecciona una imagen
+        if (filestate == JFileChooser.APPROVE_OPTION) {
+
+            File selectedImage = chooser.getSelectedFile();
+            path = selectedImage.getAbsolutePath();
+            jLabel_imgpath.setText(path);
+
+            image_path = path;
+        }
+    }//GEN-LAST:event_jButton_SeleccionImagenActionPerformed
     
     //crear una funcion para verificar las casillas vacias
 //    public boolean verifyFields()
@@ -572,6 +622,7 @@ public class Register extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton frameLogin;
     private javax.swing.JButton jButton_Registro;
+    private javax.swing.JButton jButton_SeleccionImagen;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -580,8 +631,10 @@ public class Register extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel_cerrar;
+    private javax.swing.JLabel jLabel_imgpath;
     private javax.swing.JLabel jLabel_minimizar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
