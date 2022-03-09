@@ -17,9 +17,11 @@ o cuando el foco se transfiere dentro o fuera de la Ventana*/
 import java.awt.event.WindowEvent;
 //Esta es una implementación de TableModel que usa un Vector de vectores para almacenar los objetos de valor de celda
 import javax.swing.table.DefaultTableModel;
-
+//Te conecta o importa con el paquete de client y la clase java chat
 import client.Chat;
+//Te conecta o importa con el paquete de client y la clase java Send
 import client.Send;
+////Te conecta o importa con el paquete de client.helpers y la clase GetIP
 import client.helpers.GetIP;
 //Una implementación de la interfaz Icon que pinta iconos a partir de imágenes.
 import javax.swing.ImageIcon;
@@ -28,40 +30,68 @@ Construye un nuevo marco que inicialmente es invisible.*/
 import javax.swing.JFrame;
 //facilita la aparición de un cuadro de diálogo estándar que solicita a los usuarios un valor o les informa sobre algo.
 import javax.swing.JOptionPane;
-
+//Te conecta o importa con el paquete de server y la clase java DBConnection
 import server.DBConnection;
 
 /**
  *
- * @author Academia
+ * @author Míldred Ramírez, Cristian Echauri, Houssam Amrouch, Mateo Crespí, 
+ * Javier Palacios 
  */
 public class Login extends javax.swing.JFrame {
     DefaultTableModel model = null;
 
-    int islogin;
-    String loginuser;
+    int islogin; //creamos la variable islogin
+    //Stringclass representa cadenas de caracteres.
+    String loginuser; 
     String password;
     String registerlogin;
     /**
      * Creates new form Login
      */
     public Login() {
-        super("Chatty");
-        setIconImage(Chat.LOGO);
+        super("Chatty"); //se utiliza para referirse al objeto de clase padre inmediato.
+        setIconImage(Chat.LOGO); //Establece la imagen que se mostrará como el icono de esta ventana.
         
         initComponents();
+        /*Establece la operación que ocurrirá por defecto cuando el usuario inicie
+        un "cierre" en este marco. DISPOSE_ON_CLOSE (definido en WindowConstants): 
+        oculta y elimina automáticamente el marco después de invocar cualquier objeto 
+        WindowListener registrado.*/
+       
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 //        centramos el form
         setLocationRelativeTo(null);
-        
+//        creamos un borde amarillo para el titulo del panel
+//        los cuatro números son los bordes de la casilla, cuanto mas altos, mayor grosor de la linea        
 //         con el 0, en la parte superior del titulo del panel no ponemos borde
         Border jpanel_titulo_borde = BorderFactory.createMatteBorder(0, 1, 1, 1, Color.YELLOW);
 //        fijamos el borde al jpanel del título
        jPanel_titulo.setBorder(jpanel_titulo_borde);
 //        Creamos un borde para las casillas de minimizar y cerrar
-        Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black);
+//  Creamos un bordenaranja para el panel global
+        Border glob_borde_panel = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.orange);
+        jPanel1.setBorder(glob_borde_panel);
+        
+        //        Creamos un borde para las casillas de minimizar y cerrar
+        Border jlabel_borde = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black);       
         jLabel_minimizar.setBorder(jlabel_borde);
         jLabel_cerrar.setBorder(jlabel_borde);
+        
+        // create a border for the create acconut jlabel
+        Border label_create_accont_border = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.lightGray);
+        jLabel_Create_account.setBorder(label_create_accont_border);
+        
+        // crear los bordes de las labels al removerlas
+         Border label_icons_bordes = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(153,153,153));
+        jLabel_user.setBorder(label_icons_bordes);
+        jLabel_password.setBorder(label_icons_bordes);
+        
+        //crear borde para casilla usuario y contraseña
+        Border casilla_bordes = BorderFactory.createMatteBorder(1, 5, 1, 1, Color.white);
+        txtUser.setBorder(casilla_bordes);
+        txtPassword.setBorder(casilla_bordes);
+        
         txtPassword.setTransferHandler(null);
         
         //Make it visible
@@ -170,11 +200,11 @@ public class Login extends javax.swing.JFrame {
         txtUser.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         txtUser.setText("Username");
         txtUser.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtUserFocusLost(evt);
-            }
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtUserFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtUserFocusLost(evt);
             }
         });
         txtUser.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -187,11 +217,11 @@ public class Login extends javax.swing.JFrame {
         txtPassword.setText("Username");
         txtPassword.setToolTipText("password");
         txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtPasswordFocusLost(evt);
-            }
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtPasswordFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPasswordFocusLost(evt);
             }
         });
         txtPassword.addActionListener(new java.awt.event.ActionListener() {
@@ -308,7 +338,7 @@ public class Login extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(184, Short.MAX_VALUE)
+                .addContainerGap(192, Short.MAX_VALUE)
                 .addComponent(jPanel_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(102, 102, 102)
                 .addComponent(jLabel_minimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
