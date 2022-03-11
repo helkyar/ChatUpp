@@ -19,10 +19,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
  
 /**
+ * 
+ * Esta clase se encarga de obtener la IP publica y la IP local (de la interfaz 
+ * de red activa) del equipo en el que se está ejecutando el programa
  *
  * @author Javier Palacios
  */
 public class GetIP {
+    
+    private static boolean devmode = false;
     
     public static String getPublicIP() {
         String publicIP;
@@ -54,7 +59,7 @@ public class GetIP {
                 if (iface.isUp()) {localIP.add(iface.getInetAddresses().nextElement().getHostAddress());}                
             }           
         } catch (SocketException ex) {
-            Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);
+            if(devmode) Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);
         } 
         return localIP;
     }

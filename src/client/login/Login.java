@@ -35,6 +35,15 @@ import server.DBConnection;
 
 /**
  *
+ * Esta clase se encarga de generar la interfaz de Login y validar
+ * los datos introducidos por el usuario. Conecta con la clase Register.
+ * 
+ * La mayoria de metodos se encargan de controlar el aspecto visual de la 
+ * ventana y los inputs.
+ * 
+ * Se utiliza la clase Send para enviar un Package al servidor con los datos 
+ * de login.
+ * 
  * @author Míldred Ramírez, Cristian Echauri, Houssam Amrouch, Mateo Crespí, 
  * Javier Palacios 
  */

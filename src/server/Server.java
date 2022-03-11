@@ -23,13 +23,44 @@ import javax.swing.JTextArea;
 
 /**
  *
- * @author javip
+ * La clase server se encarga de enviar la información entre clientes y realizar
+ * las conecxiones con la base de datos usando la clase DBConnection.
+ * 
+ * Dependiendo del status de los Package recibidos, se ejecutará un metodo u otro.
+ * 
+ * private void sayHelloToChat(Socket request, Package p)
+ * -> Cuando un cliente que está buscando al servidor encuentra la IP correcta,
+ * este metodo le envía la confirmación de identidad.
+ * 
+ * private void checkLogin(Package p)
+ * -> comprueba que los datos enviados en la ventana Login sean correctos.
+ * 
+ * private void registerUser(Package p)
+ * -> Utilizando los datos enviados en la ventana Register, se intenta insertar
+ * un registro en la tabla users
+ * 
+ * private void sendUsersOnline(Socket request, Package p)
+ * -> informa a los clientes de los usuarios actualmente conectados a la aplicación.
+ * 
+ * private void sendMessage(Package p)
+ * -> Envia el mensaje contenido en p a todos los participantes de un chat o un
+ * grupo
+ * 
+ * private void informGroupUsers(Package p)
+ * -> al crea un nuevo grupo, informar a todos los participantes añadidos.
+ * 
+ * private void changeGroupUsers(Package p)
+ * -> al modificar un grupo, informa a todos los participantes involucrados en 
+ * el grupo
+ * 
+ * @author Javier Palacios Botejara
  */
 public class Server extends JFrame implements Runnable{
     private static int guest = 0;
     private JTextArea txt = new JTextArea();
     private Map<String, String[]> ips = new HashMap<>(); 
     private String ip = "";
+    private boolean devmode = false;
     
     Server(){
         Thread lintening = new Thread(this);
@@ -71,11 +102,11 @@ public class Server extends JFrame implements Runnable{
                     
                     request.close();
                     
-                } catch (ClassNotFoundException ex) {System.out.println("Class not found");}
-                 catch(EOFException ex){System.out.println("Wrong chat connection protocol");}
-                catch(ConnectException ex){ex.printStackTrace();}
+                } catch (ClassNotFoundException ex) {if(devmode)System.out.println("Class not found");}
+                 catch(EOFException ex){if(devmode)System.out.println("Wrong chat connection protocol");}
+                catch(ConnectException ex){if(devmode)ex.printStackTrace();}
             }
-        } catch (IOException ex) {ex.printStackTrace();}
+        } catch (IOException ex) {if(devmode)ex.printStackTrace();}
     }
     
     private void sayHelloToChat(Socket request, Package p) throws IOException{

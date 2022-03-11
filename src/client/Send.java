@@ -9,11 +9,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
- *
- * @author admin
+ * Esta clase se utiliza para realizar el envio de informacion, en forma de 
+ * Package, del cliente al servidor. El meto message() toma como parametros 
+ * los valores que formarán el objeto Package.
+ * 
+ * @author Javier Palacios Botejara
  */
 public class Send {
     private static String server;
+    private static boolean devmode = false;
     
     public Send(String server){
         this.server = server;
@@ -43,6 +47,8 @@ public class Send {
                 socket.close();
             }
                
-        } catch (IOException ex) {ex.printStackTrace();}
+        } catch (IOException ex) {
+            if(devmode) ex.printStackTrace();
+        }
     }
 }

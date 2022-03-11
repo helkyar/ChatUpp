@@ -29,10 +29,43 @@ import java.util.Map;
 import javax.swing.Timer;
 
 /**
- * Proyecto Chat es un programa que permite la comunicación por red local entre los usarios, con un sistema
- * de registro para poder visualizar el historial de conversaciones previas y un sistema que muestra todos los
- * usuarios disponibles para conversar en ese momento.
- * @author Javier Palacios Botejara, Houssam Amrouch, Mateo Crespi, Cristian Echauri, Mildred Rámirez
+ * Proyecto Chat es un programa que permite la comunicación por red local entre 
+ * los usarios, con un sistema de registro para poder visualizar el historial de
+ * conversaciones previas y un sistema que muestra todos los usuarios 
+ * disponibles para conversar en ese momento.
+ * 
+ * @author Javier Palacios Botejara, Houssam Amrouch, Mateo Crespi, 
+ * Cristian Echauri, Mildred Rámirez
+ * 
+ * Los principales metodos y clases de esta clase son:
+ * 
+ * private void getServerIP()
+ * -> Busca en la red local el servidor del chat
+ * 
+ * class RecieveMsg()
+ * -> Hilo que se encarga de recibir las comunicaciones enviadas por el servidor
+ * y enrutarlas a cada metodo dependiendo del Status del Package recibido
+ * 
+ * private void setServerIP(Socket mysocket, Package p)
+ * -> cuando se encuentra el servidor, se guarda la informaciónde conexión al 
+ * mismo
+ * 
+ * private void askForUsersOnline(String nick)
+ * -> solicita al servidor la lista de usuarios online, informando de nuestro 
+ * nick
+ * 
+ * private void setUsersOnline(Package p)
+ * -> cuando el servidor responde con la lista de usuarios online, este metodo
+ * es llamado para crear los botones de cada chat.
+ * 
+ * private void sendMessage(Package p)
+ * -> recoge el mensaje del textarea para enviar el mensaje al servidor y lo
+ * añade al historial (hashmap) usando el chatID como llave
+ * 
+ * private void informChatUsers(String chatid, String groupname, String msg)
+ * -> cuando el usuario recibe un nuevo mensaje, coloca el boton correspondiente 
+ * a ese chat en la parte superior y añade el nuevo mensaje al historial.
+ * 
  */
 
 public class Chat extends JFrame implements ActionListener{
@@ -90,6 +123,9 @@ public class Chat extends JFrame implements ActionListener{
     private String groupUsers="";
     private String groupname;
     private int op = 2;
+    
+    //DEVELOPMENT OPTION
+    private boolean devmode = false;
     
     public Chat() {
         
@@ -169,7 +205,7 @@ public class Chat extends JFrame implements ActionListener{
         new RecieveMsg(); //Start listening for server response
         getServerIP();
     }  
-           
+       
     private void getServerIP() {
         if(serverIP.equals("")){
             userInfo.setText("\n   Starting connection...\n");
@@ -320,8 +356,8 @@ public class Chat extends JFrame implements ActionListener{
 //                     USER-TO-USER LINK / ENLACE USUARIO-USUARIO
 //===========================================================================================
   
-    //manda una instruccion mediante Send.java y GetIP.java para buscar las ips disponibles en el servidor
-    //para mostrar quien esta conectado
+    //manda una instruccion mediante Send.java y GetIP.java para buscar las ips 
+    //disponibles en el servidor para mostrar quien esta conectado
     private void askForUsersOnline(String nick){
        Send.message((String) GetIP.getLocalIp().get(1), "", nick, "getusers","");
     }
@@ -400,7 +436,9 @@ public class Chat extends JFrame implements ActionListener{
                     groups.remove(chat);
                     break;
                 }
-            } catch (Exception ex){System.out.println("fuck");continue;}
+            } catch (Exception ex){
+                if(devmode) System.out.println("fuck");
+                continue;}
         } groups.add(chat, 1);
         }else{
         for(Component btn : users.getComponents()){
@@ -410,7 +448,9 @@ public class Chat extends JFrame implements ActionListener{
                     users.remove(chat);
                     break;
                 }
-            } catch (Exception ex){System.out.println("fuck");continue;}
+            } catch (Exception ex){
+                if(devmode) System.out.println("fuck");
+                continue;}
         }users.add(chat, 0);
         }
         connect.repaint();
@@ -500,7 +540,9 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt); //overwrite previous
                 userinput.setText("");
                         
-            } catch (Exception e){e.printStackTrace();}
+            } catch (Exception e){
+                if(devmode) e.printStackTrace();
+            }
         }
         //else if(event.getSource() == erasebtn){chatxt.setText("");}
         else if(event.getSource() == exitbtn){System.exit(0);}
@@ -524,7 +566,9 @@ public class Chat extends JFrame implements ActionListener{
                 chatstorage.put(chatID, txt);
                 userinput.setText("");
             }  
-        } catch (Exception e){e.printStackTrace();}            
+        } catch (Exception e){
+            if(devmode) e.printStackTrace();
+        }            
     }
     
 // ===========================================================================
@@ -589,7 +633,7 @@ public class Chat extends JFrame implements ActionListener{
                 selectuser.remove(adduser);
                 selectuser.setVisible(false);
                 selectuser.setVisible(true);    
-                System.out.println("All users: "+groupUsers);
+                if(devmode) System.out.println("All users: "+groupUsers);
             });
             selectuser.add(adduser);
           }
@@ -656,7 +700,7 @@ public class Chat extends JFrame implements ActionListener{
     
     private void informChatUsers(String chatid, String groupname, String msg) {
       //CREATE SWING COMPONENT FOR USER-TO-USER
-      System.out.println(chatid+" | "+groupname+" | "+msg);
+      if(devmode) System.out.println(chatid+" | "+groupname+" | "+msg);
       //el chatid es una generacion compleja de numeros que empieza por ~g~
       //si chatid no lo contiene significa que no existe y lo creamos
       if(!chatid.contains("~g~")){ 
@@ -683,7 +727,7 @@ public class Chat extends JFrame implements ActionListener{
          users.validate();
          //de lo contrario se inicia el rpoceso de crear un grupo
       } else {   
-          System.out.println("creating group");
+          if(devmode) System.out.println("creating group");
      //CREATE SWING COMPONENT FOR GROUPS    
         groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
 

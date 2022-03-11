@@ -8,8 +8,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * Esta clase se encarga de recibir la dirección de un hilo y, después de un 
+ * tiempo determinado, finalizarlo. En esta aplicación su finalidad es parar
+ * los multiples hilos que se generan al buscar el servidor del chat.
  *
- * @author admin
+ * @author Javier Palacios Botejara
  */
 public class KillSearchThread extends TimerTask {
     private Thread t;

@@ -31,8 +31,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @author Academia
+ * Esta clase se encarga de generar la interfaz de registro y validar
+ * los datos introducidos por el usuario. Conecta con la clase Login.
+ * 
+ * La mayoria de metos se encargan de controlar el aspecto visual de la ventana
+ * y los inputs.
+ * 
+ * Se utiliza la clase Send para enviar un Package al servidor con los datos de
+ * registro
+ * 
+ * @author Javier Palacios Botejara, Houssam Amrouch, Mateo Crespi, Cristian Echauri, Mildred Rámirez
  */
 public class Register extends javax.swing.JFrame {
 

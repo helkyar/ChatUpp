@@ -10,8 +10,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- *
- * @author javip
+ * Clase troncal del proyecto. Este objeto sirve de contenedor para la 
+ * información a enviar y su destino. Se utiliza tanto del cliente al servidor 
+ * como a la inversa.
+ * 
+ * @author Javier Palacios Botejara
  */
 public class Package implements Serializable{
     

@@ -11,11 +11,15 @@ import java.net.Socket;
 
 /**
  *
- * @author admin
+ * Esta clase se encarga de enviar Packages a IPs para comprobar si una de 
+ * ellas es el servidor.
+ * 
+ * @author Javier Palacios Botejara
  */
 public class SearchServer implements Runnable {
     int i;
     String ip;
+    private boolean devmode = false;
         
     public SearchServer(int i, String ip){
         this.ip = ip;
@@ -33,7 +37,7 @@ public class SearchServer implements Runnable {
                     objp.writeObject(p);
                     socket.close();
                 } 
-            } catch (IOException ex) {/*System.out.println("Server tested: "+ip+i);*/}
+            } catch (IOException ex) {if(devmode) System.out.println("Server tested: "+ip+i);}
         }
     }
 }

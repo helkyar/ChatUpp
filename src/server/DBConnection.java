@@ -18,8 +18,51 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @authors Mateo and Javi
+ * 
+ * Esta clase contiene todos los metodos que acceden a la base de datos y es 
+ * utilizada por la clase Server.
+ * 
+ * public static String checkLogin(String password, String nick)
+ * -> Comprueba si el usuario dado existe y si a contraseña es correcta. 
+ * Devuelve OK si los datos son correctos.
+ * 
+ * public static String[] registerUser(String error, String nick)
+ * -> Inserta un registro en la tabla usuario. En caso de erros, devuelve
+ * un array con los mensjaes de error.
+ * 
+ * static void setLastIP(String nick, String ip)
+ * -> actualiza un registro de la tabla ussuarios con la ultima IP usada por ese
+ * usuario
+ * 
+ * static String[] getChats(String nick)
+ * -> obtiene todos los historiales de un usuario concreto
+ * 
+ * static String getUsers(String msg, String id)
+ * -> dependiendo del valor de msg, obtiene todos los ususarios u obtiene todos 
+ * los ususarios de un chat.
+ * 
+ * static String createNewGroup(String msg, String nick)
+ * -> Inserta en chats el regitro para el nuevo chat y en participants los 
+ * registros de los participantes del nuevo chat.
+ * 
+ * static String[] notifyUsers(String msg)
+ * -> Obtiene la última IP conocida de los participantes de un chat
+ * 
+ * static Map getRegisteredChats(String nick)
+ * -> Obtiene la informacion de todos los chats en los que participa un usuario.
+ * 
+ * static void saveNormalChat(String msg, String chatid)
+ * -> Crea un registro en chat, participants y message para un nuevo chat entre
+ * dos usuarios.
+ * 
+ * static ArrayList getGroupParticipants(String id)
+ * -> Obtiene la última IP conocida de los participantes de un grupo especifico
+ * 
+ * static String changeGroup(String users, String action, String id)
+ * -> Dependiendo del valor de action, se modifica un grupo añadiendo o quitando 
+ * ussuarios.
+ * 
+ * @authors Mateo Crespi and Javier Palacios Botejara
  */
 public class DBConnection {
     private static final String driver = "com.mysql.cj.jdbc.Driver";
@@ -31,6 +74,8 @@ public class DBConnection {
     private static Connection conn = null;
     private static Statement st = null;
     private static ResultSet rs = null;
+    
+    private static boolean devmode = false;
     
     /**
      * Checks if user and password exists in the database
@@ -52,7 +97,9 @@ public class DBConnection {
                 if (rs.next()) {return "OK";}
                 else {return "X";}                
                          
-            } catch (SQLException ex) {ex.printStackTrace(); return "SP";}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return "SP";}             
         } catch (ClassNotFoundException e) {return "SP";}         
         finally { try {conn.close();} catch (SQLException ex) {return "SPS";} catch (Exception ex) {return "SPS";}}
     }
@@ -82,7 +129,9 @@ public class DBConnection {
                 
                 return new String[]{error, "", data[0]};
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return serverError;}             
         } catch (ClassNotFoundException e) {return serverError;}        
         finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
     }
@@ -97,9 +146,15 @@ public class DBConnection {
                 ps = conn.prepareStatement(query);      
                 ps.executeUpdate();
                          
-        } catch (SQLException ex) {ex.printStackTrace();}  
-        } catch (ClassNotFoundException ex) {ex.printStackTrace();}     
-        finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace();}} 
+        } catch (SQLException ex) {
+            if(devmode) ex.printStackTrace();
+        }  
+        } catch (ClassNotFoundException ex) {
+            if(devmode) ex.printStackTrace();
+        }     
+        finally { try {conn.close();} catch (SQLException ex) {
+            if(devmode) ex.printStackTrace();
+        }} 
     }
     
     static String[] getChats(String nick) {
@@ -119,7 +174,9 @@ public class DBConnection {
                  
                 } else {result[1] = ""; return result;}  
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return result;}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return result;}             
         } catch (ClassNotFoundException e) {return result;}         
         finally { try {conn.close();} catch (SQLException ex) {return result;} catch (Exception ex) {return result;}}
     }
@@ -142,7 +199,9 @@ public class DBConnection {
                 while (rs.next()) { allUsers += "~"+rs.getString(1);}
                 return allUsers;
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return "S";}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return "S";}             
         } catch (ClassNotFoundException e) {return "S";}         
         finally { try {conn.close();} catch (SQLException ex) {return "S";} catch (Exception ex) {return "S";}}
         
@@ -173,7 +232,9 @@ public class DBConnection {
 
 //                return "OK";
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return serverError;}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return serverError;}             
             finally{
                 try{
                     //participants: user_id 	chat_id 
@@ -183,7 +244,9 @@ public class DBConnection {
 
                     return id;
 
-                } catch (SQLException ex) {ex.printStackTrace();return serverError;} 
+                } catch (SQLException ex) {
+                    if(devmode) ex.printStackTrace();
+                    return serverError;} 
             }  
         } catch (ClassNotFoundException e) {return serverError;}          
         finally { try {conn.close();} catch (SQLException ex) {return serverError;} catch (Exception ex) {return serverError;}}
@@ -210,7 +273,9 @@ public class DBConnection {
                 while (rs.next()) { ips[i] = rs.getString(1); i++;}
                 return ips;
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return new String[]{"S"};}     
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return new String[]{"S"};}     
           catch ( Exception e){return new String[]{"S"};}
         }catch (ClassNotFoundException e) {return new String[]{"S"};}         
         finally { try {conn.close();} catch (SQLException ex) {return new String[]{"S"};} catch (Exception ex) {return new String[]{"S"};}}
@@ -233,7 +298,9 @@ public class DBConnection {
                 while (rs.next()) { groups.put(rs.getString(1), new String[]{rs.getString(2),rs.getString(3)});}
                 return groups;
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return new HashMap();}     
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return new HashMap();}     
              catch ( Exception e){return  new HashMap();}
         }catch (ClassNotFoundException e) {return  new HashMap();}         
         finally { try {conn.close();} catch (SQLException ex) {return  new HashMap();} catch (Exception ex) {return  new HashMap();}}
@@ -274,10 +341,20 @@ public class DBConnection {
                 ps = conn.prepareStatement(addMsg);
                 ps.executeUpdate();
                 
-            } catch (SQLException ex) {ex.printStackTrace();}     
-             catch ( Exception ex){ex.printStackTrace();}
-        }catch (ClassNotFoundException ex) {ex.printStackTrace();}         
-        finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace();} catch (Exception ex) {ex.printStackTrace();}}
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace();
+            }     
+             catch ( Exception ex){
+                 if(devmode) ex.printStackTrace();
+             }
+        }catch (ClassNotFoundException ex) {
+            if(devmode) ex.printStackTrace();
+        }         
+        finally { try {conn.close();} catch (SQLException ex) {
+            if(devmode) ex.printStackTrace();
+        } catch (Exception ex) {
+            if(devmode) ex.printStackTrace();
+        }}
    
     }
 
@@ -297,11 +374,22 @@ public class DBConnection {
 
             return ips;
         
-        } catch (SQLException ex) {ex.printStackTrace(); return ips;}     
-             catch ( Exception ex){ex.printStackTrace(); return ips;}
-        }catch (ClassNotFoundException ex) {ex.printStackTrace(); return ips;}         
-        finally { try {conn.close();} catch (SQLException ex) {ex.printStackTrace(); return ips;} catch (Exception ex) {ex.printStackTrace(); return ips;}}
-   
+        } catch (SQLException ex) {
+            if(devmode) ex.printStackTrace(); 
+            return ips;}     
+             catch ( Exception ex){
+                 if(devmode) ex.printStackTrace(); 
+                 return ips;}
+        }catch (ClassNotFoundException ex) {
+            if(devmode) ex.printStackTrace(); 
+            return ips;}         
+        finally { try {conn.close();} catch (SQLException ex) {
+            if(devmode) ex.printStackTrace(); 
+            return ips;} 
+        catch (Exception ex) {
+            if(devmode) ex.printStackTrace(); 
+            return ips;}
+        }
     }
 
     static String changeGroup(String users, String action, String id) {
@@ -324,7 +412,7 @@ public class DBConnection {
                     }   query +=")";
                 }
 
-                System.out.println(query);
+                if(devmode) System.out.println(query);
                 
                 conn = DriverManager.getConnection(url, user, pass);
                 ps = conn.prepareStatement(query);
@@ -342,7 +430,9 @@ public class DBConnection {
 
                 return allgroupmembers;
                 
-            } catch (SQLException ex) {ex.printStackTrace(); return "S";}             
+            } catch (SQLException ex) {
+                if(devmode) ex.printStackTrace(); 
+                return "S";}             
         } catch (ClassNotFoundException e) {return "S";}         
         finally { try {conn.close();} catch (SQLException ex) {return "S";} catch (Exception ex) {return "S";}}
         
