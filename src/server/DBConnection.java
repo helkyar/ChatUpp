@@ -4,6 +4,8 @@
  */
 package server;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import security.Encriptador;
 
 /**
  * 
@@ -87,19 +90,36 @@ public class DBConnection {
         //Update last ip
         try {
             Class.forName(driver);
+            Encriptador encriptador = new Encriptador(password);
+            
+            if (encriptador.getHashedPassword().equals("")) return "SP";
             
             try {
                 conn = DriverManager.getConnection(url, user, pass);
                 st = conn.createStatement();
-                rs = st.executeQuery("SELECT user_id FROM users WHERE username='" + nick + "'"
-                        + "and password='" + password + "'");
-                               
-                if (rs.next()) {return "OK";}
-                else {return "X";}                
-                         
+                
+                rs = st.executeQuery("SELECT password FROM users WHERE username='" + nick + "'");
+                if (rs.next()){
+                    String hashed = rs.getString("password");
+                    boolean correctPassword = encriptador.validadorContrasenya(password, hashed);
+                    if(correctPassword){
+                        return "OK";
+                    } else {
+                        return "X";
+                    }
+                } else {
+                    return "X";
+                }
             } catch (SQLException ex) {
                 if(devmode) ex.printStackTrace(); 
-                return "SP";}             
+                return "SP";} 
+            catch (NoSuchAlgorithmException ex) {             
+                if(devmode) Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+                return "SP";
+            } catch (InvalidKeySpecException ex) {
+                if(devmode) Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+                return "SP";
+            }             
         } catch (ClassNotFoundException e) {return "SP";}         
         finally { try {conn.close();} catch (SQLException ex) {return "SPS";} catch (Exception ex) {return "SPS";}}
     }
@@ -116,10 +136,13 @@ public class DBConnection {
                 rs = st.executeQuery("SELECT user_id FROM users WHERE username='" + data[0] + "'");
                 if (rs.next()) {error += "\n\tNick taken"; }
                 
+                Encriptador encriptador = new Encriptador(data[4]);
+                if (encriptador.getHashedPassword().equals("")) error += "\n\tParse error";
+                
                 if(error.equals("")){
                     ps = conn.prepareStatement("INSERT INTO `users` (`username`, `password`, `email`, `name`, `surname`, `last_ip`, `genre`, `image`) VALUES (?, ?, ?, ?, ?, '', ?, 'null')");
                     ps.setString(1, data[0]);
-                    ps.setString(2, data[4]);
+                    ps.setString(2, encriptador.getHashedPassword());
                     ps.setString(3, data[2]);
                     ps.setString(4, data[3]);
                     ps.setString(5, data[1]);

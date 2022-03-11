@@ -487,7 +487,7 @@ public class Chat extends JFrame implements ActionListener{
     public StartOptions (){
         JButton log = new JButton("Login");        
         JButton reg = new JButton("Register");        
-        JButton guest = new JButton("Guesst");
+        JButton guest = new JButton("Guest");
         log.addActionListener(this);
         reg.addActionListener(this);
         guest.addActionListener(this);
