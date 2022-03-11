@@ -499,16 +499,11 @@ public class Login extends javax.swing.JFrame {
 
     private void txtPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusGained
         //limpiar la casilla de password cuando se pongan encima 
-        //obtener la contraseña
-        String pass = String.valueOf (txtPassword.getPassword());
-        if(pass.trim().toLowerCase().equals("password"))
-        {
-            txtPassword.setText("");
-            txtPassword.setForeground(Color.black);
-            //poner un borde amarillo al jlabel 
-            Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
-       jLabel_password.setBorder(jlabel_icon);
-        }
+        txtPassword.setText("");
+        txtPassword.setForeground(Color.black);
+        //poner un borde amarillo al jlabel 
+        Border jlabel_icon = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.YELLOW);
+        jLabel_password.setBorder(jlabel_icon);
     }//GEN-LAST:event_txtPasswordFocusGained
 
     private void txtPasswordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPasswordFocusLost
@@ -566,8 +561,7 @@ public class Login extends javax.swing.JFrame {
     public void verifyLogin(){
         loginuser = txtUser.getText();
         password = String.valueOf(txtPassword.getPassword());
-        
-        if(loginuser.trim().length() > 1 && password.trim().length() > 1){
+        if(loginuser.trim().length() >= 1 && password.trim().length() >= 1){
             //Login message sets ip adress as its own to recive the server response
             Send.message((String) GetIP.getLocalIp().get(1), password, loginuser, "login","");
         } else {

@@ -454,6 +454,7 @@ public class Chat extends JFrame implements ActionListener{
         }users.add(chat, 0);
         }
         connect.repaint();
+        connect.validate();
         
     }     
     
@@ -656,12 +657,15 @@ public class Chat extends JFrame implements ActionListener{
         options.remove(addmember);
         options.remove(delmember);
         options.repaint();
+        options.validate();
+        
     }
 //quitar las opciones de grupo en la paret superior (jpanel options) 
     private void addGroupButtons(){        
         options.add(addmember);
         options.add(delmember);
         options.repaint();
+        options.validate();
     }
 
 // ===========================================================================
