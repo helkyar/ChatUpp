@@ -56,7 +56,7 @@ lleva a acceder al chat si los datos son correctos.Si tienes que registrarte, ha
 en este panel al que le das y te muestra un panel de registro. Los campos de registro
 son: usuario, contraseña, confirmar contraseña, nombre real, apellidos, nickname,
 género e imagen. Con el botón de registro, te registras una vez rellenados los datos correctamente.
-El programa hace login directamente después del registro.
+Una vez registrado, puedes hacer click en "iniciar sesión".
 
 Una vez te logueas, en la ventana principal se muestran los usuarios que están conectados.
 Puedes seleccionar al usuario con quien deseas hablar o crear un grupo y añadir en él 
