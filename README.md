@@ -12,16 +12,20 @@ e iniciado sesión.
 >  ->Cifrado de contraseña  
     
 - Operaciones CRUD con base de datos  
->  ->Visualización de usuarios, incidencias y comentarios  
->  ->Crear usuarios, incidencias y comentarios  
->  ->Actualizar el estado de la incidencia y los comentarios  
->  ->Eliminar usuarios, incidencias y comentarios  
+>  ->Visualización de usuarios y comentarios  
+>  ->Crear usuarios y comentarios  
+>  ->Actualizar el estado de los comentarios  
+>  ->Eliminar usuarios y comentarios  
   
 -Chat
 > ->Conexión por Socket
 > ->Historial de conversación (infinite scroll)
 > ->Chat room
-> ->Cam showcase
+
+### Ejecutables y documentacion
+A parte de la documentación que se encuentra en este documento, podrás encontrar 
+la documentación técnica y el tutorial en la carpeta "docs".
+Los ejecutables están en la carpeta ejecutables.
 
 ### Run
 Has de tener instalado en el ordenador una versión de java superior a la 8.
