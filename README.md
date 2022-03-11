@@ -31,7 +31,9 @@ Los ejecutables están en la carpeta "ejecutables".
 Has de tener instalado en el ordenador una versión de java superior a la 8.
 Para poder conectarte a la aplicación uno de los usuarios ha de tener activado el servidor. 
 Solo debe haber un servidor y cada cleinte solo puede ejecutar una aplicación de chat. 
-Quien ejecute el servidor ha de tener instalado un gestor de base de datos como MySQL. No es 
+Quien ejecute el servidor ha de tener instalado el gestor de base de datos MySQL e 
+importar el archivo chat.sql encontrado en la raiz de este proyecto. CUIDADO: la 
+importación del archivo sql BORRARÁ cualquier base de datos llamada "chat" existente. No es 
 necesario tener el programa de netbeans ya que se ejecutará a través de un archivo server.jar. 
 Una vez el servidor está activo, los usuarios se pueden conectar al chat, ejecutando
 la aplicación de chat con el archivo chat.jar. Cuando ejecutas el chat, puedes entrar si 

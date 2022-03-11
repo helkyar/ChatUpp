@@ -2,10 +2,10 @@
 -- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Feb 16, 2022 at 12:44 PM
--- Server version: 10.4.22-MariaDB
--- PHP Version: 8.1.2
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 11-03-2022 a las 12:49:03
+-- Versión del servidor: 10.4.22-MariaDB
+-- Versión de PHP: 8.1.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `chat`
+-- Base de datos: `chat`
 --
 DROP DATABASE IF EXISTS `chat`;
 CREATE DATABASE `chat`;
@@ -26,7 +26,7 @@ USE `chat`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chats`
+-- Estructura de tabla para la tabla `chats`
 --
 
 CREATE TABLE `chats` (
@@ -36,11 +36,10 @@ CREATE TABLE `chats` (
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `messages`
+-- Estructura de tabla para la tabla `messages`
 --
 
 CREATE TABLE `messages` (
@@ -53,7 +52,7 @@ CREATE TABLE `messages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `participants`
+-- Estructura de tabla para la tabla `participants`
 --
 
 CREATE TABLE `participants` (
@@ -61,11 +60,10 @@ CREATE TABLE `participants` (
   `chat_id` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Estructura de tabla para la tabla `users`
 --
 
 CREATE TABLE `users` (
@@ -82,18 +80,25 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Indexes for dumped tables
+-- Volcado de datos para la tabla `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `password`, `createdAt`, `email`, `name`, `surname`, `last_ip`, `genre`, `image`) VALUES
+(8, 'admin', '1000:1b3ffd6c51686fe8d3285236617c0eb7:1f8343121f29efc9b13a408ff34ebc6f74a4697879f8b79a163e0cc57700ca441c9277ca085a6d67c324c16fbcde43c2ead3b04ae6ecba0568e1c0a810e31180', '2022-03-11', 'admin', 'admin', 'admin', '192.168.1.126', 'Masculino', 'null');
+
+--
+-- Índices para tablas volcadas
 --
 
 --
--- Indexes for table `chats`
+-- Indices de la tabla `chats`
 --
 ALTER TABLE `chats`
   ADD PRIMARY KEY (`chat_id`),
   ADD UNIQUE KEY `chat_id` (`chat_id`);
 
 --
--- Indexes for table `messages`
+-- Indices de la tabla `messages`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`msg_id`),
@@ -101,14 +106,14 @@ ALTER TABLE `messages`
   ADD KEY `fk_msg_chat` (`chat_id`);
 
 --
--- Indexes for table `participants`
+-- Indices de la tabla `participants`
 --
 ALTER TABLE `participants`
   ADD KEY `chat_key` (`chat_id`) USING BTREE,
   ADD KEY `user_key` (`user_id`) USING BTREE;
 
 --
--- Indexes for table `users`
+-- Indices de la tabla `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
@@ -116,33 +121,33 @@ ALTER TABLE `users`
   ADD KEY `username` (`username`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `messages`
+-- AUTO_INCREMENT de la tabla `messages`
 --
 ALTER TABLE `messages`
   MODIFY `msg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- Constraints for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- Constraints for table `messages`
+-- Filtros para la tabla `messages`
 --
 ALTER TABLE `messages`
   ADD CONSTRAINT `fk_msg_chat` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`chat_id`);
 
 --
--- Constraints for table `participants`
+-- Filtros para la tabla `participants`
 --
 ALTER TABLE `participants`
   ADD CONSTRAINT `fk_chat_key` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`chat_id`),
