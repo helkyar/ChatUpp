@@ -23,9 +23,9 @@ e iniciado sesión.
 > ->Chat room
 
 ### Ejecutables y documentacion
-A parte de la documentación que se encuentra en este documento, podrás encontrar 
+A parte de la información que se encuentra en este documento, podrás encontrar 
 la documentación técnica y el tutorial en la carpeta "docs".
-Los ejecutables están en la carpeta ejecutables.
+Los ejecutables están en la carpeta "ejecutables".
 
 ### Run
 Has de tener instalado en el ordenador una versión de java superior a la 8.
