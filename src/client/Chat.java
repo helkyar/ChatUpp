@@ -74,7 +74,7 @@ public class Chat extends JFrame implements ActionListener{
     //logo del programa
     public static final ImageIcon CHATLOGO = new ImageIcon("img/logo.png");
     public static final Image LOGO = CHATLOGO.getImage();
-    
+    Image icon = new ImageIcon(getClass().getResource("/img/logo.png")).getImage();
     //creacion de jpanels
     private final JPanel chat = new JPanel(); //chat donde la comunicacion ocurre
     //panel en la porte superior donde iran las opcioens de login registro y grupos
@@ -90,6 +90,7 @@ public class Chat extends JFrame implements ActionListener{
         
     //creación de botones
     private ButtonGroup bg = new ButtonGroup();
+
     private final JButton sendbtn = new JButton(new ImageIcon("img/send.png")); //enviar
     private final JButton exitbtn = new JButton("X"); //salir
     private final JButton erasebtn = new JButton("#"); //borrar
@@ -129,6 +130,8 @@ public class Chat extends JFrame implements ActionListener{
     
     public Chat() {
         
+     //Images____________________________________
+         sendbtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/send.png")));
     //POP-UP textarea___________________________________________________ 
         userInfo = new JTextArea(7,20); 
         userInfo.setEditable(false);
@@ -190,8 +193,10 @@ public class Chat extends JFrame implements ActionListener{
         });
             
     //FRAME _________________________________________________________            
-        setTitle("Chatty");     
-        setIconImage(LOGO);
+        setTitle("Chatty"); 
+        Image icon = new ImageIcon(getClass().getResource("/img/logo.png")).getImage();
+            setIconImage(icon);
+//        setIconImage(LOGO);
         setSize(800,600);
            
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -228,13 +233,20 @@ public class Chat extends JFrame implements ActionListener{
             userInfo.append("   Or our server is fucked...\n");
         }).start();
     }
+        public Icon icono(String path, int width, int heigth) {
+        Icon img = new ImageIcon(new ImageIcon(getClass().getResource(path)).getImage()
+                .getScaledInstance(width, heigth, java.awt.Image.SCALE_SMOOTH));
+        return img;
+        }
 //=====================================================================
 //                     USER SESSION
 //=====================================================================
     private void  processSessionStart(){ 
         if(onlyonce){
             StartOptions options = new StartOptions();
-            JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1, CHATLOGO, new Object[]{},null);
+                   
+
+            JOptionPane.showOptionDialog(this, options, "Select a piece", 1, 1,icono("/img/logo.png", 40, 40), new Object[]{},null);
             String slc = options.getSelection();
 
             if(slc.equals("Login")){sessionFrame = new Login();}
@@ -399,7 +411,7 @@ public class Chat extends JFrame implements ActionListener{
                  chatstorage.put(chatid,p.getMsg()); //mesage in case there is a server error it get anounced in the chat
                  //add user btn
                  final String ihatejava = chatid;
-                 JToggleButton btn = new JToggleButton(user+"                ", CHATLOGO);
+                 JToggleButton btn = new JToggleButton(user+"                ",icono("/img/logo.png", 20,20));
                  btn.addActionListener((ActionEvent e) -> {
                      chatID = ihatejava;
                      removeGroupButtons();
@@ -643,7 +655,7 @@ public class Chat extends JFrame implements ActionListener{
       JScrollPane scroll = new JScrollPane(selectuser);
       scroll.setPreferredSize(new Dimension(80,60));
       
-      int option = JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, CHATLOGO, new Object[]{"ok","cancel"},null); 
+      int option = JOptionPane.showOptionDialog(this, scroll, "Select group users", 1, 1, icono("/img/logo.png", 20, 20), new Object[]{"ok","cancel"},null); 
       if(groupUsers.length() > 2){groupUsers = groupUsers.substring(1);}
       
         //SEND SELECTION CONFIRMATION TO SERVER && CANCEL
@@ -713,7 +725,7 @@ public class Chat extends JFrame implements ActionListener{
          //meter mensaje al hashmap
          chatstorage.put(chatid, msg);
          
-         JToggleButton btn = new JToggleButton(user+"                   ", CHATLOGO);
+         JToggleButton btn = new JToggleButton(user+"                   ", icono("/img/logo.png", 20, 20));
          btn.addActionListener((ActionEvent e) -> {
             //unselectButtons(e);
             removeGroupButtons();
@@ -735,7 +747,8 @@ public class Chat extends JFrame implements ActionListener{
      //CREATE SWING COMPONENT FOR GROUPS    
         groupname = groupname.length()<"group    ".length() ? groupname+"            " : groupname;
 
-        JToggleButton gbtn = new JToggleButton(groupname, new ImageIcon("img/group.png"));
+        JToggleButton gbtn = new JToggleButton(groupname, icono("/img/logo.png", 20,20));
+
         gbtn.addActionListener((ActionEvent e) -> {
             //unselectButtons(e);
             addGroupButtons();

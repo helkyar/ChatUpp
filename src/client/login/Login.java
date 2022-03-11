@@ -206,9 +206,9 @@ public class Login extends javax.swing.JFrame {
                 .addGap(28, 28, 28))
         );
 
-        jLabel_user.setIcon(new ImageIcon("img/password.png"));
+        jLabel_user.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/password.png"))); // NOI18N
 
-        jLabel_password.setIcon(new ImageIcon("img/user.png"));
+        jLabel_password.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/user.png"))); // NOI18N
 
         txtUser.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         txtUser.setForeground(new java.awt.Color(153, 153, 153));
@@ -254,7 +254,7 @@ public class Login extends javax.swing.JFrame {
         login.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         login.setForeground(new java.awt.Color(255, 255, 255));
         login.setText("login");
-        login.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        login.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         login.setMaximumSize(new java.awt.Dimension(81, 31));
         login.setMinimumSize(new java.awt.Dimension(81, 31));
         login.setPreferredSize(new java.awt.Dimension(81, 31));
@@ -275,7 +275,7 @@ public class Login extends javax.swing.JFrame {
         jLabel_Create_account.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel_Create_account.setForeground(new java.awt.Color(255, 51, 51));
         jLabel_Create_account.setText(">> ¿No tienes cuenta?  Crea una aquí!");
-        jLabel_Create_account.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel_Create_account.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel_Create_account.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel_Create_accountMouseClicked(evt);
